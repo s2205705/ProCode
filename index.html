@@ -3,1384 +3,1982 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Python Pathfinder: Code & Conquer</title>
-    <link rel="stylesheet" href="main.css">
-    <link rel="stylesheet" href="cute_mode.css">
+    <title>Dashboard — Python Pathfinder</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* small override so demo toggle works on load before other CSS */
+        :root {
+            /* Cute Theme Variables */
+            --cute-primary: #ff6b9d;
+            --cute-secondary: #ffc8dd;
+            --cute-accent: #a2d2ff;
+            --cute-bg: #fff9fb;
+            --cute-text: #333;
+            --cute-card: #ffffff;
+            --cute-border: #ffc8dd;
+            --cute-success: #4CAF50;
+            --cute-warning: #FF9800;
+            --cute-danger: #F44336;
+            
+            /* Deadly Theme Variables */
+            --deadly-primary: #ff4655;
+            --deadly-secondary: #1a1a2e;
+            --deadly-accent: #00ff9d;
+            --deadly-bg: #0d0d15;
+            --deadly-text: #ffffff;
+            --deadly-card: #1a1a2e;
+            --deadly-border: #333;
+            --deadly-success: #00ff9d;
+            --deadly-warning: #ffd166;
+            --deadly-danger: #ff4655;
+            
+            /* Common */
+            --shadow: 0 4px 12px rgba(0,0,0,0.1);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            transition: var(--transition);
+        }
+
+        .cute-theme {
+            background-color: var(--cute-bg);
+            color: var(--cute-text);
+        }
+
+        .deadly-theme {
+            background-color: var(--deadly-bg);
+            color: var(--deadly-text);
+        }
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+
+        .navbar.cute {
+            background: white;
+            border-bottom: 3px solid var(--cute-primary);
+        }
+
+        .navbar.deadly {
+            background: var(--deadly-card);
+            border-bottom: 2px solid var(--deadly-accent);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo.cute {
+            color: var(--cute-primary);
+        }
+
+        .logo.deadly {
+            color: var(--deadly-accent);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+        .nav-link.cute {
+            color: var(--cute-text);
+        }
+
+        .nav-link.cute:hover, .nav-link.cute.active {
+            background: var(--cute-primary);
+            color: white;
+        }
+
+        .nav-link.deadly {
+            color: var(--deadly-text);
+        }
+
+        .nav-link.deadly:hover, .nav-link.deadly.active {
+            background: var(--deadly-accent);
+            color: var(--deadly-bg);
+        }
+
+        .btn {
+            padding: 0.5rem 1.5rem;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn.cute {
+            background: var(--cute-primary);
+            color: white;
+        }
+
+        .btn.cute:hover {
+            background: #ff5590;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 157, 0.3);
+        }
+
+        .btn.deadly {
+            background: var(--deadly-accent);
+            color: var(--deadly-bg);
+        }
+
+        .btn.deadly:hover {
+            background: #00e68a;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 255, 157, 0.3);
+        }
+
+        .btn.small {
+            padding: 0.25rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .btn.outline {
+            background: transparent;
+            border: 2px solid;
+        }
+
+        .btn.outline.cute {
+            border-color: var(--cute-primary);
+            color: var(--cute-primary);
+        }
+
+        .btn.outline.deadly {
+            border-color: var(--deadly-accent);
+            color: var(--deadly-accent);
+        }
+
+        /* Dashboard Layout */
+        .dashboard {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1.5rem;
+        }
+
+        /* Welcome Banner */
+        .welcome-banner {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem;
+            border-radius: var(--radius);
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 200"><path fill="%23ffffff22" d="M0,100 C150,200 350,0 500,100 C650,200 850,0 1000,100 L1000,200 L0,200 Z"/></svg>') bottom center/cover;
+        }
+
+        .welcome-banner.cute {
+            background: linear-gradient(135deg, var(--cute-primary), #ff8ab3);
+            color: white;
+        }
+
+        .welcome-banner.deadly {
+            background: linear-gradient(135deg, var(--deadly-primary), #ff6b7d);
+            color: var(--deadly-text);
+        }
+
+        .welcome-content {
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+
+        .welcome-content h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+        }
+
+        .welcome-content p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 1.5rem;
+        }
+
+        .user-level {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .level-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .xp-progress {
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .xp-bar {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .xp-fill {
+            height: 100%;
+            border-radius: 5px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .welcome-banner.cute .xp-fill {
+            background: white;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .welcome-banner.deadly .xp-fill {
+            background: var(--deadly-accent);
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.5);
+        }
+
+        .xp-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .user-avatar {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin-left: 2rem;
+        }
+
+        .avatar-character {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-banner.cute .avatar-character {
+            background: linear-gradient(135deg, white, var(--cute-accent));
+            border: 4px solid white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .welcome-banner.deadly .avatar-character {
+            background: linear-gradient(135deg, var(--deadly-accent), #000);
+            border: 4px solid var(--deadly-accent);
+            box-shadow: 0 10px 30px rgba(255, 70, 85, 0.3);
+        }
+
+        .avatar-character::after {
+            content: '🐍';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2.5rem;
+        }
+
+        .avatar-status {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid;
+        }
+
+        .welcome-banner.cute .avatar-status {
+            border-color: white;
+            background: #4CAF50;
+            box-shadow: 0 0 10px #4CAF50;
+        }
+
+        .welcome-banner.deadly .avatar-status {
+            border-color: var(--deadly-accent);
+            background: #00ff9d;
+            box-shadow: 0 0 10px #00ff9d;
+        }
+
+        .avatar-status.online::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            grid-column: span 4;
+        }
+
+        .quick-actions h2 {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+        }
+
+        .dashboard.cute .quick-actions h2 {
+            color: var(--cute-primary);
+        }
+
+        .dashboard.deadly .quick-actions h2 {
+            color: var(--deadly-accent);
+        }
+
+        .actions-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .action-card {
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            text-decoration: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+        }
+
+        .dashboard.cute .action-card {
+            background: white;
+            border: 2px solid var(--cute-secondary);
+            color: var(--cute-text);
+        }
+
+        .dashboard.deadly .action-card {
+            background: var(--deadly-card);
+            border: 1px solid var(--deadly-border);
+            color: var(--deadly-text);
+        }
+
+        .action-card:hover {
+            transform: translateX(10px);
+            box-shadow: var(--shadow);
+        }
+
+        .dashboard.cute .action-card:hover {
+            border-color: var(--cute-primary);
+            background: var(--cute-bg);
+        }
+
+        .dashboard.deadly .action-card:hover {
+            border-color: var(--deadly-accent);
+            background: rgba(255, 70, 85, 0.1);
+        }
+
+        .action-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .dashboard.cute .action-icon.continue {
+            background: rgba(255, 107, 157, 0.1);
+            color: var(--cute-primary);
+        }
+
+        .dashboard.cute .action-icon.battle {
+            background: rgba(255, 193, 7, 0.1);
+            color: #FFC107;
+        }
+
+        .dashboard.cute .action-icon.lessons {
+            background: rgba(33, 150, 243, 0.1);
+            color: #2196F3;
+        }
+
+        .dashboard.cute .action-icon.profile {
+            background: rgba(156, 39, 176, 0.1);
+            color: #9C27B0;
+        }
+
+        .dashboard.deadly .action-icon {
+            background: rgba(255, 70, 85, 0.1);
+            color: var(--deadly-accent);
+        }
+
+        .action-card h3 {
+            margin-bottom: 0.25rem;
+            font-size: 1.1rem;
+        }
+
+        .action-card p {
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        /* Stats Overview */
+        .stats-overview {
+            grid-column: span 8;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .stat-card {
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            transition: var(--transition);
+        }
+
+        .dashboard.cute .stat-card {
+            background: white;
+            border: 2px solid var(--cute-secondary);
+        }
+
+        .dashboard.deadly .stat-card {
+            background: var(--deadly-card);
+            border: 1px solid var(--deadly-border);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-header i {
+            font-size: 1.5rem;
+        }
+
+        .dashboard.cute .stat-header {
+            color: var(--cute-primary);
+        }
+
+        .dashboard.deadly .stat-header {
+            color: var(--deadly-accent);
+        }
+
+        .stat-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            line-height: 1;
+        }
+
+        .dashboard.cute .stat-value {
+            color: var(--cute-primary);
+        }
+
+        .dashboard.deadly .stat-value {
+            color: var(--deadly-accent);
+        }
+
+        .stat-trend {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .stat-trend.positive {
+            color: var(--cute-success);
+        }
+
+        .dashboard.deadly .stat-trend.positive {
+            color: var(--deadly-success);
+        }
+
+        .stat-progress {
+            margin-top: 1rem;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #eee;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard.deadly .progress-bar {
+            background: #333;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .dashboard.cute .progress-fill {
+            background: var(--cute-primary);
+        }
+
+        .dashboard.deadly .progress-fill {
+            background: var(--deadly-accent);
+        }
+
+        .achievement-preview {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .achievement-icon {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .dashboard.cute .achievement-icon {
+            background: var(--cute-bg);
+            border: 2px solid var(--cute-secondary);
+        }
+
+        .dashboard.deadly .achievement-icon {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--deadly-border);
+        }
+
+        .achievement-more {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        /* Recent Activity */
+        .recent-activity {
+            grid-column: span 8;
+            margin-top: 1.5rem;
+        }
+
+        .activity-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: var(--radius);
+            transition: var(--transition);
+        }
+
+        .dashboard.cute .activity-item {
+            background: white;
+            border-left: 4px solid var(--cute-primary);
+        }
+
+        .dashboard.deadly .activity-item {
+            background: var(--deadly-card);
+            border-left: 4px solid var(--deadly-accent);
+        }
+
+        .activity-item:hover {
+            transform: translateX(5px);
+        }
+
+        .activity-item.success {
+            border-left-color: var(--cute-success);
+        }
+
+        .activity-item.multiplayer {
+            border-left-color: #FF9800;
+        }
+
+        .activity-item.achievement {
+            border-left-color: #9C27B0;
+        }
+
+        .activity-item.learning {
+            border-left-color: #2196F3;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .dashboard.cute .activity-icon {
+            background: var(--cute-bg);
+        }
+
+        .dashboard.deadly .activity-icon {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .activity-item.success .activity-icon {
+            color: var(--cute-success);
+        }
+
+        .activity-item.multiplayer .activity-icon {
+            color: #FF9800;
+        }
+
+        .activity-item.achievement .activity-icon {
+            color: #9C27B0;
+        }
+
+        .activity-item.learning .activity-icon {
+            color: #2196F3;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-content h4 {
+            margin-bottom: 0.25rem;
+            font-size: 1rem;
+        }
+
+        .activity-meta {
+            font-size: 0.85rem;
+            opacity: 0.7;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .activity-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .activity-item.success .activity-badge {
+            background: var(--cute-success);
+            color: white;
+        }
+
+        .activity-item.multiplayer .activity-badge {
+            background: #FF9800;
+            color: white;
+        }
+
+        .activity-item.achievement .activity-badge {
+            background: #9C27B0;
+            color: white;
+        }
+
+        .activity-item.learning .activity-badge {
+            background: #2196F3;
+            color: white;
+        }
+
+        /* Learning Path */
+        .learning-path {
+            grid-column: span 4;
+            margin-top: 1.5rem;
+        }
+
+        .path-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .path-node {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: var(--radius);
+            transition: var(--transition);
+        }
+
+        .dashboard.cute .path-node {
+            background: white;
+            border: 2px solid var(--cute-secondary);
+        }
+
+        .dashboard.deadly .path-node {
+            background: var(--deadly-card);
+            border: 1px solid var(--deadly-border);
+        }
+
+        .path-node:hover {
+            transform: translateX(5px);
+        }
+
+        .path-node.completed {
+            border-color: var(--cute-success);
+        }
+
+        .path-node.current {
+            border-color: var(--cute-warning);
+            box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.1);
+        }
+
+        .node-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .dashboard.cute .node-icon {
+            background: var(--cute-bg);
+        }
+
+        .dashboard.deadly .node-icon {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .path-node.completed .node-icon {
+            background: var(--cute-success);
+            color: white;
+        }
+
+        .path-node.current .node-icon {
+            background: var(--cute-warning);
+            color: white;
+        }
+
+        .path-node.upcoming .node-icon {
+            color: #9E9E9E;
+        }
+
+        .node-content {
+            flex: 1;
+        }
+
+        .node-content h4 {
+            margin-bottom: 0.25rem;
+            font-size: 1rem;
+        }
+
+        .node-desc {
+            font-size: 0.85rem;
+            opacity: 0.7;
+        }
+
+        .node-action {
+            flex-shrink: 0;
+        }
+
+        /* Multiplayer Stats */
+        .multiplayer-stats {
+            grid-column: span 4;
+            margin-top: 1.5rem;
+        }
+
+        .multiplayer-card {
+            padding: 1.5rem;
+            border-radius: var(--radius);
+        }
+
+        .dashboard.cute .multiplayer-card {
+            background: white;
+            border: 2px solid var(--cute-secondary);
+        }
+
+        .dashboard.deadly .multiplayer-card {
+            background: var(--deadly-card);
+            border: 1px solid var(--deadly-border);
+        }
+
+        .vs-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .player {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .player-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .dashboard.cute .player-avatar {
+            background: var(--cute-primary);
+        }
+
+        .dashboard.deadly .player-avatar {
+            background: var(--deadly-primary);
+        }
+
+        .player-name {
+            font-weight: 600;
+        }
+
+        .vs-label {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--cute-primary);
+        }
+
+        .dashboard.deadly .vs-label {
+            color: var(--deadly-accent);
+        }
+
+        .vs-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .vs-stat {
+            text-align: center;
+        }
+
+        .vs-stat-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 0.25rem;
+        }
+
+        .dashboard.cute .vs-stat-value {
+            color: var(--cute-primary);
+        }
+
+        .dashboard.deadly .vs-stat-value {
+            color: var(--deadly-accent);
+        }
+
+        .vs-stat-label {
+            font-size: 0.85rem;
+            opacity: 0.7;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(45deg); }
+            50% { transform: translateY(-10px) rotate(45deg); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 5px currentColor; }
+            50% { box-shadow: 0 0 20px currentColor; }
+        }
+
+        .animate-in {
+            animation: slideIn 0.5s ease-out forwards;
+            opacity: 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-actions,
+            .stats-overview,
+            .recent-activity,
+            .learning-path,
+            .multiplayer-stats {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                padding: 1rem;
+            }
+            
+            .navbar {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .welcome-banner {
+                flex-direction: column;
+                text-align: center;
+                padding: 1.5rem;
+            }
+            
+            .user-avatar {
+                margin: 1rem auto 0;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .activity-item,
+            .path-node {
+                flex-direction: column;
+                text-align: center;
+                gap: 0.75rem;
+            }
+        }
+
+        /* Achievement Popup */
+        .achievement-popup {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: white;
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--cute-warning);
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+            max-width: 300px;
+        }
+
+        .achievement-popup .achievement-icon {
+            width: 60px;
+            height: 60px;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .achievement-popup h3 {
+            margin-bottom: 0.5rem;
+        }
+
+        .achievement-popup p {
+            opacity: 0.8;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Loading Animation */
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--cute-secondary);
+            border-top-color: var(--cute-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Decorative Elements */
+        .dashboard-decoration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .floating-element {
+            position: absolute;
+            opacity: 0.1;
+            animation: float 20s infinite linear;
+        }
+
+        .cute-element {
+            background: var(--cute-primary);
+            border-radius: 50%;
+        }
+
+        .deadly-element {
+            background: var(--deadly-accent);
+            border-radius: 50%;
+        }
     </style>
 </head>
 <body class="cute-theme">
     <nav class="navbar cute">
-        <a href="dashboard.html" class="logo cute"><i class="fas fa-code"></i> Python Pathfinder</a>
+        <a href="dashboard.html" class="logo cute">
+            <i class="fas fa-code"></i> Python Pathfinder
+        </a>
         <div class="nav-links">
-            <a href="dashboard.html" class="nav-link cute"><i class="fas fa-home"></i> Dashboard</a>
-            <a href="game.html" class="nav-link cute"><i class="fas fa-gamepad"></i> Play</a>
-            <a href="multiplayer.html" class="nav-link cute"><i class="fas fa-users"></i> Multiplayer</a>
-            <a href="lessons.html" class="nav-link cute"><i class="fas fa-book"></i> Lessons</a>
-            <a href="login.html" class="nav-link cute"><i class="fas fa-sign-in-alt"></i> Login</a>
-            <a href="register.html" class="nav-link cute"><i class="fas fa-user-plus"></i> Register</a>
-            <button id="themeToggle" class="btn cute small">Switch to Deadly Mode</button>
+            <a href="dashboard.html" class="nav-link cute active">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a href="game.html" class="nav-link cute">
+                <i class="fas fa-gamepad"></i> Play
+            </a>
+            <a href="multiplayer.html" class="nav-link cute">
+                <i class="fas fa-users"></i> Multiplayer
+            </a>
+            <a href="lessons.html" class="nav-link cute">
+                <i class="fas fa-book"></i> Lessons
+            </a>
+            <button id="themeToggle" class="btn cute small">
+                <i class="fas fa-moon"></i> Deadly Mode
+            </button>
         </div>
     </nav>
 
-    <main>
-<div class="hero cute">
-    <div class="hero-background cute">
-        <div class="cute-elements">
-            <div class="floating-cloud"></div>
-            <div class="floating-cloud"></div>
-            <div class="floating-heart"></div>
-            <div class="floating-star"></div>
-            <div class="mascot cute-mascot"></div>
-        </div>
-        <div class="deadly-elements" style="display:none;">
-            <div class="circuit-grid"></div>
-            <div class="neon-glow"></div>
-            <div class="data-stream"></div>
-            <div class="mascot deadly-mascot"></div>
-        </div>
-    </div>
-    
-    <div class="hero-content cute">
-        <h1 class="hero-title cute">
-            <span class="title-part">Python</span>
-            <span class="title-part">Pathfinder</span>
-            <span class="subtitle cute">Code & Conquer</span>
-        </h1>
-        
-        <p class="hero-description cute">
-            Master Python and Web Development through interactive gameplay.
-            Choose your theme: <span class="theme-highlight cute">Cute Mode</span>
-        </p>
-        
-        <div class="hero-buttons">
-            <a href="register.html" class="btn cute primary"><i class="fas fa-rocket"></i> Start Free Journey</a>
-            <a href="login.html" class="btn cute secondary"><i class="fas fa-sign-in-alt"></i> Login</a>
-            <a href="#features" class="btn cute outline"><i class="fas fa-info-circle"></i> Learn More</a>
-        </div>
-        
-        <div class="hero-stats cute">
-            <div class="stat cute">
-                <div class="stat-value">1,500+</div>
-                <div class="stat-label">Active Coders</div>
+    <main class="dashboard cute">
+        <!-- Welcome Banner -->
+        <div class="welcome-banner cute">
+            <div class="welcome-content">
+                <h1>Welcome back, <span id="username">Coder</span>! 🎉</h1>
+                <p>Your coding journey continues. Keep learning, keep growing!</p>
+                
+                <div class="user-level">
+                    <div class="level-badge">
+                        <i class="fas fa-trophy"></i>
+                        <span id="levelBadge">Level 1 Explorer</span>
+                    </div>
+                    <div class="xp-progress">
+                        <div class="xp-bar">
+                            <div class="xp-fill" id="xpFill" style="width: 0%"></div>
+                        </div>
+                        <div class="xp-text">
+                            <span id="currentXP">0</span> XP
+                            <span id="nextLevelXP">/ 1000 XP to Level 2</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="stat cute">
-                <div class="stat-value">50+</div>
-                <div class="stat-label">Challenges</div>
-            </div>
-            <div class="stat cute">
-                <div class="stat-value">10k+</div>
-                <div class="stat-label">Lines of Code</div>
-            </div>
-            <div class="stat cute">
-                <div class="stat-value">24/7</div>
-                <div class="stat-label">Multiplayer</div>
+            <div class="user-avatar">
+                <div class="avatar-character cute"></div>
+                <div class="avatar-status online"></div>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- (omitted remaining feature sections for brevity — the original CSS/JS handles appearance) -->
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Quick Actions -->
+            <div class="quick-actions cute">
+                <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
+                <div class="actions-grid">
+                    <a href="#" id="continueLink" class="action-card cute">
+                        <div class="action-icon continue">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                        <div>
+                            <h3>Continue Learning</h3>
+                            <p id="continueText">Start your next lesson</p>
+                        </div>
+                    </a>
+                    
+                    <a href="multiplayer.html" class="action-card cute">
+                        <div class="action-icon battle">
+                            <i class="fas fa-crosshairs"></i>
+                        </div>
+                        <div>
+                            <h3>Multiplayer Battle</h3>
+                            <p>Challenge other players</p>
+                        </div>
+                    </a>
+                    
+                    <a href="lessons.html" class="action-card cute">
+                        <div class="action-icon lessons">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        <div>
+                            <h3>Review Lessons</h3>
+                            <p>Brush up on concepts</p>
+                        </div>
+                    </a>
+                    
+                    <a href="#" class="action-card cute" id="profileSettings">
+                        <div class="action-icon profile">
+                            <i class="fas fa-user-cog"></i>
+                        </div>
+                        <div>
+                            <h3>Profile Settings</h3>
+                            <p>Customize your experience</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
 
-<!-- Include the interactive scripts from the original template -->
-<script src="game.js"></script>
-<script>
-// Theme toggle demo + apply theme at runtime
-(function(){
-    const THEME_KEY = 'pp_theme';
-    const btn = document.getElementById('themeToggle');
-    function applyTheme(theme){
-        document.body.classList.remove('cute-theme','deadly-theme');
-        document.body.classList.add(theme + '-theme');
-        document.querySelectorAll('.cute, .deadly').forEach(el => {
-            if(theme==='cute'){ el.classList.remove('deadly'); el.classList.add('cute'); }
-            else { el.classList.remove('cute'); el.classList.add('deadly'); }
-        });
-        // show/hide elements that exist in both variants
-        document.querySelectorAll('.cute-elements').forEach(el => el.style.display = theme==='cute' ? '' : 'none');
-        document.querySelectorAll('.deadly-elements').forEach(el => el.style.display = theme==='deadly' ? '' : 'none');
-        if(btn) btn.innerText = theme === 'cute' ? 'Switch to Deadly Mode' : 'Switch to Cute Mode';
-    }
-    let theme = localStorage.getItem(THEME_KEY) || 'cute';
-    applyTheme(theme);
-    if(btn) btn.addEventListener('click', ()=>{ theme = theme==='cute' ? 'deadly' : 'cute'; localStorage.setItem(THEME_KEY, theme); applyTheme(theme); });
-})();
+            <!-- Stats Overview -->
+            <div class="stats-overview cute">
+                <h2><i class="fas fa-chart-line"></i> Your Progress</h2>
+                <div class="stats-grid">
+                    <div class="stat-card cute">
+                        <div class="stat-header">
+                            <i class="fas fa-star"></i>
+                            <h3>Total XP</h3>
+                        </div>
+                        <div class="stat-value" id="totalXP">0</div>
+                        <div class="stat-trend positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+<span id="weeklyXP">0</span> this week</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card cute">
+                        <div class="stat-header">
+                            <i class="fas fa-check-circle"></i>
+                            <h3>Lessons Completed</h3>
+                        </div>
+                        <div class="stat-value" id="lessonsCompleted">0</div>
+                        <div class="stat-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="lessonsProgress" style="width: 0%"></div>
+                            </div>
+                            <span id="lessonsPercent">0%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card cute">
+                        <div class="stat-header">
+                            <i class="fas fa-trophy"></i>
+                            <h3>Achievements</h3>
+                        </div>
+                        <div class="stat-value" id="achievementsCount">0</div>
+                        <div class="achievement-preview" id="achievementPreview">
+                            <!-- Achievements will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card cute">
+                        <div class="stat-header">
+                            <i class="fas fa-fire"></i>
+                            <h3>Current Streak</h3>
+                        </div>
+                        <div class="stat-value" id="currentStreak">0</div>
+                        <div class="stat-trend positive">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>Keep going! 🔥</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-// Small subset of interactive JS from original index (stat counter + parallax + floating)
-document.addEventListener('DOMContentLoaded', function() {
-    const statValues = document.querySelectorAll('.stat-value');
-    statValues.forEach(stat => {
-        const finalValue = parseInt(stat.textContent.replace(/[^0-9]/g,''));
-        if (!isNaN(finalValue)) {
-            let current = 0;
-            const increment = Math.max(1, Math.floor(finalValue / 50));
-            const timer = setInterval(() => {
-                current += increment;
-                if (current >= finalValue) {
-                    stat.textContent = finalValue.toLocaleString() + (stat.textContent.indexOf('+')!==-1?'+':'');
-                    clearInterval(timer);
-                } else {
-                    stat.textContent = Math.floor(current).toLocaleString();
+            <!-- Recent Activity -->
+            <div class="recent-activity cute">
+                <h2><i class="fas fa-history"></i> Recent Activity</h2>
+                <div class="activity-timeline" id="activityTimeline">
+                    <!-- Activity items will be populated by JavaScript -->
+                    <div class="loading-spinner" style="margin: 2rem auto;"></div>
+                </div>
+            </div>
+
+            <!-- Learning Path -->
+            <div class="learning-path cute">
+                <h2><i class="fas fa-road"></i> Learning Path</h2>
+                <div class="path-container" id="pathContainer">
+                    <!-- Path nodes will be populated by JavaScript -->
+                    <div class="loading-spinner" style="margin: 2rem auto;"></div>
+                </div>
+            </div>
+
+            <!-- Multiplayer Stats -->
+            <div class="multiplayer-stats cute">
+                <h2><i class="fas fa-swords"></i> Multiplayer Stats</h2>
+                <div class="multiplayer-card">
+                    <div class="vs-header">
+                        <div class="player">
+                            <div class="player-avatar" id="playerAvatar"></div>
+                            <div class="player-name" id="playerName">You</div>
+                        </div>
+                        <div class="vs-label">VS</div>
+                        <div class="player">
+                            <div class="player-avatar opponent"></div>
+                            <div class="player-name">Opponent</div>
+                        </div>
+                    </div>
+                    
+                    <div class="vs-stats">
+                        <div class="vs-stat">
+                            <div class="vs-stat-value" id="winRate">0%</div>
+                            <div class="vs-stat-label">Win Rate</div>
+                        </div>
+                        <div class="vs-stat">
+                            <div class="vs-stat-value" id="totalMatches">0</div>
+                            <div class="vs-stat-label">Matches</div>
+                        </div>
+                        <div class="vs-stat">
+                            <div class="vs-stat-value" id="rating">1200</div>
+                            <div class="vs-stat-label">Rating</div>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 1.5rem;">
+                        <a href="multiplayer.html" class="btn cute">
+                            <i class="fas fa-play"></i> Play Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Dashboard Decoration -->
+    <div class="dashboard-decoration" id="dashboardDecoration"></div>
+
+    <script>
+        // ==================== PROGRESS TRACKING SYSTEM ====================
+        class DashboardProgress {
+            constructor() {
+                this.STORAGE_KEYS = {
+                    USER_PROFILE: 'pp_user_profile',
+                    XP: 'pp_total_xp',
+                    STREAK: 'pp_streak',
+                    LESSONS: 'pp_completed_lessons',
+                    ACHIEVEMENTS: 'pp_achievements',
+                    ACTIVITY: 'pp_recent_activity',
+                    WEEKLY_XP: 'pp_weekly_xp',
+                    LAST_ACTIVE: 'pp_last_active'
+                };
+                
+                this.userProfile = {
+                    username: 'Coder',
+                    level: 1,
+                    avatar: 'snake'
+                };
+                
+                this.levels = [
+                    { level: 1, name: 'Explorer', xpRequired: 0 },
+                    { level: 2, name: 'Novice', xpRequired: 1000 },
+                    { level: 3, name: 'Apprentice', xpRequired: 2500 },
+                    { level: 4, name: 'Adept', xpRequired: 5000 },
+                    { level: 5, name: 'Expert', xpRequired: 10000 },
+                    { level: 6, name: 'Master', xpRequired: 20000 },
+                    { level: 7, name: 'Grandmaster', xpRequired: 40000 }
+                ];
+                
+                this.loadProgress();
+                this.updateStreak();
+            }
+
+            loadProgress() {
+                // Load user profile
+                const savedProfile = localStorage.getItem(this.STORAGE_KEYS.USER_PROFILE);
+                if (savedProfile) {
+                    this.userProfile = { ...this.userProfile, ...JSON.parse(savedProfile) };
                 }
-            }, 30);
+                
+                // Load progress data
+                this.totalXP = parseInt(localStorage.getItem(this.STORAGE_KEYS.XP) || '0');
+                this.streak = JSON.parse(localStorage.getItem(this.STORAGE_KEYS.STREAK) || '{"days": 0, "lastDate": ""}');
+                this.completedLessons = JSON.parse(localStorage.getItem(this.STORAGE_KEYS.LESSONS) || '[]');
+                this.achievements = JSON.parse(localStorage.getItem(this.STORAGE_KEYS.ACHIEVEMENTS) || '[]');
+                this.recentActivity = JSON.parse(localStorage.getItem(this.STORAGE_KEYS.ACTIVITY) || '[]');
+                this.weeklyXP = parseInt(localStorage.getItem(this.STORAGE_KEYS.WEEKLY_XP) || '0');
+                
+                // Initialize achievements if empty
+                if (this.achievements.length === 0) {
+                    this.initializeAchievements();
+                }
+                
+                // Initialize recent activity if empty
+                if (this.recentActivity.length === 0) {
+                    this.initializeRecentActivity();
+                }
+                
+                this.saveProgress();
+            }
+
+            saveProgress() {
+                localStorage.setItem(this.STORAGE_KEYS.USER_PROFILE, JSON.stringify(this.userProfile));
+                localStorage.setItem(this.STORAGE_KEYS.XP, this.totalXP.toString());
+                localStorage.setItem(this.STORAGE_KEYS.STREAK, JSON.stringify(this.streak));
+                localStorage.setItem(this.STORAGE_KEYS.LESSONS, JSON.stringify(this.completedLessons));
+                localStorage.setItem(this.STORAGE_KEYS.ACHIEVEMENTS, JSON.stringify(this.achievements));
+                localStorage.setItem(this.STORAGE_KEYS.ACTIVITY, JSON.stringify(this.recentActivity));
+                localStorage.setItem(this.STORAGE_KEYS.WEEKLY_XP, this.weeklyXP.toString());
+                localStorage.setItem(this.STORAGE_KEYS.LAST_ACTIVE, new Date().toISOString());
+            }
+
+            updateStreak() {
+                const today = new Date().toDateString();
+                const yesterday = new Date(Date.now() - 86400000).toDateString();
+                
+                if (this.streak.lastDate === today) return;
+                
+                if (this.streak.lastDate === yesterday) {
+                    this.streak.days++;
+                    this.addActivity('streak_continued', `🔥 Streak extended to ${this.streak.days} days!`);
+                } else if (!this.streak.lastDate) {
+                    this.streak.days = 1;
+                    this.addActivity('streak_started', '🎯 Daily streak started!');
+                } else {
+                    this.streak.days = 1;
+                    this.addActivity('streak_reset', '🔄 Streak reset - new day, new start!');
+                }
+                
+                this.streak.lastDate = today;
+                this.saveProgress();
+            }
+
+            addActivity(type, title, details = {}) {
+                const activity = {
+                    id: Date.now(),
+                    type,
+                    title,
+                    details,
+                    timestamp: new Date().toISOString(),
+                    xp: details.xp || 0
+                };
+                
+                this.recentActivity.unshift(activity);
+                
+                // Keep only last 10 activities
+                if (this.recentActivity.length > 10) {
+                    this.recentActivity = this.recentActivity.slice(0, 10);
+                }
+                
+                this.saveProgress();
+                return activity;
+            }
+
+            awardXP(amount, source) {
+                const oldXP = this.totalXP;
+                const oldLevel = this.getCurrentLevel();
+                
+                this.totalXP += amount;
+                this.weeklyXP += amount;
+                
+                // Add activity
+                this.addActivity('xp_earned', `🎉 +${amount} XP Earned`, {
+                    source,
+                    xp: amount,
+                    total: this.totalXP
+                });
+                
+                // Check for level up
+                const newLevel = this.getCurrentLevel();
+                if (newLevel.level > oldLevel.level) {
+                    this.addActivity('level_up', `🚀 Level Up! ${oldLevel.name} → ${newLevel.name}`, {
+                        oldLevel: oldLevel.level,
+                        newLevel: newLevel.level
+                    });
+                    
+                    // Check for achievements
+                    this.checkAchievements();
+                }
+                
+                this.saveProgress();
+                return { oldXP, newXP: this.totalXP, levelUp: newLevel.level > oldLevel.level };
+            }
+
+            completeLesson(lessonId) {
+                if (!this.completedLessons.includes(lessonId)) {
+                    this.completedLessons.push(lessonId);
+                    
+                    // Award XP for completing a lesson
+                    const xpReward = 250; // Base XP for completing a lesson
+                    this.awardXP(xpReward, `Completed lesson: ${lessonId}`);
+                    
+                    // Add activity
+                    this.addActivity('lesson_completed', '✅ Lesson Completed', {
+                        lessonId,
+                        xp: xpReward
+                    });
+                    
+                    this.saveProgress();
+                    return true;
+                }
+                return false;
+            }
+
+            getCurrentLevel() {
+                for (let i = this.levels.length - 1; i >= 0; i--) {
+                    if (this.totalXP >= this.levels[i].xpRequired) {
+                        return this.levels[i];
+                    }
+                }
+                return this.levels[0];
+            }
+
+            getNextLevel() {
+                const currentLevel = this.getCurrentLevel();
+                const nextLevel = this.levels.find(level => level.level === currentLevel.level + 1);
+                return nextLevel || null;
+            }
+
+            getLevelProgress() {
+                const currentLevel = this.getCurrentLevel();
+                const nextLevel = this.getNextLevel();
+                
+                if (!nextLevel) {
+                    return { percent: 100, xpToNext: 0 };
+                }
+                
+                const xpInLevel = nextLevel.xpRequired - currentLevel.xpRequired;
+                const xpProgress = this.totalXP - currentLevel.xpRequired;
+                const percent = Math.min(100, (xpProgress / xpInLevel) * 100);
+                
+                return {
+                    percent,
+                    xpToNext: nextLevel.xpRequired - this.totalXP,
+                    currentLevel,
+                    nextLevel
+                };
+            }
+
+            initializeAchievements() {
+                this.achievements = [
+                    { id: 'first_lesson', name: 'First Steps', icon: '👣', unlocked: false, xp: 100 },
+                    { id: 'level_5', name: 'Python Prodigy', icon: '🐍', unlocked: false, xp: 500 },
+                    { id: 'streak_7', name: 'Consistency King', icon: '🔥', unlocked: false, xp: 300 },
+                    { id: 'lessons_10', name: 'Dedicated Learner', icon: '📚', unlocked: false, xp: 750 },
+                    { id: 'xp_10000', name: 'Master Coder', icon: '👑', unlocked: false, xp: 1000 }
+                ];
+                
+                // Check which achievements are already unlocked
+                this.checkAchievements();
+            }
+
+            checkAchievements() {
+                const unlockedAchievements = [];
+                
+                this.achievements.forEach(achievement => {
+                    if (achievement.unlocked) return;
+                    
+                    let shouldUnlock = false;
+                    
+                    switch (achievement.id) {
+                        case 'first_lesson':
+                            shouldUnlock = this.completedLessons.length >= 1;
+                            break;
+                        case 'level_5':
+                            shouldUnlock = this.getCurrentLevel().level >= 5;
+                            break;
+                        case 'streak_7':
+                            shouldUnlock = this.streak.days >= 7;
+                            break;
+                        case 'lessons_10':
+                            shouldUnlock = this.completedLessons.length >= 10;
+                            break;
+                        case 'xp_10000':
+                            shouldUnlock = this.totalXP >= 10000;
+                            break;
+                    }
+                    
+                    if (shouldUnlock) {
+                        achievement.unlocked = true;
+                        unlockedAchievements.push(achievement);
+                        
+                        // Award XP for achievement
+                        this.awardXP(achievement.xp, `Achievement: ${achievement.name}`);
+                        
+                        // Add activity
+                        this.addActivity('achievement_unlocked', `🏆 Achievement: ${achievement.name}`, {
+                            achievement: achievement.id,
+                            xp: achievement.xp
+                        });
+                    }
+                });
+                
+                if (unlockedAchievements.length > 0) {
+                    this.saveProgress();
+                    return unlockedAchievements;
+                }
+                
+                return [];
+            }
+
+            initializeRecentActivity() {
+                this.recentActivity = [
+                    {
+                        id: 1,
+                        type: 'welcome',
+                        title: '🎯 Welcome to Python Pathfinder!',
+                        details: { message: 'Start your coding journey' },
+                        timestamp: new Date(Date.now() - 86400000 * 2).toISOString(),
+                        xp: 0
+                    }
+                ];
+                this.saveProgress();
+            }
+
+            getUnlockedAchievements() {
+                return this.achievements.filter(a => a.unlocked);
+            }
         }
-    });
 
-    window.addEventListener('scroll', function() {
-        const scrolled = window.pageYOffset;
-        const heroBg = document.querySelector('.hero-background');
-        if (heroBg) { heroBg.style.transform = `translateY(${scrolled * 0.5}px)`; }
-    });
+        // ==================== DASHBOARD INITIALIZATION ====================
+        const dashboard = new DashboardProgress();
+        let currentTheme = localStorage.getItem('pp_theme') || 'cute';
 
-    if (document.body.classList.contains('cute-theme')) { /* createFloatingElements from game.js will handle it if present */ }
-});
-</script>
+        function applyTheme(theme) {
+            currentTheme = theme;
+            document.body.className = theme + '-theme';
+            
+            // Update all theme-specific elements
+            document.querySelectorAll('.cute, .deadly').forEach(el => {
+                el.classList.remove('cute', 'deadly');
+                el.classList.add(theme);
+            });
+            
+            // Update toggle button text
+            const toggleBtn = document.getElementById('themeToggle');
+            if (toggleBtn) {
+                toggleBtn.innerHTML = theme === 'cute' 
+                    ? '<i class="fas fa-moon"></i> Deadly Mode'
+                    : '<i class="fas fa-sun"></i> Cute Mode';
+            }
+            
+            localStorage.setItem('pp_theme', theme);
+            
+            // Update decorative elements
+            updateDecorativeElements();
+        }
 
-<footer class="cute-footer">
-    <div class="footer-content">
-        <p>Python Pathfinder: Code & Conquer &copy; 2024</p>
-        <p>Learn Python and Web Development through play!</p>
-        <div class="footer-links">
-            <a href="#">Privacy Policy</a> | 
-            <a href="#">Terms of Service</a> | 
-            <a href="#">Contact</a>
-        </div>
-    </div>
-</footer>
-</main>
+        function updateDashboardUI() {
+            // Update user profile
+            document.getElementById('username').textContent = dashboard.userProfile.username;
+            
+            // Update level and XP
+            const currentLevel = dashboard.getCurrentLevel();
+            const levelProgress = dashboard.getLevelProgress();
+            const nextLevel = dashboard.getNextLevel();
+            
+            document.getElementById('levelBadge').textContent = `Level ${currentLevel.level} ${currentLevel.name}`;
+            document.getElementById('xpFill').style.width = `${levelProgress.percent}%`;
+            document.getElementById('currentXP').textContent = dashboard.totalXP.toLocaleString();
+            
+            if (nextLevel) {
+                document.getElementById('nextLevelXP').textContent = `/ ${nextLevel.xpRequired} XP to Level ${nextLevel.level}`;
+            } else {
+                document.getElementById('nextLevelXP').textContent = 'Max Level Reached! 🎉';
+            }
+            
+            // Update stats
+            document.getElementById('totalXP').textContent = dashboard.totalXP.toLocaleString();
+            document.getElementById('weeklyXP').textContent = dashboard.weeklyXP;
+            document.getElementById('lessonsCompleted').textContent = dashboard.completedLessons.length;
+            document.getElementById('achievementsCount').textContent = dashboard.getUnlockedAchievements().length;
+            document.getElementById('currentStreak').textContent = dashboard.streak.days;
+            
+            // Update progress bars
+            const lessonPercent = Math.min(100, (dashboard.completedLessons.length / 20) * 100);
+            document.getElementById('lessonsProgress').style.width = `${lessonPercent}%`;
+            document.getElementById('lessonsPercent').textContent = `${Math.round(lessonPercent)}%`;
+            
+            // Update continue link
+            const nextLesson = dashboard.completedLessons.length + 1;
+            document.getElementById('continueText').textContent = `Start Lesson ${nextLesson}`;
+            document.getElementById('continueLink').href = `lessons.html?lesson=${nextLesson}`;
+            
+            // Update achievements preview
+            updateAchievementsPreview();
+            
+            // Update activity timeline
+            updateActivityTimeline();
+            
+            // Update learning path
+            updateLearningPath();
+            
+            // Update multiplayer stats
+            updateMultiplayerStats();
+        }
+
+        function updateAchievementsPreview() {
+            const container = document.getElementById('achievementPreview');
+            const unlocked = dashboard.getUnlockedAchievements().slice(0, 5);
+            
+            container.innerHTML = '';
+            
+            unlocked.forEach(achievement => {
+                const icon = document.createElement('div');
+                icon.className = `achievement-icon ${currentTheme}`;
+                icon.textContent = achievement.icon;
+                icon.title = achievement.name;
+                container.appendChild(icon);
+            });
+            
+            if (unlocked.length === 0) {
+                const placeholder = document.createElement('span');
+                placeholder.className = 'achievement-more';
+                placeholder.textContent = 'No achievements yet';
+                container.appendChild(placeholder);
+            } else if (unlocked.length < dashboard.achievements.length) {
+                const more = document.createElement('span');
+                more.className = 'achievement-more';
+                more.textContent = `+${dashboard.achievements.length - unlocked.length} more`;
+                container.appendChild(more);
+            }
+        }
+
+        function updateActivityTimeline() {
+            const container = document.getElementById('activityTimeline');
+            container.innerHTML = '';
+            
+            if (dashboard.recentActivity.length === 0) {
+                container.innerHTML = '<p style="text-align: center; padding: 2rem; opacity: 0.7;">No recent activity</p>';
+                return;
+            }
+            
+            dashboard.recentActivity.forEach((activity, index) => {
+                const activityEl = document.createElement('div');
+                activityEl.className = `activity-item ${currentTheme}`;
+                activityEl.style.animationDelay = `${index * 0.1}s`;
+                
+                // Determine activity type class
+                let typeClass = 'learning';
+                if (activity.type.includes('achievement')) typeClass = 'achievement';
+                if (activity.type.includes('xp')) typeClass = 'success';
+                if (activity.type.includes('streak')) typeClass = 'multiplayer';
+                if (activity.type.includes('level')) typeClass = 'success';
+                
+                activityEl.classList.add(typeClass);
+                
+                // Format timestamp
+                const timeAgo = getTimeAgo(new Date(activity.timestamp));
+                
+                activityEl.innerHTML = `
+                    <div class="activity-icon">
+                        <i class="fas fa-${getActivityIcon(activity.type)}"></i>
+                    </div>
+                    <div class="activity-content">
+                        <h4>${activity.title}</h4>
+                        <div class="activity-meta">
+                            <span>${timeAgo}</span>
+                            ${activity.xp > 0 ? `<span>+${activity.xp} XP</span>` : ''}
+                        </div>
+                    </div>
+                    ${activity.xp > 0 ? '<span class="activity-badge">+' + activity.xp + ' XP</span>' : ''}
+                `;
+                
+                container.appendChild(activityEl);
+            });
+            
+            // Add animation class
+            setTimeout(() => {
+                container.querySelectorAll('.activity-item').forEach(item => {
+                    item.classList.add('animate-in');
+                });
+            }, 100);
+        }
+
+        function updateLearningPath() {
+            const container = document.getElementById('pathContainer');
+            container.innerHTML = '';
+            
+            const lessonNames = [
+                'Python Variables & Data Types',
+                'Control Flow & Loops',
+                'Functions & Modules',
+                'Lists & Dictionaries',
+                'Object-Oriented Python',
+                'Error Handling',
+                'File Operations',
+                'Web Development Basics',
+                'Flask Framework',
+                'Database Integration'
+            ];
+            
+            for (let i = 1; i <= 10; i++) {
+                const isCompleted = i <= dashboard.completedLessons.length;
+                const isCurrent = i === dashboard.completedLessons.length + 1;
+                const isUpcoming = i > dashboard.completedLessons.length + 1;
+                
+                const node = document.createElement('div');
+                node.className = `path-node ${currentTheme}`;
+                
+                if (isCompleted) node.classList.add('completed');
+                if (isCurrent) node.classList.add('current');
+                if (isUpcoming) node.classList.add('upcoming');
+                
+                const iconClass = isCompleted ? 'fas fa-check-circle' : 
+                                 isCurrent ? 'fas fa-play-circle' : 
+                                 'fas fa-lock';
+                
+                const buttonText = isCompleted ? 'Review' : 
+                                  isCurrent ? 'Continue' : 
+                                  'Locked';
+                
+                const buttonHref = isCompleted || isCurrent ? `lessons.html?lesson=${i}` : '#';
+                
+                node.innerHTML = `
+                    <div class="node-icon">
+                        <i class="${iconClass}"></i>
+                    </div>
+                    <div class="node-content">
+                        <h4>Lesson ${i}</h4>
+                        <p class="node-desc">${lessonNames[i-1] || 'Advanced Topic'}</p>
+                    </div>
+                    <a href="${buttonHref}" class="node-action btn ${currentTheme} small">
+                        ${buttonText}
+                    </a>
+                `;
+                
+                container.appendChild(node);
+            }
+        }
+
+        function updateMultiplayerStats() {
+            // Simulate multiplayer stats (in a real app, this would come from backend)
+            const winRate = Math.min(100, Math.max(10, Math.floor((dashboard.totalXP / 10000) * 100)));
+            const totalMatches = Math.floor(dashboard.totalXP / 100);
+            const rating = 1200 + Math.floor(dashboard.totalXP / 10);
+            
+            document.getElementById('winRate').textContent = `${winRate}%`;
+            document.getElementById('totalMatches').textContent = totalMatches;
+            document.getElementById('rating').textContent = rating;
+            
+            // Update player avatar based on level
+            const playerAvatar = document.getElementById('playerAvatar');
+            const avatarColors = ['#ff6b9d', '#4CAF50', '#2196F3', '#FF9800', '#9C27B0'];
+            const colorIndex = Math.min(avatarColors.length - 1, Math.floor(dashboard.getCurrentLevel().level / 2));
+            playerAvatar.style.background = avatarColors[colorIndex];
+        }
+
+        function getActivityIcon(type) {
+            const icons = {
+                'lesson_completed': 'check-circle',
+                'xp_earned': 'star',
+                'level_up': 'trophy',
+                'achievement_unlocked': 'award',
+                'streak_continued': 'fire',
+                'streak_started': 'bolt',
+                'streak_reset': 'redo',
+                'welcome': 'hand-sparkles'
+            };
+            
+            return icons[type] || 'circle';
+        }
+
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+            
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+            return date.toLocaleDateString();
+        }
+
+        function updateDecorativeElements() {
+            const container = document.getElementById('dashboardDecoration');
+            container.innerHTML = '';
+            
+            // Add floating elements
+            for (let i = 0; i < 20; i++) {
+                const element = document.createElement('div');
+                element.className = `floating-element ${currentTheme === 'cute' ? 'cute-element' : 'deadly-element'}`;
+                
+                const size = 20 + Math.random() * 60;
+                const duration = 20 + Math.random() * 40;
+                const delay = Math.random() * 20;
+                
+                element.style.cssText = `
+                    width: ${size}px;
+                    height: ${size}px;
+                    left: ${Math.random() * 100}%;
+                    top: ${Math.random() * 100}%;
+                    animation-duration: ${duration}s;
+                    animation-delay: -${delay}s;
+                    opacity: ${0.03 + Math.random() * 0.07};
+                `;
+                
+                container.appendChild(element);
+            }
+        }
+
+        function showAchievementPopup(achievement) {
+            const popup = document.createElement('div');
+            popup.className = 'achievement-popup';
+            popup.innerHTML = `
+                <div class="achievement-icon" style="background: linear-gradient(135deg, var(--cute-primary), var(--cute-accent)); color: white;">
+                    ${achievement.icon}
+                </div>
+                <h3>🏆 Achievement Unlocked!</h3>
+                <p><strong>${achievement.name}</strong></p>
+                <p>+${achievement.xp} XP</p>
+                <button class="btn cute small" onclick="this.parentElement.remove()">Awesome!</button>
+            `;
+            
+            document.body.appendChild(popup);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (popup.parentElement) {
+                    popup.remove();
+                }
+            }, 5000);
+        }
+
+        function simulateActivity() {
+            // Simulate some initial activity for demo purposes
+            if (dashboard.completedLessons.length === 0) {
+                // Complete first lesson
+                dashboard.completeLesson('python_basics');
+                
+                // Award some XP
+                dashboard.awardXP(250, 'Welcome bonus');
+                
+                // Check for achievements
+                const newAchievements = dashboard.checkAchievements();
+                newAchievements.forEach(achievement => {
+                    setTimeout(() => showAchievementPopup(achievement), 1000);
+                });
+            }
+        }
+
+        // ==================== INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Apply theme
+            applyTheme(currentTheme);
+            
+            // Setup theme toggle
+            document.getElementById('themeToggle').addEventListener('click', () => {
+                applyTheme(currentTheme === 'cute' ? 'deadly' : 'cute');
+                updateDashboardUI();
+            });
+            
+            // Setup profile settings click
+            document.getElementById('profileSettings').addEventListener('click', (e) => {
+                e.preventDefault();
+                const newName = prompt('Enter your display name:', dashboard.userProfile.username);
+                if (newName && newName.trim()) {
+                    dashboard.userProfile.username = newName.trim();
+                    dashboard.saveProgress();
+                    updateDashboardUI();
+                }
+            });
+            
+            // Setup action card animations
+            document.querySelectorAll('.action-card').forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateX(10px)';
+                    this.style.boxShadow = '0 15px 30px rgba(0,0,0,0.2)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateX(0)';
+                    this.style.boxShadow = '';
+                });
+            });
+            
+            // Simulate initial activity for demo
+            simulateActivity();
+            
+            // Update UI with current progress
+            updateDashboardUI();
+            
+            // Add floating elements
+            updateDecorativeElements();
+            
+            // Check for new achievements
+            const newAchievements = dashboard.checkAchievements();
+            newAchievements.forEach(achievement => {
+                setTimeout(() => showAchievementPopup(achievement), 2000);
+            });
+        });
+
+        // Export dashboard for other pages to use
+        window.dashboardProgress = dashboard;
+    </script>
 </body>
 </html>
-
-{% extends "base.html" %}
-
-{% block content %}
-<div class="hero {{ theme }}">
-    <div class="hero-background {{ theme }}">
-        {% if theme == 'cute' %}
-        <div class="cute-elements">
-            <div class="floating-cloud"></div>
-            <div class="floating-cloud"></div>
-            <div class="floating-heart"></div>
-            <div class="floating-star"></div>
-            <div class="mascot cute-mascot"></div>
-        </div>
-        {% else %}
-        <div class="deadly-elements">
-            <div class="circuit-grid"></div>
-            <div class="neon-glow"></div>
-            <div class="data-stream"></div>
-            <div class="mascot deadly-mascot"></div>
-        </div>
-        {% endif %}
-    </div>
-    
-    <div class="hero-content {{ theme }}">
-        <h1 class="hero-title {{ theme }}">
-            <span class="title-part">Python</span>
-            <span class="title-part">Pathfinder</span>
-            <span class="subtitle {{ theme }}">Code & Conquer</span>
-        </h1>
-        
-        <p class="hero-description {{ theme }}">
-            Master Python and Web Development through interactive gameplay.
-            Choose your theme: <span class="theme-highlight {{ theme }}">{{ theme|title }} Mode</span>
-        </p>
-        
-        <div class="hero-buttons">
-            {% if session.username %}
-            <a href="{{ url_for('dashboard') }}" class="btn {{ theme }} primary">
-                <i class="fas fa-play-circle"></i> Continue Adventure
-            </a>
-            {% else %}
-            <a href="{{ url_for('register') }}" class="btn {{ theme }} primary">
-                <i class="fas fa-rocket"></i> Start Free Journey
-            </a>
-            <a href="{{ url_for('login') }}" class="btn {{ theme }} secondary">
-                <i class="fas fa-sign-in-alt"></i> Login
-            </a>
-            {% endif %}
-            <a href="#features" class="btn {{ theme }} outline">
-                <i class="fas fa-info-circle"></i> Learn More
-            </a>
-        </div>
-        
-        <div class="hero-stats {{ theme }}">
-            <div class="stat {{ theme }}">
-                <div class="stat-value">1,500+</div>
-                <div class="stat-label">Active Coders</div>
-            </div>
-            <div class="stat {{ theme }}">
-                <div class="stat-value">50+</div>
-                <div class="stat-label">Challenges</div>
-            </div>
-            <div class="stat {{ theme }}">
-                <div class="stat-value">10k+</div>
-                <div class="stat-label">Lines of Code</div>
-            </div>
-            <div class="stat {{ theme }}">
-                <div class="stat-value">24/7</div>
-                <div class="stat-label">Multiplayer</div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Features Section -->
-<section id="features" class="features-section {{ theme }}">
-    <div class="container">
-        <h2 class="section-title {{ theme }}">
-            <i class="fas fa-star"></i> Why Choose Python Pathfinder?
-        </h2>
-        <p class="section-subtitle {{ theme }}">
-            An interactive learning platform that turns coding education into an exciting adventure
-        </p>
-        
-        <div class="features-grid">
-            <div class="feature-card {{ theme }}">
-                <div class="feature-icon {{ theme }}">
-                    <i class="fas fa-gamepad"></i>
-                </div>
-                <h3>Game-Based Learning</h3>
-                <p>Learn Python and web development through interactive challenges and puzzles</p>
-                <ul class="feature-list">
-                    <li>Progressive difficulty levels</li>
-                    <li>Real-time code execution</li>
-                    <li>Instant feedback and hints</li>
-                </ul>
-            </div>
-            
-            <div class="feature-card {{ theme }}">
-                <div class="feature-icon {{ theme }}">
-                    <i class="fas fa-users"></i>
-                </div>
-                <h3>Multiplayer Battles</h3>
-                <p>Challenge other players in real-time coding duels and tournaments</p>
-                <ul class="feature-list">
-                    <li>1v1 coding battles</li>
-                    <li>Team competitions</li>
-                    <li>Global leaderboards</li>
-                </ul>
-            </div>
-            
-            <div class="feature-card {{ theme }}">
-                <div class="feature-icon {{ theme }}">
-                    <i class="fas fa-palette"></i>
-                </div>
-                <h3>Dual Themes</h3>
-                <p>Choose between Cute and Deadly visual styles for your coding journey</p>
-                <ul class="feature-list">
-                    <li>Cute: Friendly, colorful interface</li>
-                    <li>Deadly: Dark, cyberpunk aesthetic</li>
-                    <li>Switch themes anytime</li>
-                </ul>
-            </div>
-            
-            <div class="feature-card {{ theme }}">
-                <div class="feature-icon {{ theme }}">
-                    <i class="fas fa-road"></i>
-                </div>
-                <h3>Structured Path</h3>
-                <p>Follow a carefully designed learning path from beginner to advanced</p>
-                <ul class="feature-list">
-                    <li>Python fundamentals</li>
-                    <li>Web development (HTML/CSS/JS)</li>
-                    <li>Flask and database skills</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Learning Path Section -->
-<section class="learning-path-section {{ theme }}">
-    <div class="container">
-        <h2 class="section-title {{ theme }}">
-            <i class="fas fa-map-signs"></i> Your Coding Journey
-        </h2>
-        
-        <div class="path-timeline {{ theme }}">
-            {% for level in range(1, 11) %}
-            <div class="path-step {{ theme }}">
-                <div class="step-number">{{ level }}</div>
-                <div class="step-content">
-                    <h4>
-                        {% if level == 1 %}Python Basics{% endif %}
-                        {% if level == 2 %}Functions & Loops{% endif %}
-                        {% if level == 3 %}HTML Fundamentals{% endif %}
-                        {% if level == 4 %}CSS Styling{% endif %}
-                        {% if level == 5 %}JavaScript Basics{% endif %}
-                        {% if level == 6 %}Python OOP{% endif %}
-                        {% if level == 7 %}Flask Introduction{% endif %}
-                        {% if level == 8 %}Database CRUD{% endif %}
-                        {% if level == 9 %}API Development{% endif %}
-                        {% if level == 10 %}Capstone Project{% endif %}
-                    </h4>
-                    <p>
-                        {% if level == 1 %}Variables, data types, and basic operations{% endif %}
-                        {% if level == 2 %}Control structures and reusable code{% endif %}
-                        {% if level == 3 %}Building web page structures{% endif %}
-                        {% if level == 4 %}Styling and layout techniques{% endif %}
-                        {% if level == 5 %}Interactive web elements{% endif %}
-                        {% if level == 6 %}Object-oriented programming concepts{% endif %}
-                        {% if level == 7 %}Building web applications{% endif %}
-                        {% if level == 8 %}Data storage and retrieval{% endif %}
-                        {% if level == 9 %}Creating and consuming APIs{% endif %}
-                        {% if level == 10 %}Build a full-stack application{% endif %}
-                    </p>
-                </div>
-                <div class="step-reward">
-                    <span class="reward-badge {{ theme }}">{{ level * 100 }} pts</span>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-</section>
-
-<!-- Theme Preview Section -->
-<section class="theme-preview-section {{ theme }}">
-    <div class="container">
-        <h2 class="section-title {{ theme }}">
-            <i class="fas fa-magic"></i> Choose Your Style
-        </h2>
-        
-        <div class="theme-comparison {{ theme }}">
-            <div class="theme-option {{ theme }} cute-preview">
-                <div class="theme-header">
-                    <h3><i class="fas fa-heart"></i> Cute Mode</h3>
-                    <div class="theme-tag">Friendly & Playful</div>
-                </div>
-                <div class="theme-features">
-                    <div class="feature">
-                        <i class="fas fa-check-circle"></i>
-                        <span>Pastel color scheme</span>
-                    </div>
-                    <div class="feature">
-                        <i class="fas fa-check-circle"></i>
-                        <span>Friendly characters</span>
-                    </div>
-                    <div class="feature">
-                        <i class="fas fa-check-circle"></i>
-                        <span>Soft animations</span>
-                    </div>
-                    <div class="feature">
-                        <i class="fas fa-check-circle"></i>
-                        <span>Encouraging feedback</span>
-                    </div>
-                </div>
-                <div class="theme-character cute-character"></div>
-            </div>
-            
-            <div class="theme-divider {{ theme }}">
-                <div class="divider-text">OR</div>
-            </div>
-            
-            <div class="theme-option {{ theme }} deadly-preview">
-                <div class="theme-header">
-                    <h3><i class="fas fa-skull-crossbones"></i> Deadly Mode</h3>
-                    <div class="theme-tag">Intense & Competitive</div>
-                </div>
-                <div class="theme-features">
-                    <div class="feature">
-                        <i class="fas fa-check-circle"></i>
-                        <span>Neon color scheme</span>
-                    </div>
-                    <div class="feature">
-                        <i class="fas fa-check-circle"></i>
-                        <span>Cyberpunk aesthetic</span>
-                    </div>
-                    <div class="feature">
-                        <i class="fas fa-check-circle"></i>
-                        <span>Glitch effects</span>
-                    </div>
-                    <div class="feature">
-                        <i class="fas fa-check-circle"></i>
-                        <span>Competitive edge</span>
-                    </div>
-                </div>
-                <div class="theme-character deadly-character"></div>
-            </div>
-        </div>
-        
-        <div class="theme-switch-demo {{ theme }}">
-            <button id="themeToggleDemo" class="btn {{ theme }} large">
-                <i class="fas fa-sync-alt"></i>
-                Switch to {{ 'Deadly' if theme == 'cute' else 'Cute' }} Mode
-            </button>
-            <p class="demo-note">You can switch themes anytime in your profile!</p>
-        </div>
-    </div>
-</section>
-
-<!-- Testimonials Section -->
-<section class="testimonials-section {{ theme }}">
-    <div class="container">
-        <h2 class="section-title {{ theme }}">
-            <i class="fas fa-comments"></i> What Players Say
-        </h2>
-        
-        <div class="testimonials-grid">
-            <div class="testimonial {{ theme }}">
-                <div class="testimonial-header">
-                    <div class="testimonial-avatar cute-avatar"></div>
-                    <div class="testimonial-info">
-                        <h4>Sarah Chen</h4>
-                        <p>Computer Science Student</p>
-                    </div>
-                    <div class="testimonial-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                </div>
-                <p class="testimonial-text">
-                    "Python Pathfinder made learning web development fun! The cute theme kept me motivated, 
-                    and the multiplayer battles really pushed me to improve my skills faster."
-                </p>
-            </div>
-            
-            <div class="testimonial {{ theme }}">
-                <div class="testimonial-header">
-                    <div class="testimonial-avatar deadly-avatar"></div>
-                    <div class="testimonial-info">
-                        <h4>Marcus Rodriguez</h4>
-                        <p>Junior Developer</p>
-                    </div>
-                    <div class="testimonial-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                </div>
-                <p class="testimonial-text">
-                    "The deadly theme with its cyberpunk vibe is amazing! The 1v1 coding battles are intense 
-                    and have helped me prepare for technical interviews in a fun way."
-                </p>
-            </div>
-            
-            <div class="testimonial {{ theme }}">
-                <div class="testimonial-header">
-                    <div class="testimonial-avatar cute-avatar"></div>
-                    <div class="testimonial-info">
-                        <h4>Emily Johnson</h4>
-                        <p>Bootcamp Graduate</p>
-                    </div>
-                    <div class="testimonial-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half-alt"></i>
-                    </div>
-                </div>
-                <p class="testimonial-text">
-                    "Coming from a non-tech background, Python Pathfinder was the perfect way to learn. 
-                    The structured path and interactive challenges made complex concepts easy to understand."
-                </p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- CTA Section -->
-<section class="cta-section {{ theme }}">
-    <div class="container">
-        <div class="cta-content {{ theme }}">
-            <h2 class="cta-title {{ theme }}">
-                Ready to Start Your Coding Adventure?
-            </h2>
-            <p class="cta-description {{ theme }}">
-                Join thousands of developers who are learning Python and web development through gameplay.
-                It's free, fun, and effective!
-            </p>
-            
-            <div class="cta-buttons">
-                {% if session.username %}
-                <a href="{{ url_for('game', level=1) }}" class="btn {{ theme }} primary large">
-                    <i class="fas fa-play"></i> Play Now
-                </a>
-                <a href="{{ url_for('multiplayer') }}" class="btn {{ theme }} secondary large">
-                    <i class="fas fa-crosshairs"></i> Battle Others
-                </a>
-                {% else %}
-                <a href="{{ url_for('register') }}" class="btn {{ theme }} primary large">
-                    <i class="fas fa-user-plus"></i> Sign Up Free
-                </a>
-                <a href="{{ url_for('login') }}" class="btn {{ theme }} outline large">
-                    <i class="fas fa-sign-in-alt"></i> Login
-                </a>
-                {% endif %}
-            </div>
-            
-            <div class="cta-features {{ theme }}">
-                <div class="feature {{ theme }}">
-                    <i class="fas fa-shield-alt"></i>
-                    <span>No credit card required</span>
-                </div>
-                <div class="feature {{ theme }}">
-                    <i class="fas fa-graduation-cap"></i>
-                    <span>Learn at your own pace</span>
-                </div>
-                <div class="feature {{ theme }}">
-                    <i class="fas fa-trophy"></i>
-                    <span>Earn achievements & badges</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Theme toggle demo
-    const themeToggle = document.getElementById('themeToggleDemo');
-    if (themeToggle) {
-        themeToggle.addEventListener('click', function() {
-            const currentTheme = document.body.classList.contains('cute-theme') ? 'cute' : 'deadly';
-            const newTheme = currentTheme === 'cute' ? 'deadly' : 'cute';
-            
-            // Update button text
-            this.innerHTML = `<i class="fas fa-sync-alt"></i> Switch to ${currentTheme === 'cute' ? 'Cute' : 'Deadly'} Mode`;
-            
-            // Show notification
-            alert(`In the actual game, this would switch to ${newTheme} mode!`);
-        });
-    }
-    
-    // Animate stats counters
-    const statValues = document.querySelectorAll('.stat-value');
-    statValues.forEach(stat => {
-        const finalValue = parseInt(stat.textContent);
-        if (!isNaN(finalValue)) {
-            let current = 0;
-            const increment = finalValue / 50;
-            const timer = setInterval(() => {
-                current += increment;
-                if (current >= finalValue) {
-                    stat.textContent = finalValue.toLocaleString() + '+';
-                    clearInterval(timer);
-                } else {
-                    stat.textContent = Math.floor(current).toLocaleString();
-                }
-            }, 30);
-        }
-    });
-    
-    // Add parallax effect to hero background
-    window.addEventListener('scroll', function() {
-        const scrolled = window.pageYOffset;
-        const heroBg = document.querySelector('.hero-background');
-        if (heroBg) {
-            heroBg.style.transform = `translateY(${scrolled * 0.5}px)`;
-        }
-    });
-    
-    // Add floating animation to elements
-    if (document.body.classList.contains('cute-theme')) {
-        createFloatingElements();
-    } else {
-        createGlowingElements();
-    }
-});
-
-function createFloatingElements() {
-    const cuteElements = document.querySelector('.cute-elements');
-    if (!cuteElements) return;
-    
-    for (let i = 0; i < 8; i++) {
-        const element = document.createElement('div');
-        element.className = Math.random() > 0.5 ? 'floating-shape heart' : 'floating-shape star';
-        element.style.cssText = `
-            position: absolute;
-            width: ${20 + Math.random() * 20}px;
-            height: ${20 + Math.random() * 20}px;
-            opacity: ${0.3 + Math.random() * 0.4};
-            animation: float ${3 + Math.random() * 4}s ease-in-out infinite;
-            left: ${Math.random() * 100}%;
-            top: ${Math.random() * 100}%;
-            animation-delay: ${Math.random() * 2}s;
-        `;
-        
-        if (element.className.includes('heart')) {
-            element.style.background = 'var(--cute-primary)';
-            element.style.transform = 'rotate(45deg)';
-        } else {
-            element.style.background = 'var(--cute-accent)';
-            element.style.clipPath = 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)';
-        }
-        
-        cuteElements.appendChild(element);
-    }
-}
-
-function createGlowingElements() {
-    const deadlyElements = document.querySelector('.deadly-elements');
-    if (!deadlyElements) return;
-    
-    for (let i = 0; i < 6; i++) {
-        const element = document.createElement('div');
-        element.className = 'glowing-orb';
-        element.style.cssText = `
-            position: absolute;
-            width: ${10 + Math.random() * 20}px;
-            height: ${10 + Math.random() * 20}px;
-            background: radial-gradient(circle, var(--deadly-accent), transparent);
-            border-radius: 50%;
-            opacity: ${0.2 + Math.random() * 0.3};
-            animation: pulse ${2 + Math.random() * 3}s ease-in-out infinite;
-            left: ${Math.random() * 100}%;
-            top: ${Math.random() * 100}%;
-            animation-delay: ${Math.random() * 1.5}s;
-            box-shadow: 0 0 ${20 + Math.random() * 30}px var(--deadly-accent);
-        `;
-        
-        deadlyElements.appendChild(element);
-    }
-}
-</script>
-
-<style>
-/* Hero Section */
-.hero {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    overflow: hidden;
-    padding: 2rem;
-}
-
-.hero.cute {
-    background: linear-gradient(135deg, var(--cute-bg) 0%, #ffffff 100%);
-}
-
-.hero.deadly {
-    background: linear-gradient(135deg, var(--deadly-bg) 0%, #000000 100%);
-}
-
-.hero-background {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-}
-
-.cute-elements, .deadly-elements {
-    position: relative;
-    width: 100%;
-    height: 100%;
-}
-
-.mascot {
-    position: absolute;
-    bottom: 50px;
-    right: 100px;
-    width: 200px;
-    height: 200px;
-}
-
-.cute-mascot {
-    background: linear-gradient(135deg, var(--cute-primary), var(--cute-secondary));
-    border-radius: 50%;
-    animation: bounce 3s ease-in-out infinite;
-}
-
-.deadly-mascot {
-    background: linear-gradient(135deg, var(--deadly-primary), var(--deadly-accent));
-    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-    animation: rotate 10s linear infinite;
-}
-
-.hero-content {
-    position: relative;
-    z-index: 1;
-    text-align: center;
-    max-width: 800px;
-}
-
-.hero-title {
-    font-size: 4rem;
-    font-weight: 900;
-    margin-bottom: 1rem;
-    line-height: 1.2;
-}
-
-.hero-title.cute {
-    background: linear-gradient(45deg, var(--cute-primary), var(--cute-accent));
-    -webkit-text-fill-color: transparent;
-}
-
-.hero-title.deadly {
-    color: var(--deadly-text);
-    text-shadow: 0 0 30px rgba(31, 192, 255, 0.8);
-}
-
-.title-part {
-    display: block;
-}
-
-.subtitle {
-    font-size: 1.5rem;
-    font-weight: 300;
-    margin-top: 0.5rem;
-}
-
-.subtitle.cute {
-    color: var(--cute-text);
-}
-
-.subtitle.deadly {
-    color: var(--deadly-accent);
-}
-
-.hero-description {
-    font-size: 1.2rem;
-    margin-bottom: 2rem;
-    line-height: 1.6;
-}
-
-.hero-description.cute {
-    color: var(--cute-text);
-}
-
-.hero-description.deadly {
-    color: var(--deadly-text);
-}
-
-.theme-highlight {
-    font-weight: bold;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-}
-
-.theme-highlight.cute {
-    background: var(--cute-primary);
-    color: white;
-}
-
-.theme-highlight.deadly {
-    background: var(--deadly-primary);
-    color: white;
-}
-
-.hero-buttons {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    margin-bottom: 3rem;
-    flex-wrap: wrap;
-}
-
-.hero-stats {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 2rem;
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.stat {
-    text-align: center;
-}
-
-.stat-value {
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 0.25rem;
-}
-
-.stat.cute .stat-value {
-    color: var(--cute-primary);
-}
-
-.stat.deadly .stat-value {
-    color: var(--deadly-accent);
-}
-
-.stat-label {
-    font-size: 0.9rem;
-    opacity: 0.8;
-}
-
-/* Features Section */
-.features-section {
-    padding: 5rem 2rem;
-}
-
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.section-title {
-    text-align: center;
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-}
-
-.section-title.cute {
-    color: var(--cute-text);
-}
-
-.section-title.deadly {
-    color: var(--deadly-accent);
-}
-
-.section-subtitle {
-    text-align: center;
-    font-size: 1.1rem;
-    margin-bottom: 3rem;
-    opacity: 0.8;
-}
-
-.features-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 2rem;
-}
-
-.feature-card {
-    padding: 2rem;
-    border-radius: 15px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.feature-card.cute {
-    background: white;
-    border: 2px solid var(--cute-secondary);
-    box-shadow: 0 10px 30px rgba(255, 158, 216, 0.1);
-}
-
-.feature-card.deadly {
-    background: var(--deadly-secondary);
-    border: 1px solid #444;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-}
-
-.feature-card:hover {
-    transform: translateY(-10px);
-}
-
-.feature-card.cute:hover {
-    box-shadow: 0 20px 40px rgba(255, 158, 216, 0.2);
-}
-
-.feature-card.deadly:hover {
-    box-shadow: 0 20px 40px rgba(255, 70, 85, 0.2);
-}
-
-.feature-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-}
-
-.feature-card.cute .feature-icon {
-    background: var(--cute-bg);
-    color: var(--cute-primary);
-}
-
-.feature-card.deadly .feature-icon {
-    background: rgba(255, 70, 85, 0.1);
-    color: var(--deadly-primary);
-}
-
-.feature-card h3 {
-    margin-bottom: 1rem;
-    font-size: 1.5rem;
-}
-
-.feature-card.cute h3 {
-    color: var(--cute-text);
-}
-
-.feature-card.deadly h3 {
-    color: var(--deadly-text);
-}
-
-.feature-card p {
-    margin-bottom: 1rem;
-    line-height: 1.6;
-}
-
-.feature-list {
-    list-style: none;
-    padding: 0;
-}
-
-.feature-list li {
-    padding: 0.25rem 0;
-    padding-left: 1.5rem;
-    position: relative;
-}
-
-.feature-list li:before {
-    content: "✓";
-    position: absolute;
-    left: 0;
-    font-weight: bold;
-}
-
-.feature-card.cute .feature-list li:before {
-    color: var(--cute-primary);
-}
-
-.feature-card.deadly .feature-list li:before {
-    color: var(--deadly-accent);
-}
-
-/* Learning Path */
-.learning-path-section {
-    padding: 5rem 2rem;
-}
-
-.path-timeline {
-    position: relative;
-    padding-left: 50px;
-}
-
-.path-timeline:before {
-    content: '';
-    position: absolute;
-    left: 25px;
-    top: 0;
-    bottom: 0;
-    width: 4px;
-}
-
-.path-timeline.cute:before {
-    background: linear-gradient(to bottom, var(--cute-primary), var(--cute-accent));
-}
-
-.path-timeline.deadly:before {
-    background: linear-gradient(to bottom, var(--deadly-primary), var(--deadly-accent));
-}
-
-.path-step {
-    position: relative;
-    margin-bottom: 2rem;
-    padding: 1.5rem;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.path-step.cute {
-    background: white;
-    border-left: 4px solid var(--cute-primary);
-}
-
-.path-step.deadly {
-    background: var(--deadly-secondary);
-    border-left: 4px solid var(--deadly-primary);
-}
-
-.step-number {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    font-weight: bold;
-    flex-shrink: 0;
-}
-
-.path-step.cute .step-number {
-    background: var(--cute-primary);
-    color: white;
-}
-
-.path-step.deadly .step-number {
-    background: var(--deadly-primary);
-    color: white;
-}
-
-.step-content {
-    flex: 1;
-}
-
-.step-content h4 {
-    margin-bottom: 0.5rem;
-}
-
-.path-step.cute .step-content h4 {
-    color: var(--cute-text);
-}
-
-.path-step.deadly .step-content h4 {
-    color: var(--deadly-text);
-}
-
-.reward-badge {
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-weight: bold;
-    font-size: 0.9rem;
-}
-
-.path-step.cute .reward-badge {
-    background: var(--cute-accent);
-    color: white;
-}
-
-.path-step.deadly .reward-badge {
-    background: var(--deadly-accent);
-    color: white;
-}
-
-/* Theme Preview */
-.theme-preview-section {
-    padding: 5rem 2rem;
-}
-
-.theme-comparison {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    gap: 2rem;
-    align-items: center;
-    margin-bottom: 3rem;
-}
-
-.theme-option {
-    padding: 2rem;
-    border-radius: 15px;
-    position: relative;
-    overflow: hidden;
-    min-height: 300px;
-}
-
-.cute-preview {
-    background: linear-gradient(135deg, #fff0f7, #ffffff);
-    border: 3px solid var(--cute-primary);
-}
-
-.deadly-preview {
-    background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
-    border: 2px solid var(--deadly-primary);
-}
-
-.theme-header {
-    margin-bottom: 2rem;
-    position: relative;
-    z-index: 1;
-}
-
-.theme-header h3 {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.cute-preview .theme-header h3 {
-    color: var(--cute-primary);
-}
-
-.deadly-preview .theme-header h3 {
-    color: var(--deadly-accent);
-}
-
-.theme-tag {
-    display: inline-block;
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    font-weight: bold;
-}
-
-.cute-preview .theme-tag {
-    background: var(--cute-bg);
-    color: var(--cute-primary);
-}
-
-.deadly-preview .theme-tag {
-    background: rgba(255, 70, 85, 0.1);
-    color: var(--deadly-accent);
-}
-
-.theme-features {
-    position: relative;
-    z-index: 1;
-}
-
-.theme-features .feature {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.cute-preview .theme-features .feature {
-    color: var(--cute-text);
-}
-
-.deadly-preview .theme-features .feature {
-    color: var(--deadly-text);
-}
-
-.theme-character {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    width: 100px;
-    height: 100px;
-}
-
-.cute-character {
-    background: linear-gradient(135deg, var(--cute-primary), var(--cute-accent));
-    border-radius: 50%;
-    animation: float 3s ease-in-out infinite;
-}
-
-.deadly-character {
-    background: linear-gradient(135deg, var(--deadly-primary), var(--deadly-accent));
-    clip-path: polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%);
-    animation: pulse 2s ease-in-out infinite;
-}
-
-.theme-divider {
-    text-align: center;
-}
-
-.divider-text {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    margin: 0 auto;
-}
-
-.theme-divider.cute .divider-text {
-    background: var(--cute-bg);
-    color: var(--cute-primary);
-    border: 2px solid var(--cute-primary);
-}
-
-.theme-divider.deadly .divider-text {
-    background: var(--deadly-secondary);
-    color: var(--deadly-accent);
-    border: 1px solid var(--deadly-accent);
-}
-
-.theme-switch-demo {
-    text-align: center;
-}
-
-.demo-note {
-    margin-top: 1rem;
-    opacity: 0.8;
-}
-
-/* Testimonials */
-.testimonials-section {
-    padding: 5rem 2rem;
-}
-
-.testimonials-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-}
-
-.testimonial {
-    padding: 2rem;
-    border-radius: 15px;
-}
-
-.testimonial.cute {
-    background: white;
-    border: 2px solid var(--cute-secondary);
-}
-
-.testimonial.deadly {
-    background: var(--deadly-secondary);
-    border: 1px solid #444;
-}
-
-.testimonial-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-.testimonial-avatar {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    flex-shrink: 0;
-}
-
-.cute-avatar {
-    background: linear-gradient(135deg, var(--cute-primary), var(--cute-accent));
-}
-
-.deadly-avatar {
-    background: linear-gradient(135deg, var(--deadly-primary), var(--deadly-accent));
-}
-
-.testimonial-info h4 {
-    margin-bottom: 0.25rem;
-}
-
-.testimonial-rating {
-    color: #FFD700;
-    margin-left: auto;
-}
-
-.testimonial-text {
-    line-height: 1.6;
-    font-style: italic;
-}
-
-/* CTA Section */
-.cta-section {
-    padding: 5rem 2rem;
-    text-align: center;
-}
-
-.cta-content {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 4rem;
-    border-radius: 20px;
-}
-
-.cta-content.cute {
-    background: linear-gradient(135deg, var(--cute-primary), var(--cute-accent));
-    color: white;
-}
-
-.cta-content.deadly {
-    background: linear-gradient(135deg, var(--deadly-primary), var(--deadly-secondary));
-    color: var(--deadly-text);
-}
-
-.cta-title {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-}
-
-.cta-description {
-    font-size: 1.2rem;
-    margin-bottom: 2rem;
-    opacity: 0.9;
-}
-
-.cta-buttons {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    margin-bottom: 3rem;
-    flex-wrap: wrap;
-}
-
-.cta-features {
-    display: flex;
-    justify-content: center;
-    gap: 2rem;
-    flex-wrap: wrap;
-}
-
-.cta-features .feature {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-weight: 500;
-}
-
-/* Animations */
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-20px); }
-}
-
-@keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-30px); }
-}
-
-@keyframes rotate {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-@keyframes pulse {
-    0%, 100% { opacity: 0.2; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(1.1); }
-}
-
-.floating-shape {
-    animation: float 3s ease-in-out infinite;
-}
-
-.floating-shape.heart:before,
-.floating-shape.heart:after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: inherit;
-    border-radius: 50%;
-}
-
-.floating-shape.heart:before {
-    top: -50%;
-    left: 0;
-}
-
-.floating-shape.heart:after {
-    top: 0;
-    left: -50%;
-}
-
-@media (max-width: 768px) {
-    .hero-title {
-        font-size: 2.5rem;
-    }
-    
-    .hero-stats {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .theme-comparison {
-        grid-template-columns: 1fr;
-    }
-    
-    .cta-buttons,
-    .hero-buttons {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .btn {
-        width: 100%;
-        max-width: 300px;
-    }
-    
-    .mascot {
-        display: none;
-    }
-}
-</style>
-{% endblock %}
