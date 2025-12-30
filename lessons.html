@@ -3,885 +3,673 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Python Pathfinder: Code & Conquer</title>
-    <link rel="stylesheet" href="main.css">
-    <link rel="stylesheet" href="cute_mode.css">
+    <title>Python Pathfinder: Code & Conquer - Lessons</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+    <style>
+        /* Reset & Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Cute Theme */
+            --cute-primary: #ff6b9d;
+            --cute-secondary: #ffc8dd;
+            --cute-accent: #a2d2ff;
+            --cute-bg: #fff9fb;
+            --cute-text: #333;
+            --cute-card: #ffffff;
+            --cute-border: #ffc8dd;
+            --cute-success: #4CAF50;
+            --cute-warning: #FF9800;
+            --cute-danger: #F44336;
+            
+            /* Deadly Theme */
+            --deadly-primary: #ff4655;
+            --deadly-secondary: #1a1a2e;
+            --deadly-accent: #00ff9d;
+            --deadly-bg: #0d0d15;
+            --deadly-text: #ffffff;
+            --deadly-card: #1a1a2e;
+            --deadly-border: #333;
+            --deadly-success: #00ff9d;
+            --deadly-warning: #ffd166;
+            --deadly-danger: #ff4655;
+            
+            /* Common */
+            --shadow: 0 4px 12px rgba(0,0,0,0.1);
+            --radius: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            transition: var(--transition);
+        }
+
+        .cute-theme {
+            background-color: var(--cute-bg);
+            color: var(--cute-text);
+        }
+
+        .deadly-theme {
+            background-color: var(--deadly-bg);
+            color: var(--deadly-text);
+        }
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+
+        .navbar.cute {
+            background: white;
+            border-bottom: 3px solid var(--cute-primary);
+        }
+
+        .navbar.deadly {
+            background: var(--deadly-card);
+            border-bottom: 2px solid var(--deadly-accent);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo.cute {
+            color: var(--cute-primary);
+        }
+
+        .logo.deadly {
+            color: var(--deadly-accent);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-link.cute {
+            color: var(--cute-text);
+        }
+
+        .nav-link.cute:hover {
+            background: var(--cute-primary);
+            color: white;
+        }
+
+        .nav-link.deadly {
+            color: var(--deadly-text);
+        }
+
+        .nav-link.deadly:hover {
+            background: var(--deadly-accent);
+            color: var(--deadly-bg);
+        }
+
+        .btn {
+            padding: 0.5rem 1.5rem;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn.cute {
+            background: var(--cute-primary);
+            color: white;
+        }
+
+        .btn.cute:hover {
+            background: #ff5590;
+            transform: translateY(-2px);
+        }
+
+        .btn.deadly {
+            background: var(--deadly-accent);
+            color: var(--deadly-bg);
+        }
+
+        .btn.deadly:hover {
+            background: #00e68a;
+            transform: translateY(-2px);
+        }
+
+        .btn.small {
+            padding: 0.25rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .btn.outline {
+            background: transparent;
+            border: 2px solid;
+        }
+
+        .btn.outline.cute {
+            border-color: var(--cute-primary);
+            color: var(--cute-primary);
+        }
+
+        .btn.outline.deadly {
+            border-color: var(--deadly-accent);
+            color: var(--deadly-accent);
+        }
+
+        /* Lessons Container */
+        .lessons-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+            padding: 2rem;
+            min-height: calc(100vh - 140px);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 1024px) {
+            .lessons-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Sidebar */
+        .lesson-sidebar {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .lesson-sidebar.cute {
+            background: white;
+            border: 3px solid var(--cute-primary);
+        }
+
+        .lesson-sidebar.deadly {
+            background: var(--deadly-card);
+            border: 2px solid var(--deadly-accent);
+        }
+
+        .sidebar-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+        }
+
+        .lesson-sidebar.cute .sidebar-header {
+            border-bottom: 1px solid var(--cute-secondary);
+        }
+
+        .lesson-sidebar.deadly .sidebar-header {
+            border-bottom: 1px solid #444;
+        }
+
+        .course-progress {
+            margin-bottom: 2rem;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .lesson-sidebar.deadly .progress-bar {
+            background: #333;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .lesson-sidebar.cute .progress-fill {
+            background: var(--cute-primary);
+        }
+
+        .lesson-sidebar.deadly .progress-fill {
+            background: var(--deadly-accent);
+        }
+
+        .lesson-nav {
+            margin-bottom: 2rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .lesson-sidebar.cute .section-title {
+            border-bottom: 1px solid var(--cute-secondary);
+            color: var(--cute-primary);
+        }
+
+        .lesson-sidebar.deadly .section-title {
+            border-bottom: 1px solid #444;
+            color: var(--deadly-accent);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            margin-bottom: 0.25rem;
+            border-radius: var(--radius);
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .nav-item.cute {
+            color: var(--cute-text);
+            background: var(--cute-bg);
+        }
+
+        .nav-item.deadly {
+            color: var(--deadly-text);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-item:hover {
+            transform: translateX(5px);
+        }
+
+        .nav-item.cute:hover {
+            background: var(--cute-primary);
+            color: white;
+        }
+
+        .nav-item.deadly:hover {
+            background: var(--deadly-accent);
+            color: var(--deadly-bg);
+        }
+
+        .nav-item.active {
+            font-weight: bold;
+        }
+
+        .nav-item.cute.active {
+            background: var(--cute-primary);
+            color: white;
+        }
+
+        .nav-item.deadly.active {
+            background: var(--deadly-accent);
+            color: var(--deadly-bg);
+        }
+
+        .nav-icon {
+            width: 24px;
+            text-align: center;
+        }
+
+        .nav-status {
+            font-size: 0.8rem;
+        }
+
+        .nav-status.completed {
+            color: var(--cute-success);
+        }
+
+        .lesson-sidebar.deadly .nav-status.completed {
+            color: var(--deadly-success);
+        }
+
+        /* Lesson Content */
+        .lesson-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+        }
+
+        .lesson-content.cute .lesson-header {
+            border-bottom: 1px solid var(--cute-secondary);
+        }
+
+        .lesson-content.deadly .lesson-header {
+            border-bottom: 1px solid #444;
+        }
+
+        .breadcrumbs {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumbs a {
+            text-decoration: none;
+        }
+
+        .breadcrumbs.cute a {
+            color: var(--cute-primary);
+        }
+
+        .breadcrumbs.deadly a {
+            color: var(--deadly-accent);
+        }
+
+        .lesson-title {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .lesson-content.cute .lesson-title {
+            color: var(--cute-primary);
+        }
+
+        .lesson-content.deadly .lesson-title {
+            color: var(--deadly-accent);
+        }
+
+        .lesson-meta {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        /* W3Schools-style Content Layout */
+        .w3-panel {
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: var(--radius);
+            border-left: 4px solid;
+        }
+
+        .lesson-content.cute .w3-panel {
+            background: white;
+            border-left-color: var(--cute-primary);
+            box-shadow: var(--shadow);
+        }
+
+        .lesson-content.deadly .w3-panel {
+            background: var(--deadly-card);
+            border-left-color: var(--deadly-accent);
+        }
+
+        .w3-example {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: var(--radius);
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .lesson-content.deadly .w3-example {
+            background: #2a2a3e;
+        }
+
+        .w3-code {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 1rem;
+            border-radius: var(--radius);
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            margin: 1rem 0;
+        }
+
+        .w3-note {
+            background: #e7f4ff;
+            border-left: 4px solid #2196F3;
+        }
+
+        .lesson-content.deadly .w3-note {
+            background: #2a2a3e;
+            border-left-color: #1fc0ff;
+        }
+
+        .w3-warning {
+            background: #fff8e1;
+            border-left: 4px solid #FFC107;
+        }
+
+        .lesson-content.deadly .w3-warning {
+            background: #3a2e1e;
+            border-left-color: #ffd166;
+        }
+
+        /* Interactive Elements */
+        .try-it-button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0.5rem 0;
+            transition: var(--transition);
+        }
+
+        .try-it-button:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .code-editor {
+            background: #1e1e1e;
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .editor-header {
+            background: #2d2d2d;
+            padding: 0.5rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .editor-content {
+            padding: 1rem;
+            min-height: 200px;
+        }
+
+        .editor-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .run-button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        /* Quiz Styles */
+        .quiz-container {
+            background: white;
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: var(--shadow);
+        }
+
+        .lesson-content.deadly .quiz-container {
+            background: var(--deadly-card);
+        }
+
+        .quiz-question {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .quiz-option {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .quiz-option.cute {
+            background: var(--cute-bg);
+            border: 2px solid var(--cute-secondary);
+        }
+
+        .quiz-option.deadly {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #444;
+        }
+
+        .quiz-option:hover {
+            transform: translateX(5px);
+        }
+
+        .quiz-option.correct {
+            background: #d4edda;
+            border-color: #c3e6cb;
+        }
+
+        .quiz-option.incorrect {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: auto;
+        }
+
+        .cute-footer {
+            background: white;
+            border-top: 3px solid var(--cute-primary);
+            color: var(--cute-text);
+        }
+
+        .deadly-footer {
+            background: var(--deadly-card);
+            border-top: 2px solid var(--deadly-accent);
+            color: var(--deadly-text);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .footer-links a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .lessons-container {
+                padding: 1rem;
+            }
+            
+            .lesson-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .lesson-content > div {
+            animation: fadeIn 0.5s ease-out;
+        }
+    </style>
 </head>
-<style>
-.lessons-container {
-    display: grid;
-    grid-template-columns: 300px 1fr;
-    gap: 2rem;
-    padding: 2rem;
-    min-height: 100vh;
-    max-width: 1400px;
-    margin: 0 auto;
-}
-
-/* Sidebar */
-.lesson-sidebar {
-    position: sticky;
-    top: 2rem;
-    height: fit-content;
-    border-radius: 15px;
-    padding: 1.5rem;
-}
-
-.lesson-sidebar.cute {
-    background: white;
-    border: 3px solid var(--cute-primary);
-}
-
-.lesson-sidebar.deadly {
-    background: var(--deadly-secondary);
-    border: 2px solid var(--deadly-primary);
-}
-
-.sidebar-header {
-    text-align: center;
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.lesson-sidebar.cute .sidebar-header {
-    --border-color: var(--cute-secondary);
-}
-
-.lesson-sidebar.deadly .sidebar-header {
-    --border-color: #444;
-}
-
-.sidebar-header h2 {
-    margin-bottom: 0.5rem;
-    font-size: 1.5rem;
-}
-
-.lesson-sidebar.cute .sidebar-header h2 {
-    color: var(--cute-primary);
-}
-
-.lesson-sidebar.deadly .sidebar-header h2 {
-    color: var(--deadly-accent);
-}
-
-.course-progress {
-    margin-bottom: 2rem;
-}
-
-.progress-info {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-}
-
-.progress-label {
-    opacity: 0.8;
-}
-
-.progress-percent {
-    font-weight: bold;
-}
-
-.lesson-sidebar.cute .progress-percent {
-    color: var(--cute-primary);
-}
-
-.lesson-sidebar.deadly .progress-percent {
-    color: var(--deadly-accent);
-}
-
-.progress-bar {
-    height: 8px;
-    background: var(--progress-bg);
-    border-radius: 4px;
-    overflow: hidden;
-}
-
-.lesson-sidebar.cute .progress-bar {
-    --progress-bg: var(--cute-secondary);
-}
-
-.lesson-sidebar.deadly .progress-bar {
-    --progress-bg: #444;
-}
-
-.progress-fill {
-    height: 100%;
-    border-radius: 4px;
-    transition: width 0.5s ease;
-}
-
-.lesson-sidebar.cute .progress-fill {
-    background: var(--cute-primary);
-}
-
-.lesson-sidebar.deadly .progress-fill {
-    background: var(--deadly-accent);
-}
-
-.lesson-nav {
-    margin-bottom: 2rem;
-}
-
-.nav-section {
-    margin-bottom: 1.5rem;
-}
-
-.section-title {
-    font-size: 1rem;
-    margin-bottom: 0.75rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--border-color);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.lesson-sidebar.cute .section-title {
-    --border-color: var(--cute-secondary);
-    color: var(--cute-text);
-}
-
-.lesson-sidebar.deadly .section-title {
-    --border-color: #444;
-    color: var(--deadly-text);
-}
-
-.nav-item {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem;
-    margin-bottom: 0.25rem;
-    border-radius: 8px;
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
-
-.nav-item.cute {
-    color: var(--cute-text);
-    background: var(--cute-bg);
-}
-
-.nav-item.deadly {
-    color: var(--deadly-text);
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.nav-item:hover {
-    transform: translateX(5px);
-}
-
-.nav-item.cute:hover {
-    background: var(--cute-primary);
-    color: white;
-}
-
-.nav-item.deadly:hover {
-    background: var(--deadly-primary);
-    color: white;
-}
-
-.nav-item.active {
-    font-weight: bold;
-}
-
-.nav-item.cute.active {
-    background: var(--cute-primary);
-    color: white;
-}
-
-.nav-item.deadly.active {
-    background: var(--deadly-primary);
-    color: white;
-}
-
-.nav-icon {
-    width: 24px;
-    text-align: center;
-}
-
-.nav-text {
-    flex: 1;
-}
-
-.nav-status {
-    font-size: 0.8rem;
-}
-
-.nav-status.completed {
-    color: #4CAF50;
-}
-
-.nav-status.in-progress {
-    color: #FF9800;
-    animation: spin 2s linear infinite;
-}
-
-.nav-status.locked {
-    color: #9E9E9E;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.sidebar-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 1rem;
-    border-top: 1px solid var(--border-color);
-}
-
-.lesson-sidebar.cute .sidebar-footer {
-    --border-color: var(--cute-secondary);
-}
-
-.lesson-sidebar.deadly .sidebar-footer {
-    --border-color: #444;
-}
-
-.achievement-count {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.9rem;
-}
-
-.lesson-sidebar.cute .achievement-count {
-    color: var(--cute-text);
-}
-
-.lesson-sidebar.deadly .achievement-count {
-    color: var(--deadly-text);
-}
-
-/* Main Content */
-.lesson-content {
-    min-width: 0; /* Prevent grid overflow */
-}
-
-.lesson-header {
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.lesson-content.cute .lesson-header {
-    --border-color: var(--cute-secondary);
-}
-
-.lesson-content.deadly .lesson-header {
-    --border-color: #444;
-}
-
-.breadcrumbs {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    font-size: 0.9rem;
-}
-
-.breadcrumbs a {
-    text-decoration: none;
-    color: var(--link-color);
-}
-
-.breadcrumbs.cute a {
-    --link-color: var(--cute-primary);
-}
-
-.breadcrumbs.deadly a {
-    --link-color: var(--deadly-accent);
-}
-
-.breadcrumbs span {
-    opacity: 0.8;
-}
-
-.lesson-title {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.lesson-content.cute .lesson-title {
-    color: var(--cute-primary);
-}
-
-.lesson-content.deadly .lesson-title {
-    color: var(--deadly-accent);
-}
-
-.lesson-meta {
-    display: flex;
-    gap: 1.5rem;
-    flex-wrap: wrap;
-}
-
-.meta-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.9rem;
-}
-
-.lesson-content.cute .meta-item {
-    color: var(--cute-text);
-}
-
-.lesson-content.deadly .meta-item {
-    color: var(--deadly-text);
-}
-
-/* Lesson Body Sections */
-.lesson-body > div {
-    margin-bottom: 2.5rem;
-}
-
-.lesson-body h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.lesson-content.cute h2 {
-    color: var(--cute-text);
-}
-
-.lesson-content.deadly h2 {
-    color: var(--deadly-text);
-}
-
-.lesson-overview p {
-    line-height: 1.6;
-    font-size: 1.1rem;
-}
-
-.objectives-list {
-    list-style: none;
-    padding: 0;
-}
-
-.objectives-list li {
-    padding: 0.75rem;
-    margin-bottom: 0.5rem;
-    border-radius: 8px;
-    position: relative;
-    padding-left: 2.5rem;
-}
-
-.objectives-list.cute li {
-    background: var(--cute-bg);
-    border: 2px solid var(--cute-secondary);
-}
-
-.objectives-list.deadly li {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid #444;
-}
-
-.objectives-list li:before {
-    content: "✓";
-    position: absolute;
-    left: 1rem;
-    font-weight: bold;
-}
-
-.objectives-list.cute li:before {
-    color: var(--cute-primary);
-}
-
-.objectives-list.deadly li:before {
-    color: var(--deadly-accent);
-}
-
-/* Topics */
-.topics-grid {
-    display: grid;
-    gap: 1rem;
-}
-
-.topic-card {
-    border-radius: 10px;
-    overflow: hidden;
-    transition: all 0.3s ease;
-}
-
-.topic-card.cute {
-    background: white;
-    border: 2px solid var(--cute-secondary);
-}
-
-.topic-card.deadly {
-    background: var(--deadly-secondary);
-    border: 1px solid #444;
-}
-
-.topic-header {
-    padding: 1.25rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    transition: all 0.3s ease;
-}
-
-.topic-card.cute .topic-header {
-    background: var(--cute-bg);
-}
-
-.topic-card.deadly .topic-header {
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.topic-header:hover {
-    transform: translateX(5px);
-}
-
-.topic-number {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 1.2rem;
-}
-
-.topic-card.cute .topic-number {
-    background: var(--cute-primary);
-    color: white;
-}
-
-.topic-card.deadly .topic-number {
-    background: var(--deadly-primary);
-    color: white;
-}
-
-.topic-header h3 {
-    margin: 0;
-    font-size: 1.2rem;
-}
-
-.topic-body {
-    padding: 1.25rem;
-    padding-top: 0;
-}
-
-.topic-body p {
-    margin-bottom: 1rem;
-    line-height: 1.6;
-}
-
-.topic-actions {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-.topic-example,
-.topic-quiz {
-    margin-top: 1rem;
-    padding: 1rem;
-    border-radius: 8px;
-}
-
-.topic-card.cute .topic-example,
-.topic-card.cute .topic-quiz {
-    background: var(--cute-bg);
-    border: 2px solid var(--cute-secondary);
-}
-
-.topic-card.deadly .topic-example,
-.topic-card.deadly .topic-quiz {
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid #444;
-}
-
-.code-block {
-    background: var(--code-bg);
-    padding: 1rem;
-    border-radius: 5px;
-    overflow-x: auto;
-    margin-bottom: 1rem;
-    font-family: 'Courier New', monospace;
-    font-size: 0.9rem;
-    line-height: 1.5;
-    position: relative;
-}
-
-.topic-card.cute .code-block {
-    --code-bg: #2d2d2d;
-    color: #f8f8f2;
-}
-
-.topic-card.deadly .code-block {
-    --code-bg: #1a1a1a;
-    color: #ffffff;
-}
-
-.quiz-question {
-    margin-bottom: 1rem;
-    font-weight: 500;
-}
-
-.quiz-options {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-.quiz-option {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.topic-card.cute .quiz-option {
-    background: white;
-    border: 2px solid var(--cute-secondary);
-}
-
-.topic-card.deadly .quiz-option {
-    background: var(--deadly-secondary);
-    border: 1px solid #444;
-}
-
-.quiz-option:hover {
-    transform: translateX(5px);
-}
-
-.topic-card.cute .quiz-option:hover {
-    background: var(--cute-primary);
-    color: white;
-}
-
-.topic-card.deadly .quiz-option:hover {
-    background: var(--deadly-primary);
-    color: white;
-}
-
-.quiz-option input[type="radio"] {
-    margin: 0;
-}
-
-/* Practice Section */
-.practice-card {
-    border-radius: 15px;
-    overflow: hidden;
-}
-
-.practice-card.cute {
-    background: white;
-    border: 3px solid var(--cute-primary);
-}
-
-.practice-card.deadly {
-    background: var(--deadly-secondary);
-    border: 2px solid var(--deadly-primary);
-}
-
-.practice-header {
-    padding: 1.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.practice-card.cute .practice-header {
-    --border-color: var(--cute-secondary);
-    background: var(--cute-bg);
-}
-
-.practice-card.deadly .practice-header {
-    --border-color: #444;
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.difficulty-badge {
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: bold;
-}
-
-.practice-card.cute .difficulty-badge {
-    background: var(--cute-accent);
-    color: white;
-}
-
-.practice-card.deadly .difficulty-badge {
-    background: var(--deadly-accent);
-    color: white;
-}
-
-.practice-description {
-    padding: 1.5rem;
-}
-
-.practice-description p {
-    line-height: 1.6;
-    font-size: 1.1rem;
-}
-
-.code-editor-practice {
-    margin: 0 1.5rem 1.5rem;
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-.editor-header {
-    padding: 0.75rem 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.practice-card.cute .editor-header {
-    background: var(--cute-primary);
-    color: white;
-}
-
-.practice-card.deadly .editor-header {
-    background: var(--deadly-primary);
-    color: white;
-}
-
-.editor-actions {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.editor-btn {
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
-    color: white;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.editor-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: scale(1.1);
-}
-
-.practice-code {
-    width: 100%;
-    min-height: 200px;
-    padding: 1rem;
-    border: none;
-    resize: vertical;
-    font-family: 'Courier New', monospace;
-    font-size: 0.9rem;
-    line-height: 1.5;
-}
-
-.practice-card.cute .practice-code {
-    background: white;
-    color: #333;
-}
-
-.practice-card.deadly .practice-code {
-    background: #1a1a1a;
-    color: #ffffff;
-}
-
-.practice-actions {
-    padding: 0 1.5rem 1.5rem;
-    display: flex;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-}
-
-.practice-output {
-    margin: 0 1.5rem 1.5rem;
-    padding: 1rem;
-    border-radius: 8px;
-    min-height: 100px;
-    font-family: 'Courier New', monospace;
-    font-size: 0.9rem;
-    line-height: 1.5;
-    white-space: pre-wrap;
-}
-
-.practice-card.cute .practice-output {
-    background: white;
-    border: 2px solid var(--cute-secondary);
-    color: #333;
-}
-
-.practice-card.deadly .practice-output {
-    background: #1a1a1a;
-    border: 1px solid #444;
-    color: #ffffff;
-}
-
-/* Resources */
-.resources-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-}
-
-.resource-card {
-    padding: 1.5rem;
-    border-radius: 10px;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    transition: all 0.3s ease;
-}
-
-.resource-card.cute {
-    background: white;
-    border: 2px solid var(--cute-secondary);
-    color: var(--cute-text);
-}
-
-.resource-card.deadly {
-    background: var(--deadly-secondary);
-    border: 1px solid #444;
-    color: var(--deadly-text);
-}
-
-.resource-card:hover {
-    transform: translateY(-5px);
-}
-
-.resource-card.cute:hover {
-    background: var(--cute-primary);
-    color: white;
-    border-color: var(--cute-primary);
-}
-
-.resource-card.deadly:hover {
-    background: var(--deadly-primary);
-    color: white;
-    border-color: var(--deadly-primary);
-}
-
-.resource-icon {
-    font-size: 1.5rem;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.resource-card.cute .resource-icon {
-    background: var(--cute-bg);
-    color: var(--cute-primary);
-}
-
-.resource-card.deadly .resource-icon {
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--deadly-accent);
-}
-
-.resource-info h4 {
-    margin-bottom: 0.25rem;
-}
-
-.resource-info p {
-    font-size: 0.9rem;
-    opacity: 0.8;
-}
-
-/* Lesson Navigation */
-.lesson-navigation {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 2rem;
-    border-top: 1px solid var(--border-color);
-}
-
-.lesson-content.cute .lesson-navigation {
-    --border-color: var(--cute-secondary);
-}
-
-.lesson-content.deadly .lesson-navigation {
-    --border-color: #444;
-}
-
-.completion-status {
-    text-align: center;
-}
-
-.completion-status .btn.completed {
-    background: #4CAF50;
-    color: white;
-    cursor: default;
-}
-
-.status-text {
-    display: block;
-    margin-top: 0.5rem;
-    font-size: 0.9rem;
-    opacity: 0.8;
-}
-
-@media (max-width: 1024px) {
-    .lessons-container {
-        grid-template-columns: 1fr;
-    }
-    
-    .lesson-sidebar {
-        position: static;
-        margin-bottom: 2rem;
-    }
-}
-
-@media (max-width: 768px) {
-    .lessons-container {
-        padding: 1rem;
-    }
-    
-    .lesson-navigation {
-        flex-direction: column;
-        gap: 1rem;
-        text-align: center;
-    }
-    
-    .practice-actions {
-        justify-content: center;
-    }
-    
-    .lesson-meta {
-        justify-content: center;
-    }
-}
-</style>
-
 <body class="cute-theme">
-    <nav class="navbar cute">
+    <!-- Navigation -->
+    <nav class="navbar cute" id="navbar">
         <a href="dashboard.html" class="logo cute">
             <i class="fas fa-code"></i> Python Pathfinder
         </a>
@@ -892,1198 +680,907 @@
             <a href="game.html" class="nav-link cute">
                 <i class="fas fa-gamepad"></i> Play
             </a>
-            <a href="multiplayer.html" class="nav-link cute">
-                <i class="fas fa-users"></i> Multiplayer
-            </a>
-            <a href="lessons.html" class="nav-link cute">
+            <a href="lessons.html" class="nav-link cute active">
                 <i class="fas fa-book"></i> Lessons
             </a>
-            <a href="login.html" class="nav-link cute">
-                <i class="fas fa-sign-in-alt"></i> Login
-            </a>
-            <a href="register.html" class="nav-link cute">
-                <i class="fas fa-user-plus"></i> Register
-            </a>
             <button id="themeToggle" class="btn cute small">
-                Switch to Deadly Mode
+                <i class="fas fa-moon"></i> Deadly Mode
             </button>
         </div>
     </nav>
 
-    <main id="mainContent">
-        <!-- Main content loaded via JavaScript -->
-    </main>
+    <!-- Main Content -->
+    <div class="lessons-container">
+        <!-- Sidebar Navigation -->
+        <aside class="lesson-sidebar cute" id="sidebar">
+            <div class="sidebar-header cute">
+                <h2><i class="fas fa-graduation-cap"></i> Learning Path</h2>
+                <p>Master Python Step by Step</p>
+            </div>
+            
+            <div class="course-progress cute">
+                <div class="progress-info">
+                    <span>Course Progress</span>
+                    <span id="progressPercent">65%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 65%"></div>
+                </div>
+            </div>
+            
+            <nav class="lesson-nav cute" id="lessonNav">
+                <!-- Navigation items will be populated by JavaScript -->
+            </nav>
+            
+            <div class="sidebar-footer cute">
+                <div class="achievement-count cute">
+                    <i class="fas fa-trophy"></i>
+                    <span id="achievementCount">5/25 Achievements</span>
+                </div>
+            </div>
+        </aside>
 
-    <footer class="{{ theme if theme else 'cute' }}-footer">
+        <!-- Main Lesson Content -->
+        <main class="lesson-content cute" id="lessonContent">
+            <!-- Content will be loaded dynamically -->
+            <div id="defaultContent">
+                <div class="lesson-header cute">
+                    <div class="breadcrumbs cute">
+                        <a href="dashboard.html">Dashboard</a>
+                        <i class="fas fa-chevron-right"></i>
+                        <a href="lessons.html">Lessons</a>
+                        <i class="fas fa-chevron-right"></i>
+                        <span>Python Basics</span>
+                    </div>
+                    
+                    <h1 class="lesson-title cute">
+                        <i class="fas fa-play-circle"></i> Python Basics
+                    </h1>
+                    
+                    <div class="lesson-meta cute">
+                        <span class="meta-item">
+                            <i class="fas fa-clock"></i>
+                            <span>30-45 min</span>
+                        </span>
+                        <span class="meta-item">
+                            <i class="fas fa-star"></i>
+                            <span>Beginner</span>
+                        </span>
+                        <span class="meta-item">
+                            <i class="fas fa-gem"></i>
+                            <span>100 XP</span>
+                        </span>
+                    </div>
+                </div>
+                
+                <!-- Introduction -->
+                <div class="w3-panel cute">
+                    <h2><i class="fas fa-info-circle"></i> Introduction to Python</h2>
+                    <p>Python is a popular programming language. It was created by Guido van Rossum, and released in 1991.</p>
+                    <p>It is used for:</p>
+                    <ul>
+                        <li>Web development (server-side)</li>
+                        <li>Software development</li>
+                        <li>Mathematics</li>
+                        <li>System scripting</li>
+                    </ul>
+                </div>
+
+                <!-- Syntax -->
+                <div class="w3-panel cute">
+                    <h2><i class="fas fa-code"></i> Python Syntax</h2>
+                    <p>Python syntax can be executed by writing directly in the Command Line:</p>
+                    
+                    <div class="w3-example">
+                        <h3>Example</h3>
+                        <div class="w3-code">
+>>> print("Hello, World!")
+Hello, World!
+                        </div>
+                        <button class="try-it-button" onclick="runCode('print(\"Hello, World!\")')">
+                            <i class="fas fa-play"></i> Try it Yourself
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Variables -->
+                <div class="w3-panel cute">
+                    <h2><i class="fas fa-tag"></i> Python Variables</h2>
+                    <p>Variables are containers for storing data values.</p>
+                    
+                    <div class="w3-example">
+                        <h3>Example</h3>
+                        <div class="w3-code">
+x = 5
+y = "John"
+print(x)
+print(y)
+                        </div>
+                        <button class="try-it-button" onclick="runCode('x = 5\ny = \"John\"\nprint(x)\nprint(y)')">
+                            <i class="fas fa-play"></i> Try it Yourself
+                        </button>
+                    </div>
+                    
+                    <div class="w3-note">
+                        <p><strong>Note:</strong> Python has no command for declaring a variable. A variable is created the moment you first assign a value to it.</p>
+                    </div>
+                </div>
+
+                <!-- Interactive Practice -->
+                <div class="w3-panel cute">
+                    <h2><i class="fas fa-laptop-code"></i> Practice Exercise</h2>
+                    <p>Create a variable named <code>carName</code> and assign the value <code>Volvo</code> to it.</p>
+                    
+                    <div class="code-editor">
+                        <div class="editor-header">
+                            <span>practice.py</span>
+                            <div class="editor-actions">
+                                <button class="run-button" onclick="runPracticeCode()">
+                                    <i class="fas fa-play"></i> Run
+                                </button>
+                            </div>
+                        </div>
+                        <div class="editor-content">
+                            <textarea id="practiceCode" style="width: 100%; height: 150px; background: #1e1e1e; color: white; border: none; padding: 10px; font-family: monospace; resize: vertical;">
+# Create a variable named carName and assign the value "Volvo" to it
+
+# Your code here
+
+# This should print "Volvo"
+print(carName)
+                            </textarea>
+                        </div>
+                    </div>
+                    
+                    <div id="practiceOutput" style="margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: var(--radius); min-height: 50px;">
+                        <strong>Output:</strong> Run your code to see output here...
+                    </div>
+                </div>
+
+                <!-- Quiz -->
+                <div class="quiz-container cute">
+                    <h2><i class="fas fa-question-circle"></i> Quick Quiz</h2>
+                    <div class="quiz-question">
+                        Which of the following is the correct way to create a variable in Python?
+                    </div>
+                    
+                    <div class="quiz-options" id="quizOptions">
+                        <div class="quiz-option cute" onclick="checkAnswer(this, 'correct')">
+                            <input type="radio" name="quiz1">
+                            <span>x = 5</span>
+                        </div>
+                        <div class="quiz-option cute" onclick="checkAnswer(this, 'incorrect')">
+                            <input type="radio" name="quiz1">
+                            <span>int x = 5</span>
+                        </div>
+                        <div class="quiz-option cute" onclick="checkAnswer(this, 'incorrect')">
+                            <input type="radio" name="quiz1">
+                            <span>var x = 5</span>
+                        </div>
+                        <div class="quiz-option cute" onclick="checkAnswer(this, 'incorrect')">
+                            <input type="radio" name="quiz1">
+                            <span>let x = 5</span>
+                        </div>
+                    </div>
+                    
+                    <div id="quizFeedback" style="margin-top: 1rem; padding: 0.5rem; border-radius: var(--radius); display: none;"></div>
+                </div>
+
+                <!-- Navigation -->
+                <div class="lesson-navigation cute" style="display: flex; justify-content: space-between; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--cute-secondary);">
+                    <button class="btn outline cute" onclick="prevLesson()">
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <button class="btn cute" onclick="markComplete()">
+                        <i class="fas fa-check-circle"></i> Mark Complete
+                    </button>
+                    <button class="btn cute" onclick="nextLesson()">
+                        Next <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="cute-footer" id="footer">
         <div class="footer-content">
             <p>Python Pathfinder: Code & Conquer &copy; 2024</p>
-            <p>Learn Python and Web Development through play!</p>
             <div class="footer-links">
-                <a href="#">Privacy Policy</a> | 
-                <a href="#">Terms of Service</a> | 
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
                 <a href="#">Contact</a>
             </div>
         </div>
     </footer>
 
-    <script src="game.js"></script>
-    <script src="code_editor.js"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
     <script>
-    // Theme toggle for static version (stores choice in localStorage)
-    (function() {
+        // Theme Management
         const THEME_KEY = 'pp_theme';
-        const btn = document.getElementById('themeToggle');
+        let currentTheme = localStorage.getItem(THEME_KEY) || 'cute';
 
         function applyTheme(theme) {
-            // Update body class
-            document.body.classList.remove('cute-theme','deadly-theme');
-            document.body.classList.add(theme + '-theme');
-
-            // Swap element classes named 'cute' <-> 'deadly'
+            currentTheme = theme;
+            document.body.className = theme + '-theme';
+            
+            // Update all theme-specific elements
             document.querySelectorAll('.cute, .deadly').forEach(el => {
-                if (theme === 'cute') {
-                    el.classList.remove('deadly');
-                    el.classList.add('cute');
-                } else {
-                    el.classList.remove('cute');
-                    el.classList.add('deadly');
+                el.classList.remove('cute', 'deadly');
+                el.classList.add(theme);
+            });
+            
+            // Update toggle button text
+            const toggleBtn = document.getElementById('themeToggle');
+            if (toggleBtn) {
+                toggleBtn.innerHTML = theme === 'cute' 
+                    ? '<i class="fas fa-moon"></i> Deadly Mode'
+                    : '<i class="fas fa-sun"></i> Cute Mode';
+            }
+            
+            localStorage.setItem(THEME_KEY, theme);
+        }
+
+        // Initialize theme
+        document.addEventListener('DOMContentLoaded', () => {
+            applyTheme(currentTheme);
+            
+            // Setup theme toggle
+            document.getElementById('themeToggle').addEventListener('click', () => {
+                applyTheme(currentTheme === 'cute' ? 'deadly' : 'cute');
+            });
+            
+            // Initialize lesson navigation
+            initializeLessonNav();
+            
+            // Setup syntax highlighting
+            hljs.highlightAll();
+        });
+
+        // Lesson Data Structure
+        const lessons = {
+            python_basics: {
+                title: "Python Basics",
+                duration: "30-45 min",
+                difficulty: "Beginner",
+                xp: 100,
+                completed: true,
+                content: [
+                    {
+                        type: "intro",
+                        title: "Introduction to Python",
+                        content: "Python is a high-level, interpreted programming language known for its simplicity and readability."
+                    },
+                    {
+                        type: "syntax",
+                        title: "Python Syntax",
+                        content: "Learn the basic syntax rules of Python programming.",
+                        example: 'print("Hello, World!")'
+                    },
+                    {
+                        type: "variables",
+                        title: "Variables",
+                        content: "Variables are used to store data values in Python.",
+                        example: 'x = 5\ny = "Python"'
+                    }
+                ]
+            },
+            control_structures: {
+                title: "Control Structures",
+                duration: "45-60 min",
+                difficulty: "Beginner",
+                xp: 150,
+                completed: true,
+                content: []
+            },
+            functions: {
+                title: "Functions & Modules",
+                duration: "60-90 min",
+                difficulty: "Intermediate",
+                xp: 200,
+                completed: false,
+                content: []
+            },
+            web_basics: {
+                title: "HTML & CSS Basics",
+                duration: "60-90 min",
+                difficulty: "Beginner",
+                xp: 150,
+                completed: false,
+                content: []
+            }
+        };
+
+        // Navigation Structure
+        const navigation = [
+            {
+                section: "Python Fundamentals",
+                icon: "fas fa-book",
+                lessons: [
+                    { id: "python_basics", title: "Python Basics", icon: "fas fa-play-circle", status: "completed" },
+                    { id: "control_structures", title: "Control Structures", icon: "fas fa-code", status: "completed" },
+                    { id: "functions", title: "Functions & Modules", icon: "fas fa-function", status: "in-progress" },
+                    { id: "data_structures", title: "Data Structures", icon: "fas fa-layer-group", status: "locked" },
+                    { id: "oop", title: "OOP in Python", icon: "fas fa-cogs", status: "locked" }
+                ]
+            },
+            {
+                section: "Web Development",
+                icon: "fas fa-globe",
+                lessons: [
+                    { id: "web_basics", title: "HTML & CSS Basics", icon: "fas fa-html5", status: "in-progress" },
+                    { id: "javascript", title: "JavaScript Fundamentals", icon: "fas fa-js", status: "locked" },
+                    { id: "flask", title: "Backend with Flask", icon: "fas fa-server", status: "locked" },
+                    { id: "database", title: "Database Fundamentals", icon: "fas fa-database", status: "locked" }
+                ]
+            }
+        ];
+
+        // Initialize Lesson Navigation
+        function initializeLessonNav() {
+            const navContainer = document.getElementById('lessonNav');
+            let navHTML = '';
+            
+            navigation.forEach(section => {
+                navHTML += `
+                    <div class="nav-section ${currentTheme}">
+                        <h3 class="section-title ${currentTheme}">
+                            <i class="${section.icon}"></i> ${section.section}
+                        </h3>
+                `;
+                
+                section.lessons.forEach(lesson => {
+                    const statusIcon = lesson.status === 'completed' ? 'fas fa-check' :
+                                      lesson.status === 'in-progress' ? 'fas fa-spinner fa-spin' :
+                                      'fas fa-lock';
+                    const statusClass = lesson.status === 'completed' ? 'completed' : '';
+                    
+                    navHTML += `
+                        <a href="#" class="nav-item ${currentTheme} ${lesson.id === 'python_basics' ? 'active' : ''}" 
+                           onclick="loadLesson('${lesson.id}')" data-lesson="${lesson.id}">
+                            <span class="nav-icon"><i class="${lesson.icon}"></i></span>
+                            <span class="nav-text">${lesson.title}</span>
+                            <span class="nav-status ${statusClass}"><i class="${statusIcon}"></i></span>
+                        </a>
+                    `;
+                });
+                
+                navHTML += '</div>';
+            });
+            
+            navContainer.innerHTML = navHTML;
+            
+            // Update progress
+            updateProgress();
+        }
+
+        // Load Lesson Content
+        function loadLesson(lessonId) {
+            const lesson = lessons[lessonId];
+            if (!lesson) return;
+            
+            // Update active nav item
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.lesson === lessonId) {
+                    item.classList.add('active');
                 }
             });
-
-            // Update toggle text
-            if (btn) btn.innerText = theme === 'cute' ? 'Switch to Deadly Mode' : 'Switch to Cute Mode';
+            
+            // Update breadcrumbs
+            const breadcrumbs = `
+                <a href="dashboard.html">Dashboard</a>
+                <i class="fas fa-chevron-right"></i>
+                <a href="lessons.html">Lessons</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>${lesson.title}</span>
+            `;
+            
+            // Generate lesson content
+            let contentHTML = `
+                <div class="lesson-header ${currentTheme}">
+                    <div class="breadcrumbs ${currentTheme}">
+                        ${breadcrumbs}
+                    </div>
+                    
+                    <h1 class="lesson-title ${currentTheme}">
+                        <i class="fas fa-book-open"></i> ${lesson.title}
+                    </h1>
+                    
+                    <div class="lesson-meta ${currentTheme}">
+                        <span class="meta-item">
+                            <i class="fas fa-clock"></i>
+                            <span>${lesson.duration}</span>
+                        </span>
+                        <span class="meta-item">
+                            <i class="fas fa-star"></i>
+                            <span>${lesson.difficulty}</span>
+                        </span>
+                        <span class="meta-item">
+                            <i class="fas fa-gem"></i>
+                            <span>${lesson.xp} XP</span>
+                        </span>
+                    </div>
+                </div>
+            `;
+            
+            // Add lesson content sections
+            if (lesson.content && lesson.content.length > 0) {
+                lesson.content.forEach(section => {
+                    contentHTML += generateSectionHTML(section, lessonId);
+                });
+            } else {
+                contentHTML += `
+                    <div class="w3-panel ${currentTheme}">
+                        <h2><i class="fas fa-info-circle"></i> Lesson Overview</h2>
+                        <p>This lesson is under development. Check back soon for interactive content!</p>
+                    </div>
+                `;
+            }
+            
+            // Add practice and quiz sections
+            contentHTML += generatePracticeSection(lessonId);
+            contentHTML += generateQuizSection(lessonId);
+            
+            // Add navigation buttons
+            contentHTML += `
+                <div class="lesson-navigation ${currentTheme}" style="display: flex; justify-content: space-between; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid ${currentTheme === 'cute' ? 'var(--cute-secondary)' : '#444'};">
+                    <button class="btn outline ${currentTheme}" onclick="prevLesson()">
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <button class="btn ${currentTheme}" onclick="markComplete()" id="completeBtn">
+                        <i class="fas fa-check-circle"></i> ${lesson.completed ? 'Completed' : 'Mark Complete'}
+                    </button>
+                    <button class="btn ${currentTheme}" onclick="nextLesson()">
+                        Next <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            `;
+            
+            // Update the content area
+            document.getElementById('lessonContent').innerHTML = contentHTML;
+            
+            // Re-initialize syntax highlighting
+            setTimeout(() => hljs.highlightAll(), 100);
+            
+            // Update complete button state
+            if (lesson.completed) {
+                const btn = document.getElementById('completeBtn');
+                if (btn) {
+                    btn.innerHTML = '<i class="fas fa-check-double"></i> Completed';
+                    btn.disabled = true;
+                }
+            }
         }
 
-        let theme = localStorage.getItem(THEME_KEY) || 'cute';
-        applyTheme(theme);
-
-        if (btn) btn.addEventListener('click', () => {
-            theme = theme === 'cute' ? 'deadly' : 'cute';
-            localStorage.setItem(THEME_KEY, theme);
-            applyTheme(theme);
-        });
-    })();
-    </script>
-    
-<div class="lessons-container {{ theme }}">
-    <!-- Lesson Navigation -->
-    <div class="lesson-sidebar {{ theme }}">
-        <div class="sidebar-header {{ theme }}">
-            <h2><i class="fas fa-graduation-cap"></i> Learning Path</h2>
-            <p>Master Python & Web Development</p>
-        </div>
-        
-        <div class="course-progress {{ theme }}">
-            <div class="progress-info">
-                <div class="progress-label">Course Progress</div>
-                <div class="progress-percent">65%</div>
-            </div>
-            <div class="progress-bar {{ theme }}">
-                <div class="progress-fill" style="width: 65%"></div>
-            </div>
-        </div>
-        
-        <nav class="lesson-nav {{ theme }}">
-            <div class="nav-section {{ theme }}">
-                <h3 class="section-title {{ theme }}">
-                    <i class="fas fa-book"></i> Python Fundamentals
-                </h3>
-                <a href="{{ url_for('lessons', topic='python_basics') }}" 
-                   class="nav-item {{ theme }} {{ 'active' if topic == 'python_basics' else '' }}">
-                    <span class="nav-icon"><i class="fas fa-play-circle"></i></span>
-                    <span class="nav-text">Python Basics</span>
-                    <span class="nav-status completed"><i class="fas fa-check"></i></span>
-                </a>
-                <a href="#" class="nav-item {{ theme }}">
-                    <span class="nav-icon"><i class="fas fa-code"></i></span>
-                    <span class="nav-text">Control Structures</span>
-                    <span class="nav-status completed"><i class="fas fa-check"></i></span>
-                </a>
-                <a href="#" class="nav-item {{ theme }}">
-                    <span class="nav-icon"><i class="fas fa-function"></i></span>
-                    <span class="nav-text">Functions & Modules</span>
-                    <span class="nav-status in-progress"><i class="fas fa-spinner"></i></span>
-                </a>
-                <a href="#" class="nav-item {{ theme }}">
-                    <span class="nav-icon"><i class="fas fa-layer-group"></i></span>
-                    <span class="nav-text">Data Structures</span>
-                    <span class="nav-status locked"><i class="fas fa-lock"></i></span>
-                </a>
-                <a href="#" class="nav-item {{ theme }}">
-                    <span class="nav-icon"><i class="fas fa-cogs"></i></span>
-                    <span class="nav-text">OOP in Python</span>
-                    <span class="nav-status locked"><i class="fas fa-lock"></i></span>
-                </a>
-            </div>
+        // Generate Section HTML
+        function generateSectionHTML(section, lessonId) {
+            let html = `
+                <div class="w3-panel ${currentTheme}">
+                    <h2><i class="fas fa-${getSectionIcon(section.type)}"></i> ${section.title}</h2>
+                    <p>${section.content}</p>
+            `;
             
-            <div class="nav-section {{ theme }}">
-                <h3 class="section-title {{ theme }}">
-                    <i class="fas fa-globe"></i> Web Development
-                </h3>
-                <a href="{{ url_for('lessons', topic='web_basics') }}" 
-                   class="nav-item {{ theme }} {{ 'active' if topic == 'web_basics' else '' }}">
-                    <span class="nav-icon"><i class="fas fa-html5"></i></span>
-                    <span class="nav-text">HTML & CSS Basics</span>
-                    <span class="nav-status completed"><i class="fas fa-check"></i></span>
-                </a>
-                <a href="#" class="nav-item {{ theme }}">
-                    <span class="nav-icon"><i class="fas fa-js"></i></span>
-                    <span class="nav-text">JavaScript Fundamentals</span>
-                    <span class="nav-status in-progress"><i class="fas fa-spinner"></i></span>
-                </a>
-                <a href="#" class="nav-item {{ theme }}">
-                    <span class="nav-icon"><i class="fas fa-server"></i></span>
-                    <span class="nav-text">Backend with Flask</span>
-                    <span class="nav-status locked"><i class="fas fa-lock"></i></span>
-                </a>
-                <a href="{{ url_for('lessons', topic='database') }}" 
-                   class="nav-item {{ theme }} {{ 'active' if topic == 'database' else '' }}">
-                    <span class="nav-icon"><i class="fas fa-database"></i></span>
-                    <span class="nav-text">Database Fundamentals</span>
-                    <span class="nav-status locked"><i class="fas fa-lock"></i></span>
-                </a>
-                <a href="{{ url_for('lessons', topic='advanced_python') }}" 
-                   class="nav-item {{ theme }} {{ 'active' if topic == 'advanced_python' else '' }}">
-                    <span class="nav-icon"><i class="fas fa-rocket"></i></span>
-                    <span class="nav-text">Advanced Python</span>
-                    <span class="nav-status locked"><i class="fas fa-lock"></i></span>
-                </a>
-            </div>
-            
-            <div class="nav-section {{ theme }}">
-                <h3 class="section-title {{ theme }}">
-                    <i class="fas fa-project-diagram"></i> Projects
-                </h3>
-                <a href="#" class="nav-item {{ theme }}">
-                    <span class="nav-icon"><i class="fas fa-gamepad"></i></span>
-                    <span class="nav-text">Simple Game</span>
-                    <span class="nav-status locked"><i class="fas fa-lock"></i></span>
-                </a>
-                <a href="#" class="nav-item {{ theme }}">
-                    <span class="nav-icon"><i class="fas fa-shopping-cart"></i></span>
-                    <span class="nav-text">E-commerce Site</span>
-                    <span class="nav-status locked"><i class="fas fa-lock"></i></span>
-                </a>
-                <a href="#" class="nav-item {{ theme }}">
-                    <span class="nav-icon"><i class="fas fa-comments"></i></span>
-                    <span class="nav-text">Chat Application</span>
-                    <span class="nav-status locked"><i class="fas fa-lock"></i></span>
-                </a>
-            </div>
-        </nav>
-        
-        <div class="sidebar-footer {{ theme }}">
-            <div class="achievement-count {{ theme }}">
-                <i class="fas fa-trophy"></i>
-                <span>5/25 Achievements</span>
-            </div>
-            <a href="{{ url_for('dashboard') }}" class="btn {{ theme }} small">
-                <i class="fas fa-arrow-left"></i> Back to Dashboard
-            </a>
-        </div>
-    </div>
-    
-    <!-- Main Content -->
-    <div class="lesson-content {{ theme }}">
-        <div class="lesson-header {{ theme }}">
-            <div class="breadcrumbs {{ theme }}">
-                <a href="{{ url_for('dashboard') }}">Dashboard</a>
-                <i class="fas fa-chevron-right"></i>
-                <a href="#">Learning Path</a>
-                <i class="fas fa-chevron-right"></i>
-                <span>{{ lesson.title|default('Lesson') }}</span>
-            </div>
-            
-            <h1 class="lesson-title {{ theme }}">
-                <i class="fas fa-book-open"></i> {{ lesson.title|default('Python Fundamentals') }}
-            </h1>
-            
-            <div class="lesson-meta {{ theme }}">
-                <span class="meta-item">
-                    <i class="fas fa-clock"></i>
-                    <span>45 min</span>
-                </span>
-                <span class="meta-item">
-                    <i class="fas fa-star"></i>
-                    <span>Beginner</span>
-                </span>
-                <span class="meta-item">
-                    <i class="fas fa-tasks"></i>
-                    <span>{{ lesson.content|length if lesson.content else 5 }} topics</span>
-                </span>
-                <span class="meta-item">
-                    <i class="fas fa-gem"></i>
-                    <span>100 XP</span>
-                </span>
-            </div>
-        </div>
-        
-        <div class="lesson-body {{ theme }}">
-            <!-- Overview -->
-            <div class="lesson-overview {{ theme }}">
-                <h2><i class="fas fa-info-circle"></i> Overview</h2>
-                <p>
-                    {% if topic == 'python_basics' %}
-                    Learn the fundamentals of Python programming, including variables, data types, 
-                    control structures, and basic operations. This lesson provides the foundation 
-                    for all future Python development.
-                    {% elif topic == 'web_basics' %}
-                    Introduction to web development with HTML, CSS, and JavaScript. Learn how to 
-                    create structured web pages, style them effectively, and add interactivity.
-                    {% elif topic == 'advanced_python' %}
-                    Dive deep into advanced Python concepts including object-oriented programming, 
-                    decorators, generators, and asynchronous programming.
-                    {% elif topic == 'database' %}
-                    Understand database fundamentals, SQL basics, and how to integrate databases 
-                    with Python applications using SQLAlchemy.
-                    {% else %}
-                    Comprehensive learning materials to help you master programming concepts 
-                    through interactive examples and hands-on practice.
-                    {% endif %}
-                </p>
-            </div>
-            
-            <!-- Learning Objectives -->
-            <div class="objectives {{ theme }}">
-                <h2><i class="fas fa-bullseye"></i> Learning Objectives</h2>
-                <ul class="objectives-list {{ theme }}">
-                    {% if topic == 'python_basics' %}
-                    <li>Understand Python syntax and basic programming concepts</li>
-                    <li>Work with variables and different data types</li>
-                    <li>Use control structures (if/else, loops)</li>
-                    <li>Write and call functions</li>
-                    <li>Handle basic input/output operations</li>
-                    {% elif topic == 'web_basics' %}
-                    <li>Create structured HTML documents</li>
-                    <li>Style web pages using CSS</li>
-                    <li>Add interactivity with JavaScript</li>
-                    <li>Understand the DOM and event handling</li>
-                    <li>Build responsive web designs</li>
-                    {% elif topic == 'advanced_python' %}
-                    <li>Master object-oriented programming in Python</li>
-                    <li>Understand decorators and their applications</li>
-                    <li>Work with generators and iterators</li>
-                    <li>Implement asynchronous programming</li>
-                    <li>Write efficient and maintainable code</li>
-                    {% elif topic == 'database' %}
-                    <li>Understand relational database concepts</li>
-                    <li>Write basic SQL queries</li>
-                    <li>Design database schemas</li>
-                    <li>Integrate databases with Python</li>
-                    <li>Perform CRUD operations</li>
-                    {% else %}
-                    <li>Master core programming concepts</li>
-                    <li>Apply knowledge through hands-on projects</li>
-                    <li>Develop problem-solving skills</li>
-                    <li>Prepare for real-world development</li>
-                    {% endif %}
-                </ul>
-            </div>
-            
-            <!-- Topics List -->
-            <div class="topics {{ theme }}">
-                <h2><i class="fas fa-list-ul"></i> Topics Covered</h2>
-                <div class="topics-grid">
-                    {% for item in lesson.content %}
-                    <div class="topic-card {{ theme }}">
-                        <div class="topic-header {{ theme }}">
-                            <div class="topic-number">{{ loop.index }}</div>
-                            <h3>{{ item }}</h3>
+            if (section.example) {
+                html += `
+                    <div class="w3-example">
+                        <h3>Example</h3>
+                        <div class="w3-code">
+${section.example}
                         </div>
-                        <div class="topic-body">
-                            <p>
-                                {% if topic == 'python_basics' %}
-                                    {% if loop.index == 1 %}
-                                    Variables are containers for storing data values. In Python, you don't need to declare variable types.
-                                    {% elif loop.index == 2 %}
-                                    Control structures help you control the flow of your program's execution.
-                                    {% elif loop.index == 3 %}
-                                    Functions are reusable blocks of code that perform specific tasks.
-                                    {% elif loop.index == 4 %}
-                                    Lists and dictionaries are powerful data structures for organizing data.
-                                    {% elif loop.index == 5 %}
-                                    Learn how to read from and write to files in Python.
-                                    {% endif %}
-                                {% elif topic == 'web_basics' %}
-                                    {% if loop.index == 1 %}
-                                    HTML provides the structure and content of web pages.
-                                    {% elif loop.index == 2 %}
-                                    CSS controls the visual presentation and layout of web pages.
-                                    {% elif loop.index == 3 %}
-                                    JavaScript adds interactivity and dynamic behavior to websites.
-                                    {% elif loop.index == 4 %}
-                                    HTTP is the protocol for transmitting web content.
-                                    {% elif loop.index == 5 %}
-                                    Flask is a lightweight Python web framework.
-                                    {% endif %}
-                                {% else %}
-                                Detailed explanation and examples for this topic will be covered in the lesson.
-                                {% endif %}
-                            </p>
-                            <div class="topic-actions">
-                                <button class="btn {{ theme }} small" onclick="toggleExample('{{ loop.index }}')">
-                                    <i class="fas fa-code"></i> Show Example
-                                </button>
-                                <button class="btn {{ theme }} outline small" onclick="toggleQuiz('{{ loop.index }}')">
-                                    <i class="fas fa-question-circle"></i> Quick Quiz
-                                </button>
-                            </div>
-                            
-                            <!-- Example Code -->
-                            <div class="topic-example" id="example-{{ loop.index }}" style="display: none;">
-                                <pre class="code-block {{ theme }}"><code>
-{% if topic == 'python_basics' %}
-{% if loop.index == 1 %}
-# Variables and Data Types
-name = "Python Pathfinder"  # String
-score = 100                 # Integer
-rating = 4.8                # Float
-is_awesome = True           # Boolean
-
-print(f"Welcome to {name}!")
-print(f"Current score: {score}")
-print(f"Rating: {rating}")
-print(f"Awesome: {is_awesome}")
-{% elif loop.index == 2 %}
-# Control Structures
-age = 18
-
-# If-else statement
-if age >= 18:
-    print("You are an adult")
-else:
-    print("You are a minor")
-
-# For loop
-for i in range(5):
-    print(f"Count: {i}")
-
-# While loop
-count = 0
-while count < 3:
-    print(f"Counting: {count}")
-    count += 1
-{% elif loop.index == 3 %}
-# Functions
-def greet(name):
-    """Greet a user by name"""
-    return f"Hello, {name}!"
-
-def add_numbers(a, b):
-    """Add two numbers and return the result"""
-    return a + b
-
-# Using functions
-message = greet("Coder")
-print(message)
-
-result = add_numbers(5, 3)
-print(f"5 + 3 = {result}")
-{% endif %}
-{% elif topic == 'web_basics' %}
-{% if loop.index == 1 %}
-&lt;!-- HTML Structure --&gt;
-&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-    &lt;title&gt;My Web Page&lt;/title&gt;
-&lt;/head&gt;
-&lt;body&gt;
-    &lt;h1&gt;Welcome to Web Development&lt;/h1&gt;
-    &lt;p&gt;This is a paragraph of text.&lt;/p&gt;
-    &lt;a href="#"&gt;This is a link&lt;/a&gt;
-&lt;/body&gt;
-&lt;/html&gt;
-{% elif loop.index == 2 %}
-/* CSS Styling */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
-    margin: 0;
-    padding: 20px;
-}
-
-h1 {
-    color: #333;
-    text-align: center;
-}
-
-.button {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.button:hover {
-    background-color: #45a049;
-}
-{% elif loop.index == 3 %}
-// JavaScript Basics
-console.log("Hello, JavaScript!");
-
-// Variables
-let message = "Welcome to JavaScript";
-const MAX_SCORE = 100;
-
-// Function
-function greetUser(name) {
-    return `Hello, ${name}!`;
-}
-
-// Event listener
-document.querySelector('.button').addEventListener('click', function() {
-    alert('Button clicked!');
-});
-{% endif %}
-{% else %}
-# Example code will appear here
-# Based on the selected topic
-print("Learning is fun with Python Pathfinder!")
-{% endif %}
-                                </code></pre>
-                                <button class="btn {{ theme }} small" onclick="runExample('{{ loop.index }}')">
-                                    <i class="fas fa-play"></i> Run Code
-                                </button>
-                            </div>
-                            
-                            <!-- Quick Quiz -->
-                            <div class="topic-quiz" id="quiz-{{ loop.index }}" style="display: none;">
-                                <div class="quiz-question {{ theme }}">
-                                    <p>
-                                        {% if topic == 'python_basics' %}
-                                            {% if loop.index == 1 %}
-                                            What is the correct way to create a variable in Python?
-                                            {% elif loop.index == 2 %}
-                                            Which loop continues while a condition is true?
-                                            {% elif loop.index == 3 %}
-                                            What keyword is used to define a function in Python?
-                                            {% else %}
-                                            Test question for this topic
-                                            {% endif %}
-                                        {% elif topic == 'web_basics' %}
-                                            {% if loop.index == 1 %}
-                                            Which tag is used to create a hyperlink in HTML?
-                                            {% elif loop.index == 2 %}
-                                            What does CSS stand for?
-                                            {% elif loop.index == 3 %}
-                                            Which symbol is used for single-line comments in JavaScript?
-                                            {% else %}
-                                            Test question for this topic
-                                            {% endif %}
-                                        {% else %}
-                                        What have you learned from this topic?
-                                        {% endif %}
-                                    </p>
-                                </div>
-                                <div class="quiz-options {{ theme }}">
-                                    {% for option in ['Option A', 'Option B', 'Option C', 'Option D'] %}
-                                    <label class="quiz-option {{ theme }}">
-                                        <input type="radio" name="quiz-{{ loop.parent.loop.index }}" value="{{ option }}">
-                                        <span class="option-text">{{ option }}</span>
-                                    </label>
-                                    {% endfor %}
-                                </div>
-                                <button class="btn {{ theme }} small" onclick="submitQuiz('{{ loop.index }}')">
-                                    <i class="fas fa-check"></i> Submit Answer
-                                </button>
-                            </div>
-                        </div>
+                        <button class="try-it-button" onclick="runCode(\`${section.example.replace(/`/g, '\\`')}\`)">
+                            <i class="fas fa-play"></i> Try it Yourself
+                        </button>
                     </div>
-                    {% endfor %}
-                </div>
-            </div>
+                `;
+            }
             
-            <!-- Practice Section -->
-            <div class="practice-section {{ theme }}">
-                <h2><i class="fas fa-laptop-code"></i> Hands-on Practice</h2>
-                <div class="practice-card {{ theme }}">
-                    <div class="practice-header {{ theme }}">
-                        <h3>Interactive Challenge</h3>
-                        <span class="difficulty-badge {{ theme }}">Beginner</span>
-                    </div>
+            html += '</div>';
+            return html;
+        }
+
+        // Get appropriate icon for section type
+        function getSectionIcon(type) {
+            const icons = {
+                intro: 'info-circle',
+                syntax: 'code',
+                variables: 'tag',
+                functions: 'function',
+                loops: 'redo',
+                lists: 'list-ul',
+                dictionaries: 'book'
+            };
+            return icons[type] || 'code';
+        }
+
+        // Generate Practice Section
+        function generatePracticeSection(lessonId) {
+            const practices = {
+                python_basics: {
+                    title: "Variable Practice",
+                    description: "Create variables and print their values",
+                    template: `# Create variables
+name = "Your Name"
+age = 25
+score = 95.5
+
+# Print the variables
+print("Name:", name)
+print("Age:", age)
+print("Score:", score)`,
+                    solution: `name = "Python Learner"
+age = 20
+score = 98.7
+print("Name:", name)
+print("Age:", age)
+print("Score:", score)`
+                },
+                control_structures: {
+                    title: "Loop Practice",
+                    description: "Create a loop that prints numbers 1-5",
+                    template: `# Create a for loop that prints numbers 1 through 5
+for i in range(1, 6):
+    print(i)`,
+                    solution: `for i in range(1, 6):
+    print(i)`
+                }
+            };
+            
+            const practice = practices[lessonId] || practices.python_basics;
+            
+            return `
+                <div class="w3-panel ${currentTheme}">
+                    <h2><i class="fas fa-laptop-code"></i> Practice Exercise</h2>
+                    <p>${practice.description}</p>
                     
-                    <div class="practice-description">
-                        <p>
-                            {% if topic == 'python_basics' %}
-                            Create a Python program that asks for the user's name and age, then prints a personalized greeting.
-                            {% elif topic == 'web_basics' %}
-                            Create a simple HTML page with a heading, paragraph, and styled button.
-                            {% elif topic == 'advanced_python' %}
-                            Implement a Python class that represents a bank account with deposit/withdraw methods.
-                            {% elif topic == 'database' %}
-                            Write SQL queries to create a users table and insert sample data.
-                            {% else %}
-                            Apply what you've learned by completing this coding challenge.
-                            {% endif %}
-                        </p>
-                    </div>
-                    
-                    <div class="code-editor-practice {{ theme }}">
-                        <div class="editor-header {{ theme }}">
-                            <span><i class="fas fa-code"></i> practice.py</span>
+                    <div class="code-editor">
+                        <div class="editor-header">
+                            <span>practice.py</span>
                             <div class="editor-actions">
-                                <button class="editor-btn" title="Reset">
-                                    <i class="fas fa-redo"></i>
+                                <button class="run-button" onclick="runPracticeCode()">
+                                    <i class="fas fa-play"></i> Run
                                 </button>
-                                <button class="editor-btn" title="Format">
-                                    <i class="fas fa-align-left"></i>
+                                <button class="run-button" style="background: #2196F3;" onclick="showHint()">
+                                    <i class="fas fa-lightbulb"></i> Hint
+                                </button>
+                                <button class="run-button" style="background: #9C27B0;" onclick="showSolution()">
+                                    <i class="fas fa-eye"></i> Solution
                                 </button>
                             </div>
                         </div>
-                        <textarea class="practice-code {{ theme }}" id="practiceCode">
-{% if topic == 'python_basics' %}
-# Practice: User Greeting Program
-# TODO: Ask for user's name and age
-# TODO: Print a personalized greeting
-
-# Your code here
-
-{% elif topic == 'web_basics' %}
-<!-- Practice: Simple Web Page -->
-<!-- TODO: Create a complete HTML page -->
-<!-- TODO: Add CSS styling -->
-<!-- TODO: Add JavaScript interaction -->
-
-<!-- Your code here -->
-
-{% else %}
-# Write your practice code here
-# Use the concepts you've learned
-
-print("Start coding!")
-{% endif %}
-                        </textarea>
+                        <div class="editor-content">
+                            <textarea id="practiceCode" style="width: 100%; height: 200px; background: #1e1e1e; color: white; border: none; padding: 10px; font-family: monospace; resize: vertical;">
+${practice.template}
+                            </textarea>
+                        </div>
                     </div>
                     
-                    <div class="practice-actions">
-                        <button class="btn {{ theme }}" onclick="runPracticeCode()">
-                            <i class="fas fa-play"></i> Run Code
-                        </button>
-                        <button class="btn {{ theme }} secondary" onclick="checkPracticeSolution()">
-                            <i class="fas fa-check"></i> Check Solution
-                        </button>
-                        <button class="btn {{ theme }} outline" onclick="showHint()">
-                            <i class="fas fa-lightbulb"></i> Get Hint
-                        </button>
+                    <div id="practiceOutput" style="margin-top: 1rem; padding: 1rem; background: ${currentTheme === 'cute' ? '#f8f9fa' : '#2a2a3e'}; border-radius: var(--radius); min-height: 80px; font-family: monospace; white-space: pre-wrap;">
+                        <strong>Output:</strong> Run your code to see output here...
                     </div>
                     
-                    <div class="practice-output {{ theme }}">
-                        <h4><i class="fas fa-terminal"></i> Output</h4>
-                        <pre id="practiceOutput">Run your code to see output here...</pre>
+                    <div id="hint" style="display: none; margin-top: 1rem; padding: 1rem; background: ${currentTheme === 'cute' ? '#e7f4ff' : '#2a2a3e'}; border-left: 4px solid #2196F3; border-radius: var(--radius);">
+                        <strong>Hint:</strong> Make sure to use the correct variable names and print statements.
                     </div>
                 </div>
-            </div>
+            `;
+        }
+
+        // Generate Quiz Section
+        function generateQuizSection(lessonId) {
+            const quizzes = {
+                python_basics: [
+                    {
+                        question: "Which of the following is the correct way to create a variable in Python?",
+                        options: [
+                            { text: "x = 5", correct: true },
+                            { text: "int x = 5", correct: false },
+                            { text: "var x = 5", correct: false },
+                            { text: "let x = 5", correct: false }
+                        ]
+                    },
+                    {
+                        question: "What is the output of: print(type(3.14))",
+                        options: [
+                            { text: "<class 'int'>", correct: false },
+                            { text: "<class 'float'>", correct: true },
+                            { text: "<class 'str'>", correct: false },
+                            { text: "<class 'double'>", correct: false }
+                        ]
+                    }
+                ],
+                control_structures: [
+                    {
+                        question: "Which loop continues while a condition is true?",
+                        options: [
+                            { text: "for loop", correct: false },
+                            { text: "while loop", correct: true },
+                            { text: "if statement", correct: false },
+                            { text: "switch statement", correct: false }
+                        ]
+                    }
+                ]
+            };
             
-            <!-- Resources -->
-            <div class="resources-section {{ theme }}">
-                <h2><i class="fas fa-external-link-alt"></i> Additional Resources</h2>
-                <div class="resources-grid {{ theme }}">
-                    <a href="#" class="resource-card {{ theme }}">
-                        <div class="resource-icon">
-                            <i class="fas fa-file-pdf"></i>
+            const quiz = quizzes[lessonId] || quizzes.python_basics;
+            let quizHTML = `
+                <div class="quiz-container ${currentTheme}">
+                    <h2><i class="fas fa-question-circle"></i> Quick Quiz</h2>
+            `;
+            
+            quiz.forEach((q, index) => {
+                quizHTML += `
+                    <div class="quiz-question" style="margin-top: ${index > 0 ? '1.5rem' : '0'}">
+                        ${q.question}
+                    </div>
+                    <div class="quiz-options" id="quizOptions${index}">
+                `;
+                
+                q.options.forEach((option, optIndex) => {
+                    quizHTML += `
+                        <div class="quiz-option ${currentTheme}" onclick="checkAnswer(this, ${option.correct}, ${index})">
+                            <input type="radio" name="quiz${index}">
+                            <span>${option.text}</span>
                         </div>
-                        <div class="resource-info">
-                            <h4>Cheat Sheet</h4>
-                            <p>Quick reference for {{ lesson.title|default('this lesson') }}</p>
-                        </div>
-                    </a>
-                    
-                    <a href="#" class="resource-card {{ theme }}">
-                        <div class="resource-icon">
-                            <i class="fas fa-video"></i>
-                        </div>
-                        <div class="resource-info">
-                            <h4>Video Tutorial</h4>
-                            <p>Watch detailed explanation videos</p>
-                        </div>
-                    </a>
-                    
-                    <a href="#" class="resource-card {{ theme }}">
-                        <div class="resource-icon">
-                            <i class="fas fa-project-diagram"></i>
-                        </div>
-                        <div class="resource-info">
-                            <h4>Project Ideas</h4>
-                            <p>Practice with real-world projects</p>
-                        </div>
-                    </a>
-                    
-                    <a href="#" class="resource-card {{ theme }}">
-                        <div class="resource-icon">
-                            <i class="fas fa-question-circle"></i>
-                        </div>
-                        <div class="resource-info">
-                            <h4>FAQ</h4>
-                            <p>Common questions and answers</p>
-                        </div>
-                    </a>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Lesson Navigation -->
-        <div class="lesson-navigation {{ theme }}">
-            <a href="#" class="nav-prev btn {{ theme }} outline">
-                <i class="fas fa-arrow-left"></i> Previous Lesson
-            </a>
-            <div class="completion-status {{ theme }}">
-                <button class="btn {{ theme }} success" onclick="completeLesson()">
-                    <i class="fas fa-check-circle"></i> Mark as Complete
-                </button>
-                <span class="status-text">0/{{ lesson.content|length if lesson.content else 5 }} topics completed</span>
-            </div>
-            <a href="#" class="nav-next btn {{ theme }}">
-                Next Lesson <i class="fas fa-arrow-right"></i>
-            </a>
-        </div>
-    </div>
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize code editors
-    initCodeEditors();
-    
-    // Set up topic navigation
-    setupTopicNavigation();
-    
-    // Load lesson progress
-    loadLessonProgress();
-    
-    // Set up interactive elements
-    setupInteractiveElements();
-});
-
-function initCodeEditors() {
-    // Add line numbers to code blocks
-    document.querySelectorAll('.code-block').forEach(block => {
-        const lines = block.textContent.split('\n').length;
-        const lineNumbers = document.createElement('div');
-        lineNumbers.className = 'line-numbers';
-        
-        for (let i = 1; i <= lines; i++) {
-            lineNumbers.innerHTML += `<span>${i}</span>`;
+                    `;
+                });
+                
+                quizHTML += `
+                    </div>
+                    <div id="quizFeedback${index}" style="margin-top: 0.5rem; padding: 0.5rem; border-radius: var(--radius); display: none;"></div>
+                `;
+            });
+            
+            quizHTML += '</div>';
+            return quizHTML;
         }
-        
-        block.parentElement.insertBefore(lineNumbers, block);
-    });
-}
 
-function setupTopicNavigation() {
-    // Make topic cards clickable
-    document.querySelectorAll('.topic-card').forEach(card => {
-        card.addEventListener('click', function(e) {
-            if (!e.target.closest('.topic-actions')) {
-                const header = this.querySelector('.topic-header');
-                header.classList.toggle('expanded');
-            }
-        });
-    });
-}
+        // Run Code
+        function runCode(code) {
+            // In a real implementation, this would send to a server for execution
+            // For demo purposes, we'll simulate execution
+            const output = simulateCodeExecution(code);
+            alert(`Output:\n${output}`);
+        }
 
-function loadLessonProgress() {
-    // Load saved progress from localStorage
-    const progress = localStorage.getItem(`lesson_${topic}_progress`) || '{}';
-    const completedTopics = JSON.parse(progress);
-    
-    // Mark completed topics
-    Object.keys(completedTopics).forEach(topicIndex => {
-        const topicCard = document.querySelector(`.topic-card:nth-child(${parseInt(topicIndex) + 1})`);
-        if (topicCard) {
-            topicCard.classList.add('completed');
-            const status = topicCard.querySelector('.nav-status');
-            if (status) {
-                status.className = 'nav-status completed';
-                status.innerHTML = '<i class="fas fa-check"></i>';
+        // Run Practice Code
+        function runPracticeCode() {
+            const code = document.getElementById('practiceCode').value;
+            const output = simulateCodeExecution(code);
+            document.getElementById('practiceOutput').innerHTML = `<strong>Output:</strong>\n${output}`;
+            
+            // Check if solution is mostly correct
+            if (code.includes('print') && (code.includes('name') || code.includes('age') || code.includes('score'))) {
+                showNotification('Good job! Your code is working correctly!', 'success');
             }
         }
-    });
-    
-    // Update completion status
-    updateCompletionStatus();
-}
 
-function updateCompletionStatus() {
-    const completed = document.querySelectorAll('.topic-card.completed').length;
-    const total = document.querySelectorAll('.topic-card').length;
-    const statusText = document.querySelector('.status-text');
-    if (statusText) {
-        statusText.textContent = `${completed}/${total} topics completed`;
-    }
-    
-    // Update progress bar
-    const percent = (completed / total) * 100;
-    const progressFill = document.querySelector('.progress-fill');
-    if (progressFill) {
-        progressFill.style.width = `${percent}%`;
-    }
-    const progressPercent = document.querySelector('.progress-percent');
-    if (progressPercent) {
-        progressPercent.textContent = `${Math.round(percent)}%`;
-    }
-}
-
-function setupInteractiveElements() {
-    // Add syntax highlighting to code blocks
-    document.querySelectorAll('.code-block code').forEach(block => {
-        const lang = topic.includes('python') ? 'python' : 
-                    topic.includes('web') ? 'html' : 'python';
-        highlightSyntax(block, lang);
-    });
-}
-
-function highlightSyntax(element, language) {
-    // Simple syntax highlighting
-    const code = element.textContent;
-    let highlighted = code;
-    
-    if (language === 'python') {
-        // Highlight Python keywords
-        const keywords = ['def', 'class', 'return', 'if', 'elif', 'else', 'for', 'while', 
-                         'try', 'except', 'import', 'from', 'as', 'True', 'False', 'None'];
-        
-        keywords.forEach(keyword => {
-            const regex = new RegExp(`\\b${keyword}\\b`, 'g');
-            highlighted = highlighted.replace(regex, `<span class="keyword">${keyword}</span>`);
-        });
-        
-        // Highlight strings
-        highlighted = highlighted.replace(/(['"])(.*?)\1/g, '<span class="string">$1$2$1</span>');
-        
-        // Highlight comments
-        highlighted = highlighted.replace(/#.*$/gm, '<span class="comment">$&</span>');
-        
-        // Highlight numbers
-        highlighted = highlighted.replace(/\b\d+\b/g, '<span class="number">$&</span>');
-    } else if (language === 'html') {
-        // Highlight HTML tags
-        highlighted = highlighted.replace(/&lt;\/?(\w+).*?&gt;/g, '<span class="tag">&lt;$1&gt;</span>');
-    }
-    
-    element.innerHTML = highlighted;
-}
-
-function toggleExample(topicIndex) {
-    const example = document.getElementById(`example-${topicIndex}`);
-    const quiz = document.getElementById(`quiz-${topicIndex}`);
-    
-    if (example.style.display === 'none') {
-        example.style.display = 'block';
-        if (quiz) quiz.style.display = 'none';
-    } else {
-        example.style.display = 'none';
-    }
-}
-
-function toggleQuiz(topicIndex) {
-    const quiz = document.getElementById(`quiz-${topicIndex}`);
-    const example = document.getElementById(`example-${topicIndex}`);
-    
-    if (quiz.style.display === 'none') {
-        quiz.style.display = 'block';
-        if (example) example.style.display = 'none';
-    } else {
-        quiz.style.display = 'none';
-    }
-}
-
-function runExample(topicIndex) {
-    const example = document.getElementById(`example-${topicIndex}`);
-    const code = example.querySelector('code').textContent;
-    
-    // In a real implementation, this would send to server for execution
-    // For now, simulate execution
-    alert('Running example code... Check the browser console for output!');
-    console.log('Executing example code:', code);
-    
-    // Mark topic as practiced
-    markTopicPracticed(topicIndex);
-}
-
-function submitQuiz(topicIndex) {
-    const quiz = document.getElementById(`quiz-${topicIndex}`);
-    const selected = quiz.querySelector('input[type="radio"]:checked');
-    
-    if (!selected) {
-        alert('Please select an answer!');
-        return;
-    }
-    
-    // Simple validation (in real app, check against correct answer)
-    const isCorrect = Math.random() > 0.5; // Simulate random correctness
-    
-    if (isCorrect) {
-        alert('🎉 Correct! Well done!');
-        markTopicCompleted(topicIndex);
-    } else {
-        alert('❌ Not quite right. Try again!');
-    }
-}
-
-function markTopicCompleted(topicIndex) {
-    const topicCard = document.querySelector(`.topic-card:nth-child(${topicIndex})`);
-    if (topicCard) {
-        topicCard.classList.add('completed');
-        
-        // Save to localStorage
-        const progress = JSON.parse(localStorage.getItem(`lesson_${topic}_progress`) || '{}');
-        progress[topicIndex] = true;
-        localStorage.setItem(`lesson_${topic}_progress`, JSON.stringify(progress));
-        
-        // Update UI
-        updateCompletionStatus();
-        
-        // Show celebration for completing all topics
-        const completed = document.querySelectorAll('.topic-card.completed').length;
-        const total = document.querySelectorAll('.topic-card').length;
-        if (completed === total) {
-            showCompletionCelebration();
+        // Simulate Code Execution
+        function simulateCodeExecution(code) {
+            // Very basic simulation for demo purposes
+            if (code.includes('print')) {
+                const lines = code.split('\n');
+                let output = '';
+                lines.forEach(line => {
+                    if (line.includes('print(')) {
+                        const match = line.match(/print\((.*)\)/);
+                        if (match) {
+                            output += eval(match[1]) + '\n';
+                        }
+                    }
+                });
+                return output || 'No output generated';
+            }
+            return 'Code executed successfully (simulated)';
         }
-    }
-}
 
-function markTopicPracticed(topicIndex) {
-    const topicCard = document.querySelector(`.topic-card:nth-child(${topicIndex})`);
-    if (topicCard && !topicCard.classList.contains('completed')) {
-        topicCard.classList.add('practiced');
-    }
-}
+        // Check Quiz Answer
+        function checkAnswer(element, isCorrect, questionIndex) {
+            const feedback = document.getElementById(`quizFeedback${questionIndex}`);
+            const options = element.parentElement.children;
+            
+            // Reset all options
+            for (let opt of options) {
+                opt.classList.remove('correct', 'incorrect');
+            }
+            
+            // Mark selected option
+            element.classList.add(isCorrect ? 'correct' : 'incorrect');
+            
+            // Show feedback
+            feedback.style.display = 'block';
+            feedback.style.background = isCorrect ? 
+                (currentTheme === 'cute' ? '#d4edda' : '#1a3a2a') :
+                (currentTheme === 'cute' ? '#f8d7da' : '#3a1a1a');
+            feedback.style.borderLeft = isCorrect ? '4px solid #28a745' : '4px solid #dc3545';
+            feedback.innerHTML = isCorrect ? 
+                '<i class="fas fa-check-circle"></i> Correct! Well done!' :
+                '<i class="fas fa-times-circle"></i> Not quite right. Try again!';
+            
+            if (isCorrect) {
+                // Award XP for correct answer
+                awardXP(10);
+            }
+        }
 
-function runPracticeCode() {
-    const code = document.getElementById('practiceCode').value;
-    const output = document.getElementById('practiceOutput');
-    
-    try {
-        // Simulate code execution
-        const result = simulateExecution(code);
-        output.textContent = result;
-        output.className = 'success';
-        
-        // Show success message
-        showNotification('Code executed successfully!', 'success');
-    } catch (error) {
-        output.textContent = `Error: ${error.message}`;
-        output.className = 'error';
-        
-        showNotification('Code execution failed', 'error');
-    }
-}
+        // Show Hint
+        function showHint() {
+            const hint = document.getElementById('hint');
+            hint.style.display = 'block';
+        }
 
-function simulateExecution(code) {
-    // Very basic simulation
-    if (code.includes('print') || code.includes('console.log')) {
-        return "Hello, Coder!\nWelcome to Python Pathfinder!\nYour code executed successfully.";
-    } else if (code.includes('TODO') || code.trim() === '') {
-        return "Please write some code before running.";
-    } else {
-        return "Code executed. No output generated.";
-    }
-}
+        // Show Solution
+        function showSolution() {
+            const practices = {
+                python_basics: `# Solution
+name = "Python Learner"
+age = 20
+score = 98.7
+print("Name:", name)
+print("Age:", age)
+print("Score:", score)`
+            };
+            
+            document.getElementById('practiceCode').value = practices.python_basics;
+            document.getElementById('hint').style.display = 'none';
+        }
 
-function checkPracticeSolution() {
-    const code = document.getElementById('practiceCode').value;
-    
-    // Simple validation based on topic
-    let isValid = false;
-    let feedback = '';
-    
-    if (topic === 'python_basics') {
-        isValid = code.includes('input(') && code.includes('print(');
-        feedback = isValid ? 
-            "✅ Perfect! You're using input() and print() correctly!" :
-            "⚠️ Make sure to use input() to get user data and print() to display results.";
-    } else if (topic === 'web_basics') {
-        isValid = code.includes('<html>') && code.includes('<body>');
-        feedback = isValid ?
-            "✅ Great! You have the basic HTML structure!" :
-            "⚠️ Remember to include <html> and <body> tags in your HTML.";
-    } else {
-        isValid = code.trim().length > 10;
-        feedback = isValid ?
-            "✅ Good attempt! Keep practicing!" :
-            "⚠️ Try writing more code to complete the challenge.";
-    }
-    
-    alert(feedback);
-    
-    if (isValid) {
-        showNotification('Challenge completed! +50 XP', 'success');
-        // In real app, would award XP and update progress
-    }
-}
+        // Mark Lesson as Complete
+        function markComplete() {
+            const currentLesson = document.querySelector('.nav-item.active');
+            if (currentLesson) {
+                const lessonId = currentLesson.dataset.lesson;
+                if (lessons[lessonId]) {
+                    lessons[lessonId].completed = true;
+                    
+                    // Update button
+                    const btn = document.getElementById('completeBtn');
+                    if (btn) {
+                        btn.innerHTML = '<i class="fas fa-check-double"></i> Completed';
+                        btn.disabled = true;
+                    }
+                    
+                    // Update navigation
+                    const navItem = document.querySelector(`[data-lesson="${lessonId}"] .nav-status`);
+                    if (navItem) {
+                        navItem.className = 'nav-status completed';
+                        navItem.innerHTML = '<i class="fas fa-check"></i>';
+                    }
+                    
+                    // Award XP
+                    awardXP(lessons[lessonId].xp);
+                    
+                    // Show notification
+                    showNotification(`Lesson completed! +${lessons[lessonId].xp} XP earned!`, 'success');
+                    
+                    // Update progress
+                    updateProgress();
+                }
+            }
+        }
 
-function showHint() {
-    const hints = {
-        'python_basics': 'Use the input() function to get user input and print() to display results.',
-        'web_basics': 'Start with the basic HTML structure: <html><head><title></title></head><body></body></html>',
-        'advanced_python': 'Define a class with __init__ method and create instance methods for operations.',
-        'database': 'Use CREATE TABLE to define structure and INSERT to add data.'
-    };
-    
-    const hint = hints[topic] || 'Try breaking the problem into smaller steps and test each part.';
-    alert(`💡 Hint: ${hint}`);
-}
-
-function completeLesson() {
-    const completed = document.querySelectorAll('.topic-card.completed').length;
-    const total = document.querySelectorAll('.topic-card').length;
-    
-    if (completed === total) {
-        // Show celebration
-        showCompletionCelebration();
-        
-        // Update progress
-        localStorage.setItem(`lesson_${topic}_completed`, 'true');
-        
         // Award XP
-        showNotification(`🎉 Lesson Completed! +100 XP`, 'success');
-        
-        // Update button
-        const completeBtn = document.querySelector('.completion-status .btn');
-        if (completeBtn) {
-            completeBtn.innerHTML = '<i class="fas fa-check-double"></i> Completed';
-            completeBtn.classList.remove('success');
-            completeBtn.classList.add('completed');
-            completeBtn.disabled = true;
+        function awardXP(amount) {
+            let totalXP = parseInt(localStorage.getItem('total_xp') || '0');
+            totalXP += amount;
+            localStorage.setItem('total_xp', totalXP.toString());
+            
+            // Update achievements if needed
+            updateAchievements(totalXP);
         }
-    } else {
-        alert(`Complete all ${total} topics first! You've completed ${completed}/${total}.`);
-    }
-}
 
-function showCompletionCelebration() {
-    // Create celebration elements
-    const celebration = document.createElement('div');
-    celebration.className = `celebration ${theme}`;
-    celebration.innerHTML = `
-        <div class="celebration-content">
-            <div class="celebration-icon">🎉</div>
-            <h3>Lesson Completed!</h3>
-            <p>You've mastered ${lesson.title}</p>
-            <div class="rewards">
-                <span class="reward">+100 XP</span>
-                <span class="reward">🏆 Achievement Unlocked</span>
-            </div>
-            <button class="btn ${theme}" onclick="this.parentElement.parentElement.remove()">
-                Continue Learning
-            </button>
-        </div>
-    `;
-    
-    celebration.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 10000;
-        animation: fadeIn 0.3s ease;
-    `;
-    
-    document.body.appendChild(celebration);
-    
-    // Add confetti
-    createConfetti();
-}
+        // Update Progress
+        function updateProgress() {
+            const completedLessons = Object.values(lessons).filter(l => l.completed).length;
+            const totalLessons = Object.keys(lessons).length;
+            const progress = Math.round((completedLessons / totalLessons) * 100);
+            
+            document.getElementById('progressPercent').textContent = `${progress}%`;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+        }
 
-function createConfetti() {
-    const confetti = document.createElement('div');
-    confetti.className = 'confetti';
-    confetti.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: 9999;
-    `;
-    
-    document.body.appendChild(confetti);
-    
-    // Create confetti pieces
-    const colors = theme === 'cute' ? 
-        ['#ff9ed8', '#a6e3ff', '#ffd166', '#a8e6cf'] :
-        ['#ff4655', '#1fc0ff', '#00ff9d', '#ffd166'];
-    
-    for (let i = 0; i < 100; i++) {
-        const piece = document.createElement('div');
-        piece.style.cssText = `
-            position: absolute;
-            width: ${8 + Math.random() * 8}px;
-            height: ${8 + Math.random() * 8}px;
-            background: ${colors[Math.floor(Math.random() * colors.length)]};
-            top: -20px;
-            left: ${Math.random() * 100}%;
-            border-radius: ${Math.random() > 0.5 ? '50%' : '0'};
-            animation: fall ${2 + Math.random() * 3}s linear forwards;
-            transform: rotate(${Math.random() * 360}deg);
+        // Update Achievements
+        function updateAchievements(xp) {
+            let achievements = Math.floor(xp / 100);
+            document.getElementById('achievementCount').textContent = `${achievements}/25 Achievements`;
+        }
+
+        // Show Notification
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                ${message}
+            `;
+            
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 1rem 1.5rem;
+                background: ${type === 'success' ? '#4CAF50' : '#F44336'};
+                color: white;
+                border-radius: var(--radius);
+                box-shadow: var(--shadow);
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out forwards';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Navigation between lessons
+        function nextLesson() {
+            const current = document.querySelector('.nav-item.active');
+            const next = current.parentElement.querySelectorAll('.nav-item:not(.active)')[0];
+            if (next && !next.querySelector('.fa-lock')) {
+                next.click();
+            } else {
+                showNotification('Complete current lesson first!', 'warning');
+            }
+        }
+
+        function prevLesson() {
+            const current = document.querySelector('.nav-item.active');
+            const items = current.parentElement.querySelectorAll('.nav-item');
+            const currentIndex = Array.from(items).indexOf(current);
+            if (currentIndex > 0) {
+                items[currentIndex - 1].click();
+            }
+        }
+
+        // Add animation styles
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+            
+            @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+            
+            .fa-spin {
+                animation: spin 1s linear infinite;
+            }
+            
+            .quiz-option.correct {
+                background: #d4edda !important;
+                border-color: #c3e6cb !important;
+            }
+            
+            .quiz-option.incorrect {
+                background: #f8d7da !important;
+                border-color: #f5c6cb !important;
+            }
+            
+            .lesson-content.deadly .quiz-option.correct {
+                background: #1a3a2a !important;
+                border-color: #28a745 !important;
+            }
+            
+            .lesson-content.deadly .quiz-option.incorrect {
+                background: #3a1a1a !important;
+                border-color: #dc3545 !important;
+            }
         `;
-        confetti.appendChild(piece);
-    }
-    
-    setTimeout(() => confetti.remove(), 3000);
-}
+        document.head.appendChild(style);
 
-function showNotification(message, type) {
-    const notification = document.createElement('div');
-    notification.className = `lesson-notification ${type} ${theme}`;
-    notification.textContent = message;
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 12px 20px;
-        border-radius: 8px;
-        z-index: 10001;
-        animation: slideInRight 0.3s ease-out;
-    `;
-    
-    if (theme === 'cute') {
-        notification.style.background = 'white';
-        notification.style.border = '2px solid var(--cute-primary)';
-        notification.style.color = 'var(--cute-text)';
-    } else {
-        notification.style.background = 'var(--deadly-secondary)';
-        notification.style.border = '1px solid var(--deadly-accent)';
-        notification.style.color = 'var(--deadly-text)';
-    }
-    
-    if (type === 'success') {
-        notification.style.borderColor = '#4CAF50';
-    } else if (type === 'error') {
-        notification.style.borderColor = '#F44336';
-    }
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        notification.style.animation = 'slideOutRight 0.3s ease-out forwards';
-        setTimeout(() => notification.remove(), 300);
-    }, 3000);
-}
-
-// Add CSS animations
-const style = document.createElement('style');
-style.textContent = `
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes slideInRight {
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-}
-
-@keyframes slideOutRight {
-    from { transform: translateX(0); opacity: 1; }
-    to { transform: translateX(100%); opacity: 0; }
-}
-
-@keyframes fall {
-    to { transform: translateY(100vh) rotate(360deg); opacity: 0; }
-}
-
-@keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-}
-
-.topic-card.completed {
-    border-color: #4CAF50 !important;
-}
-
-.topic-card.completed .topic-header {
-    background: rgba(76, 175, 80, 0.1) !important;
-}
-
-.topic-card.practiced {
-    border-color: #FF9800 !important;
-}
-
-.code-block {
-    position: relative;
-    padding-left: 40px;
-}
-
-.line-numbers {
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 30px;
-    background: rgba(0, 0, 0, 0.05);
-    padding: 10px 5px;
-    font-family: monospace;
-    font-size: 0.9em;
-    line-height: 1.5;
-    text-align: right;
-    border-right: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-.line-numbers span {
-    display: block;
-}
-
-.code-block .keyword { color: #ff6b6b; font-weight: bold; }
-.code-block .string { color: #4ecdc4; }
-.code-block .comment { color: #999; font-style: italic; }
-.code-block .number { color: #ffd166; }
-.code-block .tag { color: #1a73e8; }
-
-.practice-output.success {
-    color: #4CAF50;
-    border-color: #4CAF50 !important;
-}
-
-.practice-output.error {
-    color: #F44336;
-    border-color: #F44336 !important;
-}
-
-.celebration-content {
-    background: white;
-    padding: 3rem;
-    border-radius: 20px;
-    text-align: center;
-    max-width: 500px;
-    animation: pulse 2s infinite;
-}
-
-.celebration.deadly .celebration-content {
-    background: var(--deadly-secondary);
-    color: var(--deadly-text);
-    border: 2px solid var(--deadly-accent);
-}
-
-.celebration-icon {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-}
-
-.rewards {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin: 1rem 0;
-}
-
-.reward {
-    padding: 0.5rem 1rem;
-    background: rgba(76, 175, 80, 0.1);
-    border-radius: 20px;
-    font-weight: bold;
-}
-`;
-document.head.appendChild(style);
-</script>
-
+        // Initialize with first lesson
+        loadLesson('python_basics');
+    </script>
+</body>
+</html>
