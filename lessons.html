@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -665,6 +666,98 @@
         .lesson-content > div {
             animation: fadeIn 0.5s ease-out;
         }
+
+        /* Progress indicators */
+        .topic-progress {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .topic-progress-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ddd;
+        }
+
+        .topic-progress-dot.completed {
+            background: #4CAF50;
+        }
+
+        .topic-progress-dot.active {
+            background: #2196F3;
+            animation: pulse 2s infinite;
+        }
+
+        /* XP Badge */
+        .xp-badge {
+            background: linear-gradient(135deg, #ffd700, #ff9800);
+            color: #333;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* Completion Celebration */
+        .celebration-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .celebration-content {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            animation: pulse 2s infinite;
+        }
+
+        .celebration-content.deadly {
+            background: var(--deadly-card);
+            color: var(--deadly-text);
+            border: 2px solid var(--deadly-accent);
+        }
+
+        .celebration-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            animation: fall linear forwards;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body class="cute-theme">
@@ -674,6 +767,9 @@
             <i class="fas fa-code"></i> Python Pathfinder
         </a>
         <div class="nav-links">
+            <div class="xp-badge" id="xpBadge">
+                <i class="fas fa-gem"></i> <span id="xpCount">0</span> XP
+            </div>
             <a href="dashboard.html" class="nav-link cute">
                 <i class="fas fa-home"></i> Dashboard
             </a>
@@ -701,10 +797,10 @@
             <div class="course-progress cute">
                 <div class="progress-info">
                     <span>Course Progress</span>
-                    <span id="progressPercent">65%</span>
+                    <span id="progressPercent">0%</span>
                 </div>
                 <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill" style="width: 65%"></div>
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
                 </div>
             </div>
             
@@ -715,7 +811,7 @@
             <div class="sidebar-footer cute">
                 <div class="achievement-count cute">
                     <i class="fas fa-trophy"></i>
-                    <span id="achievementCount">5/25 Achievements</span>
+                    <span id="achievementCount">0 Achievements</span>
                 </div>
             </div>
         </aside>
@@ -726,157 +822,73 @@
             <div id="defaultContent">
                 <div class="lesson-header cute">
                     <div class="breadcrumbs cute">
-                        <a href="dashboard.html">Dashboard</a>
+                        <a href="#" onclick="loadDashboard()">Dashboard</a>
                         <i class="fas fa-chevron-right"></i>
                         <a href="lessons.html">Lessons</a>
                         <i class="fas fa-chevron-right"></i>
-                        <span>Python Basics</span>
+                        <span>Welcome to Python Pathfinder</span>
                     </div>
                     
                     <h1 class="lesson-title cute">
-                        <i class="fas fa-play-circle"></i> Python Basics
+                        <i class="fas fa-rocket"></i> Start Your Coding Journey
                     </h1>
                     
                     <div class="lesson-meta cute">
                         <span class="meta-item">
-                            <i class="fas fa-clock"></i>
-                            <span>30-45 min</span>
-                        </span>
-                        <span class="meta-item">
                             <i class="fas fa-star"></i>
-                            <span>Beginner</span>
+                            <span>Beginner Friendly</span>
                         </span>
                         <span class="meta-item">
                             <i class="fas fa-gem"></i>
-                            <span>100 XP</span>
+                            <span>Earn XP as you learn</span>
                         </span>
                     </div>
                 </div>
                 
-                <!-- Introduction -->
                 <div class="w3-panel cute">
-                    <h2><i class="fas fa-info-circle"></i> Introduction to Python</h2>
-                    <p>Python is a popular programming language. It was created by Guido van Rossum, and released in 1991.</p>
-                    <p>It is used for:</p>
-                    <ul>
-                        <li>Web development (server-side)</li>
-                        <li>Software development</li>
-                        <li>Mathematics</li>
-                        <li>System scripting</li>
+                    <h2><i class="fas fa-info-circle"></i> Welcome Coder!</h2>
+                    <p>Select a lesson from the sidebar to begin your journey. Each lesson includes:</p>
+                    <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                        <li>Interactive tutorials with live code examples</li>
+                        <li>Hands-on practice exercises</li>
+                        <li>Knowledge-check quizzes</li>
+                        <li>Real-time progress tracking</li>
+                        <li>XP rewards for completion</li>
                     </ul>
                 </div>
 
-                <!-- Syntax -->
                 <div class="w3-panel cute">
-                    <h2><i class="fas fa-code"></i> Python Syntax</h2>
-                    <p>Python syntax can be executed by writing directly in the Command Line:</p>
-                    
-                    <div class="w3-example">
-                        <h3>Example</h3>
-                        <div class="w3-code">
->>> print("Hello, World!")
-Hello, World!
-                        </div>
-                        <button class="try-it-button" onclick="runCode('print(\"Hello, World!\")')">
-                            <i class="fas fa-play"></i> Try it Yourself
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Variables -->
-                <div class="w3-panel cute">
-                    <h2><i class="fas fa-tag"></i> Python Variables</h2>
-                    <p>Variables are containers for storing data values.</p>
-                    
-                    <div class="w3-example">
-                        <h3>Example</h3>
-                        <div class="w3-code">
-x = 5
-y = "John"
-print(x)
-print(y)
-                        </div>
-                        <button class="try-it-button" onclick="runCode('x = 5\ny = \"John\"\nprint(x)\nprint(y)')">
-                            <i class="fas fa-play"></i> Try it Yourself
-                        </button>
-                    </div>
-                    
-                    <div class="w3-note">
-                        <p><strong>Note:</strong> Python has no command for declaring a variable. A variable is created the moment you first assign a value to it.</p>
-                    </div>
-                </div>
-
-                <!-- Interactive Practice -->
-                <div class="w3-panel cute">
-                    <h2><i class="fas fa-laptop-code"></i> Practice Exercise</h2>
-                    <p>Create a variable named <code>carName</code> and assign the value <code>Volvo</code> to it.</p>
-                    
-                    <div class="code-editor">
-                        <div class="editor-header">
-                            <span>practice.py</span>
-                            <div class="editor-actions">
-                                <button class="run-button" onclick="runPracticeCode()">
-                                    <i class="fas fa-play"></i> Run
-                                </button>
+                    <h2><i class="fas fa-chart-line"></i> Your Progress</h2>
+                    <div id="welcomeProgress" style="margin-top: 1rem;">
+                        <p>Complete lessons to earn XP and unlock achievements!</p>
+                        <div style="background: #f0f0f0; border-radius: var(--radius); padding: 1rem; margin-top: 1rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>Total Lessons Completed:</span>
+                                <strong id="completedCount">0</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>Total XP Earned:</span>
+                                <strong id="totalXP">0</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>Current Streak:</span>
+                                <strong id="currentStreak">0 days</strong>
                             </div>
                         </div>
-                        <div class="editor-content">
-                            <textarea id="practiceCode" style="width: 100%; height: 150px; background: #1e1e1e; color: white; border: none; padding: 10px; font-family: monospace; resize: vertical;">
-# Create a variable named carName and assign the value "Volvo" to it
-
-# Your code here
-
-# This should print "Volvo"
-print(carName)
-                            </textarea>
-                        </div>
-                    </div>
-                    
-                    <div id="practiceOutput" style="margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: var(--radius); min-height: 50px;">
-                        <strong>Output:</strong> Run your code to see output here...
                     </div>
                 </div>
 
-                <!-- Quiz -->
-                <div class="quiz-container cute">
-                    <h2><i class="fas fa-question-circle"></i> Quick Quiz</h2>
-                    <div class="quiz-question">
-                        Which of the following is the correct way to create a variable in Python?
+                <div class="w3-panel cute">
+                    <h2><i class="fas fa-lightbulb"></i> Quick Start Tips</h2>
+                    <div class="w3-note" style="margin-top: 1rem;">
+                        <p><strong>Tip #1:</strong> Complete lessons in order - each builds on previous knowledge</p>
                     </div>
-                    
-                    <div class="quiz-options" id="quizOptions">
-                        <div class="quiz-option cute" onclick="checkAnswer(this, 'correct')">
-                            <input type="radio" name="quiz1">
-                            <span>x = 5</span>
-                        </div>
-                        <div class="quiz-option cute" onclick="checkAnswer(this, 'incorrect')">
-                            <input type="radio" name="quiz1">
-                            <span>int x = 5</span>
-                        </div>
-                        <div class="quiz-option cute" onclick="checkAnswer(this, 'incorrect')">
-                            <input type="radio" name="quiz1">
-                            <span>var x = 5</span>
-                        </div>
-                        <div class="quiz-option cute" onclick="checkAnswer(this, 'incorrect')">
-                            <input type="radio" name="quiz1">
-                            <span>let x = 5</span>
-                        </div>
+                    <div class="w3-note" style="margin-top: 1rem;">
+                        <p><strong>Tip #2:</strong> Try all code examples - hands-on practice is key to learning</p>
                     </div>
-                    
-                    <div id="quizFeedback" style="margin-top: 1rem; padding: 0.5rem; border-radius: var(--radius); display: none;"></div>
-                </div>
-
-                <!-- Navigation -->
-                <div class="lesson-navigation cute" style="display: flex; justify-content: space-between; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--cute-secondary);">
-                    <button class="btn outline cute" onclick="prevLesson()">
-                        <i class="fas fa-arrow-left"></i> Previous
-                    </button>
-                    <button class="btn cute" onclick="markComplete()">
-                        <i class="fas fa-check-circle"></i> Mark Complete
-                    </button>
-                    <button class="btn cute" onclick="nextLesson()">
-                        Next <i class="fas fa-arrow-right"></i>
-                    </button>
+                    <div class="w3-note" style="margin-top: 1rem;">
+                        <p><strong>Tip #3:</strong> Don't rush - take your time to understand each concept</p>
+                    </div>
                 </div>
             </div>
         </main>
@@ -894,23 +906,352 @@ print(carName)
         </div>
     </footer>
 
+    <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-python-interpreter@latest/dist/interpreter.min.js"></script>
     <script>
-        // Theme Management
-        const THEME_KEY = 'pp_theme';
-        let currentTheme = localStorage.getItem(THEME_KEY) || 'cute';
+        // ==================== DATA STORAGE & MANAGEMENT ====================
+        class UserProgress {
+            constructor() {
+                this.STORAGE_KEYS = {
+                    PROGRESS: 'pp_lesson_progress',
+                    XP: 'pp_total_xp',
+                    STREAK: 'pp_streak',
+                    LAST_ACTIVE: 'pp_last_active',
+                    COMPLETED_LESSONS: 'pp_completed_lessons',
+                    COMPLETED_TOPICS: 'pp_completed_topics'
+                };
+                this.loadProgress();
+            }
 
+            loadProgress() {
+                this.progress = JSON.parse(localStorage.getItem(this.STORAGE_KEYS.PROGRESS) || '{}');
+                this.totalXP = parseInt(localStorage.getItem(this.STORAGE_KEYS.XP) || '0');
+                this.streak = JSON.parse(localStorage.getItem(this.STORAGE_KEYS.STREAK) || '{"days": 0, "lastDate": ""}');
+                this.completedLessons = JSON.parse(localStorage.getItem(this.STORAGE_KEYS.COMPLETED_LESSONS) || '[]');
+                this.completedTopics = JSON.parse(localStorage.getItem(this.STORAGE_KEYS.COMPLETED_TOPICS) || '{}');
+                
+                this.updateStreak();
+            }
+
+            saveProgress() {
+                localStorage.setItem(this.STORAGE_KEYS.PROGRESS, JSON.stringify(this.progress));
+                localStorage.setItem(this.STORAGE_KEYS.XP, this.totalXP.toString());
+                localStorage.setItem(this.STORAGE_KEYS.STREAK, JSON.stringify(this.streak));
+                localStorage.setItem(this.STORAGE_KEYS.COMPLETED_LESSONS, JSON.stringify(this.completedLessons));
+                localStorage.setItem(this.STORAGE_KEYS.COMPLETED_TOPICS, JSON.stringify(this.completedTopics));
+            }
+
+            updateStreak() {
+                const today = new Date().toDateString();
+                const yesterday = new Date(Date.now() - 86400000).toDateString();
+                
+                if (this.streak.lastDate === today) return;
+                
+                if (this.streak.lastDate === yesterday) {
+                    this.streak.days++;
+                } else if (!this.streak.lastDate) {
+                    this.streak.days = 1;
+                } else {
+                    this.streak.days = 1;
+                }
+                
+                this.streak.lastDate = today;
+                this.saveProgress();
+            }
+
+            markTopicComplete(lessonId, topicIndex) {
+                if (!this.completedTopics[lessonId]) {
+                    this.completedTopics[lessonId] = [];
+                }
+                
+                if (!this.completedTopics[lessonId].includes(topicIndex)) {
+                    this.completedTopics[lessonId].push(topicIndex);
+                    this.awardXP(10); // 10 XP per topic
+                    this.saveProgress();
+                    return true;
+                }
+                return false;
+            }
+
+            markLessonComplete(lessonId) {
+                if (!this.completedLessons.includes(lessonId)) {
+                    this.completedLessons.push(lessonId);
+                    this.awardXP(100); // 100 XP for completing lesson
+                    this.saveProgress();
+                    
+                    // Check for achievements
+                    this.checkAchievements();
+                    return true;
+                }
+                return false;
+            }
+
+            awardXP(amount) {
+                this.totalXP += amount;
+                this.saveProgress();
+                
+                // Update UI
+                document.getElementById('xpCount').textContent = this.totalXP;
+                
+                // Check for level up
+                this.checkLevelUp();
+                return this.totalXP;
+            }
+
+            checkLevelUp() {
+                const oldLevel = Math.floor((this.totalXP - 100) / 1000);
+                const newLevel = Math.floor(this.totalXP / 1000);
+                
+                if (newLevel > oldLevel && newLevel > 0) {
+                    this.showNotification(`🎉 Level Up! You reached Level ${newLevel}!`, 'success');
+                }
+            }
+
+            checkAchievements() {
+                const achievements = [];
+                const completedCount = this.completedLessons.length;
+                
+                if (completedCount >= 1 && !this.progress.first_lesson) {
+                    achievements.push({ name: "First Steps", xp: 50 });
+                    this.progress.first_lesson = true;
+                }
+                
+                if (completedCount >= 3 && !this.progress.three_lessons) {
+                    achievements.push({ name: "Quick Learner", xp: 100 });
+                    this.progress.three_lessons = true;
+                }
+                
+                if (completedCount >= 5 && !this.progress.five_lessons) {
+                    achievements.push({ name: "Code Master", xp: 200 });
+                    this.progress.five_lessons = true;
+                }
+                
+                if (this.streak.days >= 3 && !this.progress.three_day_streak) {
+                    achievements.push({ name: "Consistent Coder", xp: 150 });
+                    this.progress.three_day_streak = true;
+                }
+                
+                if (this.streak.days >= 7 && !this.progress.week_streak) {
+                    achievements.push({ name: "Dedicated Developer", xp: 300 });
+                    this.progress.week_streak = true;
+                }
+                
+                achievements.forEach(achievement => {
+                    this.awardXP(achievement.xp);
+                    this.showNotification(`🏆 Achievement Unlocked: ${achievement.name}! +${achievement.xp} XP`, 'success');
+                });
+                
+                this.saveProgress();
+            }
+
+            getProgressPercent() {
+                const totalLessons = Object.keys(LESSON_DATA).length;
+                return Math.round((this.completedLessons.length / totalLessons) * 100);
+            }
+
+            showNotification(message, type) {
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.innerHTML = `
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                    ${message}
+                `;
+                
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    padding: 1rem 1.5rem;
+                    background: ${type === 'success' ? '#4CAF50' : '#F44336'};
+                    color: white;
+                    border-radius: var(--radius);
+                    box-shadow: var(--shadow);
+                    z-index: 10000;
+                    animation: slideIn 0.3s ease-out;
+                `;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.style.animation = 'slideOut 0.3s ease-out forwards';
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+            }
+
+            createConfetti() {
+                const colors = currentTheme === 'cute' ? 
+                    ['#ff9ed8', '#a6e3ff', '#ffd166', '#a8e6cf'] :
+                    ['#ff4655', '#1fc0ff', '#00ff9d', '#ffd166'];
+                
+                for (let i = 0; i < 100; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.cssText = `
+                        position: fixed;
+                        width: ${8 + Math.random() * 8}px;
+                        height: ${8 + Math.random() * 8}px;
+                        background: ${colors[Math.floor(Math.random() * colors.length)]};
+                        top: -20px;
+                        left: ${Math.random() * 100}%;
+                        border-radius: ${Math.random() > 0.5 ? '50%' : '0'};
+                        animation: fall ${2 + Math.random() * 3}s linear forwards;
+                        transform: rotate(${Math.random() * 360}deg);
+                        z-index: 9999;
+                    `;
+                    document.body.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 3000);
+                }
+            }
+        }
+
+        // ==================== LESSON DATA ====================
+        const LESSON_DATA = {
+            python_basics: {
+                id: "python_basics",
+                title: "Python Basics",
+                description: "Learn the fundamentals of Python programming",
+                icon: "fas fa-play-circle",
+                duration: "30-45 min",
+                difficulty: "Beginner",
+                xp: 100,
+                topics: [
+                    {
+                        title: "Introduction to Python",
+                        content: "Python is a high-level, interpreted programming language known for its simplicity and readability.",
+                        example: 'print("Hello, World!")',
+                        quiz: {
+                            question: "What type of programming language is Python?",
+                            options: [
+                                { text: "Compiled", correct: false },
+                                { text: "Interpreted", correct: true },
+                                { text: "Assembly", correct: false },
+                                { text: "Machine Code", correct: false }
+                            ]
+                        }
+                    },
+                    {
+                        title: "Variables",
+                        content: "Variables are used to store data values in Python. You don't need to declare variable types.",
+                        example: 'name = "Python"\nage = 30\nprint(name)\nprint(age)',
+                        practice: {
+                            task: "Create a variable called 'score' and assign it the value 100",
+                            solution: 'score = 100\nprint(score)'
+                        },
+                        quiz: {
+                            question: "How do you create a variable in Python?",
+                            options: [
+                                { text: "var x = 5", correct: false },
+                                { text: "x = 5", correct: true },
+                                { text: "int x = 5", correct: false },
+                                { text: "let x = 5", correct: false }
+                            ]
+                        }
+                    },
+                    {
+                        title: "Data Types",
+                        content: "Python has several built-in data types: integers, floats, strings, booleans, lists, and more.",
+                        example: 'x = 5          # Integer\ny = 3.14       # Float\nname = "John"  # String\nis_true = True # Boolean',
+                        practice: {
+                            task: "Create variables of different data types and print them",
+                            solution: 'num = 42\nprice = 19.99\ntext = "Python"\nflag = True\nprint(num, price, text, flag)'
+                        }
+                    }
+                ]
+            },
+            control_structures: {
+                id: "control_structures",
+                title: "Control Structures",
+                description: "Learn how to control the flow of your Python programs",
+                icon: "fas fa-code",
+                duration: "45-60 min",
+                difficulty: "Beginner",
+                xp: 150,
+                topics: [
+                    {
+                        title: "If Statements",
+                        content: "Use if statements to make decisions in your code.",
+                        example: 'age = 18\nif age >= 18:\n    print("You are an adult")\nelse:\n    print("You are a minor")',
+                        quiz: {
+                            question: "What keyword starts a conditional statement in Python?",
+                            options: [
+                                { text: "when", correct: false },
+                                { text: "if", correct: true },
+                                { text: "check", correct: false },
+                                { text: "condition", correct: false }
+                            ]
+                        }
+                    },
+                    {
+                        title: "Loops",
+                        content: "Loops allow you to execute code repeatedly.",
+                        example: '# For loop\nfor i in range(5):\n    print(i)\n\n# While loop\ncount = 0\nwhile count < 3:\n    print(count)\n    count += 1'
+                    }
+                ]
+            },
+            functions: {
+                id: "functions",
+                title: "Functions & Modules",
+                description: "Learn to create reusable code with functions",
+                icon: "fas fa-function",
+                duration: "60-90 min",
+                difficulty: "Intermediate",
+                xp: 200,
+                topics: [
+                    {
+                        title: "Defining Functions",
+                        content: "Functions are reusable blocks of code that perform specific tasks.",
+                        example: 'def greet(name):\n    return f"Hello, {name}!"\n\nprint(greet("Alice"))'
+                    }
+                ]
+            },
+            web_basics: {
+                id: "web_basics",
+                title: "HTML & CSS Basics",
+                description: "Learn the fundamentals of web development",
+                icon: "fas fa-html5",
+                duration: "60-90 min",
+                difficulty: "Beginner",
+                xp: 150,
+                topics: [
+                    {
+                        title: "HTML Structure",
+                        content: "HTML provides the structure and content of web pages.",
+                        example: '<!DOCTYPE html>\n<html>\n<head>\n    <title>My Page</title>\n</head>\n<body>\n    <h1>Welcome</h1>\n</body>\n</html>'
+                    }
+                ]
+            }
+        };
+
+        const NAVIGATION = [
+            {
+                section: "Python Fundamentals",
+                icon: "fas fa-book",
+                lessons: ["python_basics", "control_structures", "functions", "data_structures", "oop"]
+            },
+            {
+                section: "Web Development",
+                icon: "fas fa-globe",
+                lessons: ["web_basics", "javascript", "flask", "database"]
+            }
+        ];
+
+        // ==================== APPLICATION STATE ====================
+        let currentTheme = localStorage.getItem('pp_theme') || 'cute';
+        let userProgress = new UserProgress();
+        let currentLessonId = null;
+        let currentTopicIndex = 0;
+
+        // ==================== THEME MANAGEMENT ====================
         function applyTheme(theme) {
             currentTheme = theme;
             document.body.className = theme + '-theme';
             
-            // Update all theme-specific elements
             document.querySelectorAll('.cute, .deadly').forEach(el => {
                 el.classList.remove('cute', 'deadly');
                 el.classList.add(theme);
             });
             
-            // Update toggle button text
             const toggleBtn = document.getElementById('themeToggle');
             if (toggleBtn) {
                 toggleBtn.innerHTML = theme === 'cute' 
@@ -918,110 +1259,15 @@ print(carName)
                     : '<i class="fas fa-sun"></i> Cute Mode';
             }
             
-            localStorage.setItem(THEME_KEY, theme);
+            localStorage.setItem('pp_theme', theme);
         }
 
-        // Initialize theme
-        document.addEventListener('DOMContentLoaded', () => {
-            applyTheme(currentTheme);
-            
-            // Setup theme toggle
-            document.getElementById('themeToggle').addEventListener('click', () => {
-                applyTheme(currentTheme === 'cute' ? 'deadly' : 'cute');
-            });
-            
-            // Initialize lesson navigation
-            initializeLessonNav();
-            
-            // Setup syntax highlighting
-            hljs.highlightAll();
-        });
-
-        // Lesson Data Structure
-        const lessons = {
-            python_basics: {
-                title: "Python Basics",
-                duration: "30-45 min",
-                difficulty: "Beginner",
-                xp: 100,
-                completed: true,
-                content: [
-                    {
-                        type: "intro",
-                        title: "Introduction to Python",
-                        content: "Python is a high-level, interpreted programming language known for its simplicity and readability."
-                    },
-                    {
-                        type: "syntax",
-                        title: "Python Syntax",
-                        content: "Learn the basic syntax rules of Python programming.",
-                        example: 'print("Hello, World!")'
-                    },
-                    {
-                        type: "variables",
-                        title: "Variables",
-                        content: "Variables are used to store data values in Python.",
-                        example: 'x = 5\ny = "Python"'
-                    }
-                ]
-            },
-            control_structures: {
-                title: "Control Structures",
-                duration: "45-60 min",
-                difficulty: "Beginner",
-                xp: 150,
-                completed: true,
-                content: []
-            },
-            functions: {
-                title: "Functions & Modules",
-                duration: "60-90 min",
-                difficulty: "Intermediate",
-                xp: 200,
-                completed: false,
-                content: []
-            },
-            web_basics: {
-                title: "HTML & CSS Basics",
-                duration: "60-90 min",
-                difficulty: "Beginner",
-                xp: 150,
-                completed: false,
-                content: []
-            }
-        };
-
-        // Navigation Structure
-        const navigation = [
-            {
-                section: "Python Fundamentals",
-                icon: "fas fa-book",
-                lessons: [
-                    { id: "python_basics", title: "Python Basics", icon: "fas fa-play-circle", status: "completed" },
-                    { id: "control_structures", title: "Control Structures", icon: "fas fa-code", status: "completed" },
-                    { id: "functions", title: "Functions & Modules", icon: "fas fa-function", status: "in-progress" },
-                    { id: "data_structures", title: "Data Structures", icon: "fas fa-layer-group", status: "locked" },
-                    { id: "oop", title: "OOP in Python", icon: "fas fa-cogs", status: "locked" }
-                ]
-            },
-            {
-                section: "Web Development",
-                icon: "fas fa-globe",
-                lessons: [
-                    { id: "web_basics", title: "HTML & CSS Basics", icon: "fas fa-html5", status: "in-progress" },
-                    { id: "javascript", title: "JavaScript Fundamentals", icon: "fas fa-js", status: "locked" },
-                    { id: "flask", title: "Backend with Flask", icon: "fas fa-server", status: "locked" },
-                    { id: "database", title: "Database Fundamentals", icon: "fas fa-database", status: "locked" }
-                ]
-            }
-        ];
-
-        // Initialize Lesson Navigation
+        // ==================== LESSON NAVIGATION ====================
         function initializeLessonNav() {
             const navContainer = document.getElementById('lessonNav');
             let navHTML = '';
             
-            navigation.forEach(section => {
+            NAVIGATION.forEach(section => {
                 navHTML += `
                     <div class="nav-section ${currentTheme}">
                         <h3 class="section-title ${currentTheme}">
@@ -1029,15 +1275,20 @@ print(carName)
                         </h3>
                 `;
                 
-                section.lessons.forEach(lesson => {
-                    const statusIcon = lesson.status === 'completed' ? 'fas fa-check' :
-                                      lesson.status === 'in-progress' ? 'fas fa-spinner fa-spin' :
-                                      'fas fa-lock';
-                    const statusClass = lesson.status === 'completed' ? 'completed' : '';
+                section.lessons.forEach(lessonId => {
+                    const lesson = LESSON_DATA[lessonId];
+                    if (!lesson) return;
+                    
+                    const isCompleted = userProgress.completedLessons.includes(lessonId);
+                    const statusIcon = isCompleted ? 'fas fa-check' :
+                                      userProgress.completedTopics[lessonId] ? 'fas fa-spinner fa-spin' :
+                                      'fas fa-play';
+                    const statusClass = isCompleted ? 'completed' : '';
+                    const isActive = currentLessonId === lessonId;
                     
                     navHTML += `
-                        <a href="#" class="nav-item ${currentTheme} ${lesson.id === 'python_basics' ? 'active' : ''}" 
-                           onclick="loadLesson('${lesson.id}')" data-lesson="${lesson.id}">
+                        <a href="#" class="nav-item ${currentTheme} ${isActive ? 'active' : ''}" 
+                           onclick="loadLesson('${lessonId}')" data-lesson="${lessonId}">
                             <span class="nav-icon"><i class="${lesson.icon}"></i></span>
                             <span class="nav-text">${lesson.title}</span>
                             <span class="nav-status ${statusClass}"><i class="${statusIcon}"></i></span>
@@ -1049,14 +1300,12 @@ print(carName)
             });
             
             navContainer.innerHTML = navHTML;
-            
-            // Update progress
-            updateProgress();
+            updateProgressUI();
         }
 
-        // Load Lesson Content
         function loadLesson(lessonId) {
-            const lesson = lessons[lessonId];
+            currentLessonId = lessonId;
+            const lesson = LESSON_DATA[lessonId];
             if (!lesson) return;
             
             // Update active nav item
@@ -1067,24 +1316,17 @@ print(carName)
                 }
             });
             
-            // Update breadcrumbs
-            const breadcrumbs = `
-                <a href="dashboard.html">Dashboard</a>
-                <i class="fas fa-chevron-right"></i>
-                <a href="lessons.html">Lessons</a>
-                <i class="fas fa-chevron-right"></i>
-                <span>${lesson.title}</span>
-            `;
-            
             // Generate lesson content
             let contentHTML = `
                 <div class="lesson-header ${currentTheme}">
                     <div class="breadcrumbs ${currentTheme}">
-                        ${breadcrumbs}
+                        <a href="#" onclick="showWelcome()">Lessons</a>
+                        <i class="fas fa-chevron-right"></i>
+                        <span>${lesson.title}</span>
                     </div>
                     
                     <h1 class="lesson-title ${currentTheme}">
-                        <i class="fas fa-book-open"></i> ${lesson.title}
+                        <i class="${lesson.icon}"></i> ${lesson.title}
                     </h1>
                     
                     <div class="lesson-meta ${currentTheme}">
@@ -1100,77 +1342,142 @@ print(carName)
                             <i class="fas fa-gem"></i>
                             <span>${lesson.xp} XP</span>
                         </span>
+                        <span class="meta-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>${userProgress.completedTopics[lessonId]?.length || 0}/${lesson.topics.length} topics</span>
+                        </span>
                     </div>
+                </div>
+                
+                <div class="topic-progress ${currentTheme}" style="margin-bottom: 2rem;">
+                    ${lesson.topics.map((_, index) => {
+                        const isCompleted = userProgress.completedTopics[lessonId]?.includes(index);
+                        const isActive = index === currentTopicIndex;
+                        return `<div class="topic-progress-dot ${isCompleted ? 'completed' : ''} ${isActive ? 'active' : ''}"></div>`;
+                    }).join('')}
                 </div>
             `;
             
-            // Add lesson content sections
-            if (lesson.content && lesson.content.length > 0) {
-                lesson.content.forEach(section => {
-                    contentHTML += generateSectionHTML(section, lessonId);
-                });
-            } else {
-                contentHTML += `
-                    <div class="w3-panel ${currentTheme}">
-                        <h2><i class="fas fa-info-circle"></i> Lesson Overview</h2>
-                        <p>This lesson is under development. Check back soon for interactive content!</p>
-                    </div>
-                `;
-            }
+            // Add topics
+            lesson.topics.forEach((topic, index) => {
+                const isActive = index === currentTopicIndex;
+                if (!isActive) return;
+                
+                contentHTML += generateTopicHTML(lessonId, topic, index);
+            });
             
-            // Add practice and quiz sections
-            contentHTML += generatePracticeSection(lessonId);
-            contentHTML += generateQuizSection(lessonId);
-            
-            // Add navigation buttons
+            // Add navigation
             contentHTML += `
                 <div class="lesson-navigation ${currentTheme}" style="display: flex; justify-content: space-between; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid ${currentTheme === 'cute' ? 'var(--cute-secondary)' : '#444'};">
-                    <button class="btn outline ${currentTheme}" onclick="prevLesson()">
-                        <i class="fas fa-arrow-left"></i> Previous
+                    <button class="btn outline ${currentTheme}" onclick="prevTopic()" ${currentTopicIndex === 0 ? 'disabled' : ''}>
+                        <i class="fas fa-arrow-left"></i> Previous Topic
                     </button>
-                    <button class="btn ${currentTheme}" onclick="markComplete()" id="completeBtn">
-                        <i class="fas fa-check-circle"></i> ${lesson.completed ? 'Completed' : 'Mark Complete'}
+                    
+                    <button class="btn ${currentTheme}" onclick="completeCurrentTopic()" id="completeTopicBtn">
+                        <i class="fas fa-check"></i> Complete Topic
                     </button>
-                    <button class="btn ${currentTheme}" onclick="nextLesson()">
-                        Next <i class="fas fa-arrow-right"></i>
+                    
+                    <button class="btn ${currentTheme}" onclick="nextTopic()" ${currentTopicIndex >= lesson.topics.length - 1 ? 'disabled' : ''}>
+                        Next Topic <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                
+                <div style="text-align: center; margin-top: 1rem;">
+                    <button class="btn outline ${currentTheme}" onclick="completeLesson()" id="completeLessonBtn">
+                        <i class="fas fa-trophy"></i> Complete Entire Lesson
                     </button>
                 </div>
             `;
             
-            // Update the content area
             document.getElementById('lessonContent').innerHTML = contentHTML;
             
-            // Re-initialize syntax highlighting
-            setTimeout(() => hljs.highlightAll(), 100);
-            
             // Update complete button state
-            if (lesson.completed) {
-                const btn = document.getElementById('completeBtn');
-                if (btn) {
-                    btn.innerHTML = '<i class="fas fa-check-double"></i> Completed';
-                    btn.disabled = true;
-                }
+            const isTopicCompleted = userProgress.completedTopics[lessonId]?.includes(currentTopicIndex);
+            if (isTopicCompleted) {
+                document.getElementById('completeTopicBtn').innerHTML = '<i class="fas fa-check-double"></i> Topic Completed';
+                document.getElementById('completeTopicBtn').disabled = true;
+            }
+            
+            const isLessonCompleted = userProgress.completedLessons.includes(lessonId);
+            if (isLessonCompleted) {
+                document.getElementById('completeLessonBtn').innerHTML = '<i class="fas fa-trophy"></i> Lesson Completed';
+                document.getElementById('completeLessonBtn').disabled = true;
             }
         }
 
-        // Generate Section HTML
-        function generateSectionHTML(section, lessonId) {
+        function generateTopicHTML(lessonId, topic, index) {
+            const isCompleted = userProgress.completedTopics[lessonId]?.includes(index);
+            
             let html = `
                 <div class="w3-panel ${currentTheme}">
-                    <h2><i class="fas fa-${getSectionIcon(section.type)}"></i> ${section.title}</h2>
-                    <p>${section.content}</p>
+                    <h2><i class="fas fa-${isCompleted ? 'check-circle success' : 'circle'}"></i> ${topic.title}</h2>
+                    <p>${topic.content}</p>
             `;
             
-            if (section.example) {
+            if (topic.example) {
                 html += `
                     <div class="w3-example">
                         <h3>Example</h3>
                         <div class="w3-code">
-${section.example}
+${topic.example}
                         </div>
-                        <button class="try-it-button" onclick="runCode(\`${section.example.replace(/`/g, '\\`')}\`)">
+                        <button class="try-it-button" onclick="runCode(\`${topic.example.replace(/`/g, '\\`')}\`)">
                             <i class="fas fa-play"></i> Try it Yourself
                         </button>
+                    </div>
+                `;
+            }
+            
+            if (topic.practice) {
+                html += `
+                    <div class="w3-panel ${currentTheme}" style="margin-top: 1.5rem;">
+                        <h3><i class="fas fa-laptop-code"></i> Practice Exercise</h3>
+                        <p>${topic.practice.task}</p>
+                        
+                        <div class="code-editor">
+                            <div class="editor-header">
+                                <span>practice.py</span>
+                                <div class="editor-actions">
+                                    <button class="run-button" onclick="runPracticeCode(${index})">
+                                        <i class="fas fa-play"></i> Run
+                                    </button>
+                                    <button class="run-button" style="background: #2196F3;" onclick="showHint(${index})">
+                                        <i class="fas fa-lightbulb"></i> Hint
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="editor-content">
+                                <textarea id="practiceCode${index}" style="width: 100%; height: 150px; background: #1e1e1e; color: white; border: none; padding: 10px; font-family: monospace; resize: vertical;">
+# ${topic.practice.task}
+
+# Your code here
+                                </textarea>
+                            </div>
+                        </div>
+                        
+                        <div id="practiceOutput${index}" style="margin-top: 1rem; padding: 1rem; background: ${currentTheme === 'cute' ? '#f8f9fa' : '#2a2a3e'}; border-radius: var(--radius); min-height: 60px; font-family: monospace; white-space: pre-wrap;">
+                            <strong>Output:</strong> Run your code to see output here...
+                        </div>
+                    </div>
+                `;
+            }
+            
+            if (topic.quiz) {
+                html += `
+                    <div class="quiz-container ${currentTheme}" style="margin-top: 1.5rem;">
+                        <h3><i class="fas fa-question-circle"></i> Quick Quiz</h3>
+                        <div class="quiz-question">
+                            ${topic.quiz.question}
+                        </div>
+                        <div class="quiz-options" id="quizOptions${index}">
+                            ${topic.quiz.options.map((option, optIndex) => `
+                                <div class="quiz-option ${currentTheme}" onclick="checkQuizAnswer(this, ${option.correct}, '${lessonId}', ${index})">
+                                    <input type="radio" name="quiz${index}">
+                                    <span>${option.text}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div id="quizFeedback${index}" style="margin-top: 1rem; padding: 0.5rem; border-radius: var(--radius); display: none;"></div>
                     </div>
                 `;
             }
@@ -1179,204 +1486,83 @@ ${section.example}
             return html;
         }
 
-        // Get appropriate icon for section type
-        function getSectionIcon(type) {
-            const icons = {
-                intro: 'info-circle',
-                syntax: 'code',
-                variables: 'tag',
-                functions: 'function',
-                loops: 'redo',
-                lists: 'list-ul',
-                dictionaries: 'book'
-            };
-            return icons[type] || 'code';
-        }
-
-        // Generate Practice Section
-        function generatePracticeSection(lessonId) {
-            const practices = {
-                python_basics: {
-                    title: "Variable Practice",
-                    description: "Create variables and print their values",
-                    template: `# Create variables
-name = "Your Name"
-age = 25
-score = 95.5
-
-# Print the variables
-print("Name:", name)
-print("Age:", age)
-print("Score:", score)`,
-                    solution: `name = "Python Learner"
-age = 20
-score = 98.7
-print("Name:", name)
-print("Age:", age)
-print("Score:", score)`
-                },
-                control_structures: {
-                    title: "Loop Practice",
-                    description: "Create a loop that prints numbers 1-5",
-                    template: `# Create a for loop that prints numbers 1 through 5
-for i in range(1, 6):
-    print(i)`,
-                    solution: `for i in range(1, 6):
-    print(i)`
-                }
-            };
-            
-            const practice = practices[lessonId] || practices.python_basics;
-            
-            return `
-                <div class="w3-panel ${currentTheme}">
-                    <h2><i class="fas fa-laptop-code"></i> Practice Exercise</h2>
-                    <p>${practice.description}</p>
-                    
-                    <div class="code-editor">
-                        <div class="editor-header">
-                            <span>practice.py</span>
-                            <div class="editor-actions">
-                                <button class="run-button" onclick="runPracticeCode()">
-                                    <i class="fas fa-play"></i> Run
-                                </button>
-                                <button class="run-button" style="background: #2196F3;" onclick="showHint()">
-                                    <i class="fas fa-lightbulb"></i> Hint
-                                </button>
-                                <button class="run-button" style="background: #9C27B0;" onclick="showSolution()">
-                                    <i class="fas fa-eye"></i> Solution
-                                </button>
-                            </div>
-                        </div>
-                        <div class="editor-content">
-                            <textarea id="practiceCode" style="width: 100%; height: 200px; background: #1e1e1e; color: white; border: none; padding: 10px; font-family: monospace; resize: vertical;">
-${practice.template}
-                            </textarea>
-                        </div>
-                    </div>
-                    
-                    <div id="practiceOutput" style="margin-top: 1rem; padding: 1rem; background: ${currentTheme === 'cute' ? '#f8f9fa' : '#2a2a3e'}; border-radius: var(--radius); min-height: 80px; font-family: monospace; white-space: pre-wrap;">
-                        <strong>Output:</strong> Run your code to see output here...
-                    </div>
-                    
-                    <div id="hint" style="display: none; margin-top: 1rem; padding: 1rem; background: ${currentTheme === 'cute' ? '#e7f4ff' : '#2a2a3e'}; border-left: 4px solid #2196F3; border-radius: var(--radius);">
-                        <strong>Hint:</strong> Make sure to use the correct variable names and print statements.
-                    </div>
-                </div>
-            `;
-        }
-
-        // Generate Quiz Section
-        function generateQuizSection(lessonId) {
-            const quizzes = {
-                python_basics: [
-                    {
-                        question: "Which of the following is the correct way to create a variable in Python?",
-                        options: [
-                            { text: "x = 5", correct: true },
-                            { text: "int x = 5", correct: false },
-                            { text: "var x = 5", correct: false },
-                            { text: "let x = 5", correct: false }
-                        ]
-                    },
-                    {
-                        question: "What is the output of: print(type(3.14))",
-                        options: [
-                            { text: "<class 'int'>", correct: false },
-                            { text: "<class 'float'>", correct: true },
-                            { text: "<class 'str'>", correct: false },
-                            { text: "<class 'double'>", correct: false }
-                        ]
-                    }
-                ],
-                control_structures: [
-                    {
-                        question: "Which loop continues while a condition is true?",
-                        options: [
-                            { text: "for loop", correct: false },
-                            { text: "while loop", correct: true },
-                            { text: "if statement", correct: false },
-                            { text: "switch statement", correct: false }
-                        ]
-                    }
-                ]
-            };
-            
-            const quiz = quizzes[lessonId] || quizzes.python_basics;
-            let quizHTML = `
-                <div class="quiz-container ${currentTheme}">
-                    <h2><i class="fas fa-question-circle"></i> Quick Quiz</h2>
-            `;
-            
-            quiz.forEach((q, index) => {
-                quizHTML += `
-                    <div class="quiz-question" style="margin-top: ${index > 0 ? '1.5rem' : '0'}">
-                        ${q.question}
-                    </div>
-                    <div class="quiz-options" id="quizOptions${index}">
-                `;
-                
-                q.options.forEach((option, optIndex) => {
-                    quizHTML += `
-                        <div class="quiz-option ${currentTheme}" onclick="checkAnswer(this, ${option.correct}, ${index})">
-                            <input type="radio" name="quiz${index}">
-                            <span>${option.text}</span>
-                        </div>
-                    `;
-                });
-                
-                quizHTML += `
-                    </div>
-                    <div id="quizFeedback${index}" style="margin-top: 0.5rem; padding: 0.5rem; border-radius: var(--radius); display: none;"></div>
-                `;
-            });
-            
-            quizHTML += '</div>';
-            return quizHTML;
-        }
-
-        // Run Code
-        function runCode(code) {
-            // In a real implementation, this would send to a server for execution
-            // For demo purposes, we'll simulate execution
-            const output = simulateCodeExecution(code);
-            alert(`Output:\n${output}`);
-        }
-
-        // Run Practice Code
-        function runPracticeCode() {
-            const code = document.getElementById('practiceCode').value;
-            const output = simulateCodeExecution(code);
-            document.getElementById('practiceOutput').innerHTML = `<strong>Output:</strong>\n${output}`;
-            
-            // Check if solution is mostly correct
-            if (code.includes('print') && (code.includes('name') || code.includes('age') || code.includes('score'))) {
-                showNotification('Good job! Your code is working correctly!', 'success');
+        // ==================== TOPIC NAVIGATION ====================
+        function nextTopic() {
+            if (!currentLessonId) return;
+            const lesson = LESSON_DATA[currentLessonId];
+            if (currentTopicIndex < lesson.topics.length - 1) {
+                currentTopicIndex++;
+                loadLesson(currentLessonId);
             }
         }
 
-        // Simulate Code Execution
-        function simulateCodeExecution(code) {
-            // Very basic simulation for demo purposes
-            if (code.includes('print')) {
+        function prevTopic() {
+            if (currentTopicIndex > 0) {
+                currentTopicIndex--;
+                loadLesson(currentLessonId);
+            }
+        }
+
+        // ==================== CODE EXECUTION ====================
+        function runCode(code) {
+            try {
+                // Using Function constructor for safe execution
+                const func = new Function(code);
+                const output = func();
+                alert(`Output:\n${output || 'Code executed successfully!'}`);
+            } catch (error) {
+                alert(`Error:\n${error.message}`);
+            }
+        }
+
+        function runPracticeCode(topicIndex) {
+            const code = document.getElementById(`practiceCode${topicIndex}`).value;
+            const outputDiv = document.getElementById(`practiceOutput${topicIndex}`);
+            
+            try {
+                // Simple Python code execution simulation
                 const lines = code.split('\n');
                 let output = '';
+                let hasPrint = false;
+                
                 lines.forEach(line => {
                     if (line.includes('print(')) {
+                        hasPrint = true;
                         const match = line.match(/print\((.*)\)/);
                         if (match) {
-                            output += eval(match[1]) + '\n';
+                            try {
+                                // Try to evaluate the expression
+                                const result = eval(match[1]);
+                                output += result + '\n';
+                            } catch (e) {
+                                output += '[Printed output]\n';
+                            }
                         }
                     }
                 });
-                return output || 'No output generated';
+                
+                if (!hasPrint) {
+                    output = 'Code executed (no print statements found)';
+                }
+                
+                outputDiv.innerHTML = `<strong>Output:</strong>\n${output}`;
+                
+                // Check if solution is correct
+                const lesson = LESSON_DATA[currentLessonId];
+                if (lesson?.topics[topicIndex]?.practice?.solution) {
+                    const solution = lesson.topics[topicIndex].practice.solution;
+                    if (code.includes('print') && code.trim().length > 0) {
+                        userProgress.showNotification('✓ Practice code executed successfully!', 'success');
+                    }
+                }
+            } catch (error) {
+                outputDiv.innerHTML = `<strong>Error:</strong>\n${error.message}`;
             }
-            return 'Code executed successfully (simulated)';
         }
 
-        // Check Quiz Answer
-        function checkAnswer(element, isCorrect, questionIndex) {
-            const feedback = document.getElementById(`quizFeedback${questionIndex}`);
+        // ==================== QUIZ HANDLING ====================
+        function checkQuizAnswer(element, isCorrect, lessonId, topicIndex) {
+            const feedback = document.getElementById(`quizFeedback${topicIndex}`);
             const options = element.parentElement.children;
             
             // Reset all options
@@ -1399,141 +1585,177 @@ ${practice.template}
             
             if (isCorrect) {
                 // Award XP for correct answer
-                awardXP(10);
+                userProgress.awardXP(15);
+                
+                // Auto-complete topic if practice was also done
+                setTimeout(() => {
+                    completeCurrentTopic();
+                }, 1500);
             }
         }
 
-        // Show Hint
-        function showHint() {
-            const hint = document.getElementById('hint');
-            hint.style.display = 'block';
-        }
-
-        // Show Solution
-        function showSolution() {
-            const practices = {
-                python_basics: `# Solution
-name = "Python Learner"
-age = 20
-score = 98.7
-print("Name:", name)
-print("Age:", age)
-print("Score:", score)`
-            };
+        // ==================== PROGRESS MANAGEMENT ====================
+        function completeCurrentTopic() {
+            if (!currentLessonId) return;
             
-            document.getElementById('practiceCode').value = practices.python_basics;
-            document.getElementById('hint').style.display = 'none';
-        }
-
-        // Mark Lesson as Complete
-        function markComplete() {
-            const currentLesson = document.querySelector('.nav-item.active');
-            if (currentLesson) {
-                const lessonId = currentLesson.dataset.lesson;
-                if (lessons[lessonId]) {
-                    lessons[lessonId].completed = true;
-                    
-                    // Update button
-                    const btn = document.getElementById('completeBtn');
-                    if (btn) {
-                        btn.innerHTML = '<i class="fas fa-check-double"></i> Completed';
-                        btn.disabled = true;
-                    }
-                    
-                    // Update navigation
-                    const navItem = document.querySelector(`[data-lesson="${lessonId}"] .nav-status`);
-                    if (navItem) {
-                        navItem.className = 'nav-status completed';
-                        navItem.innerHTML = '<i class="fas fa-check"></i>';
-                    }
-                    
-                    // Award XP
-                    awardXP(lessons[lessonId].xp);
-                    
-                    // Show notification
-                    showNotification(`Lesson completed! +${lessons[lessonId].xp} XP earned!`, 'success');
-                    
-                    // Update progress
-                    updateProgress();
+            const wasNew = userProgress.markTopicComplete(currentLessonId, currentTopicIndex);
+            if (wasNew) {
+                userProgress.showNotification(`✓ Topic completed! +10 XP`, 'success');
+                
+                // Update UI
+                const btn = document.getElementById('completeTopicBtn');
+                if (btn) {
+                    btn.innerHTML = '<i class="fas fa-check-double"></i> Topic Completed';
+                    btn.disabled = true;
+                }
+                
+                // Update progress dots
+                updateProgressUI();
+                
+                // Move to next topic if available
+                const lesson = LESSON_DATA[currentLessonId];
+                if (currentTopicIndex < lesson.topics.length - 1) {
+                    setTimeout(() => {
+                        nextTopic();
+                    }, 1000);
                 }
             }
         }
 
-        // Award XP
-        function awardXP(amount) {
-            let totalXP = parseInt(localStorage.getItem('total_xp') || '0');
-            totalXP += amount;
-            localStorage.setItem('total_xp', totalXP.toString());
+        function completeLesson() {
+            if (!currentLessonId) return;
             
-            // Update achievements if needed
-            updateAchievements(totalXP);
-        }
-
-        // Update Progress
-        function updateProgress() {
-            const completedLessons = Object.values(lessons).filter(l => l.completed).length;
-            const totalLessons = Object.keys(lessons).length;
-            const progress = Math.round((completedLessons / totalLessons) * 100);
+            // Complete all topics first
+            const lesson = LESSON_DATA[currentLessonId];
+            for (let i = 0; i < lesson.topics.length; i++) {
+                userProgress.markTopicComplete(currentLessonId, i);
+            }
             
-            document.getElementById('progressPercent').textContent = `${progress}%`;
-            document.getElementById('progressFill').style.width = `${progress}%`;
+            const wasNew = userProgress.markLessonComplete(currentLessonId);
+            if (wasNew) {
+                // Show celebration
+                showCompletionCelebration(currentLessonId);
+                
+                // Update UI
+                const btn = document.getElementById('completeLessonBtn');
+                if (btn) {
+                    btn.innerHTML = '<i class="fas fa-trophy"></i> Lesson Completed';
+                    btn.disabled = true;
+                }
+                
+                userProgress.showNotification(`🎉 Lesson completed! +${lesson.xp} XP earned!`, 'success');
+                updateProgressUI();
+            }
         }
 
-        // Update Achievements
-        function updateAchievements(xp) {
-            let achievements = Math.floor(xp / 100);
-            document.getElementById('achievementCount').textContent = `${achievements}/25 Achievements`;
-        }
-
-        // Show Notification
-        function showNotification(message, type) {
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.innerHTML = `
-                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
-                ${message}
+        function showCompletionCelebration(lessonId) {
+            const lesson = LESSON_DATA[lessonId];
+            
+            const overlay = document.createElement('div');
+            overlay.className = 'celebration-overlay';
+            overlay.innerHTML = `
+                <div class="celebration-content ${currentTheme}">
+                    <div class="celebration-icon">🎉</div>
+                    <h2>Lesson Completed!</h2>
+                    <p>You've successfully completed:</p>
+                    <h3>${lesson.title}</h3>
+                    <div style="margin: 2rem 0;">
+                        <div style="background: ${currentTheme === 'cute' ? '#f0f0f0' : '#2a2a2a'}; padding: 1rem; border-radius: var(--radius); margin: 1rem 0;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>XP Earned:</span>
+                                <strong>+${lesson.xp} XP</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-top: 0.5rem;">
+                                <span>Total XP:</span>
+                                <strong>${userProgress.totalXP} XP</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn ${currentTheme}" onclick="this.parentElement.parentElement.remove()">
+                        Continue Learning
+                    </button>
+                </div>
             `;
             
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                padding: 1rem 1.5rem;
-                background: ${type === 'success' ? '#4CAF50' : '#F44336'};
-                color: white;
-                border-radius: var(--radius);
-                box-shadow: var(--shadow);
-                z-index: 10000;
-                animation: slideIn 0.3s ease-out;
-            `;
+            document.body.appendChild(overlay);
             
-            document.body.appendChild(notification);
+            // Add confetti
+            userProgress.createConfetti();
             
+            // Auto-close after 5 seconds
             setTimeout(() => {
-                notification.style.animation = 'slideOut 0.3s ease-out forwards';
-                setTimeout(() => notification.remove(), 300);
-            }, 3000);
+                if (overlay.parentElement) {
+                    overlay.remove();
+                }
+            }, 5000);
         }
 
-        // Navigation between lessons
-        function nextLesson() {
-            const current = document.querySelector('.nav-item.active');
-            const next = current.parentElement.querySelectorAll('.nav-item:not(.active)')[0];
-            if (next && !next.querySelector('.fa-lock')) {
-                next.click();
-            } else {
-                showNotification('Complete current lesson first!', 'warning');
+        // ==================== UI UPDATES ====================
+        function updateProgressUI() {
+            // Update progress bar
+            const progressPercent = userProgress.getProgressPercent();
+            document.getElementById('progressPercent').textContent = `${progressPercent}%`;
+            document.getElementById('progressFill').style.width = `${progressPercent}%`;
+            
+            // Update XP
+            document.getElementById('xpCount').textContent = userProgress.totalXP;
+            
+            // Update achievements count
+            const achievementCount = Object.keys(userProgress.progress).filter(key => 
+                userProgress.progress[key] === true
+            ).length;
+            document.getElementById('achievementCount').textContent = `${achievementCount} Achievements`;
+            
+            // Update welcome screen stats
+            document.getElementById('completedCount').textContent = userProgress.completedLessons.length;
+            document.getElementById('totalXP').textContent = userProgress.totalXP;
+            document.getElementById('currentStreak').textContent = `${userProgress.streak.days} days`;
+        }
+
+        function showWelcome() {
+            currentLessonId = null;
+            currentTopicIndex = 0;
+            
+            document.getElementById('lessonContent').innerHTML = document.getElementById('defaultContent').innerHTML;
+            updateProgressUI();
+            
+            // Update active nav
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+        }
+
+        function showHint(topicIndex) {
+            const lesson = LESSON_DATA[currentLessonId];
+            if (lesson?.topics[topicIndex]?.practice?.solution) {
+                const solution = lesson.topics[topicIndex].practice.solution;
+                const hint = solution.split('\n')[0]; // First line as hint
+                userProgress.showNotification(`💡 Hint: ${hint}`, 'info');
             }
         }
 
-        function prevLesson() {
-            const current = document.querySelector('.nav-item.active');
-            const items = current.parentElement.querySelectorAll('.nav-item');
-            const currentIndex = Array.from(items).indexOf(current);
-            if (currentIndex > 0) {
-                items[currentIndex - 1].click();
-            }
-        }
+        // ==================== INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Apply theme
+            applyTheme(currentTheme);
+            
+            // Setup theme toggle
+            document.getElementById('themeToggle').addEventListener('click', () => {
+                applyTheme(currentTheme === 'cute' ? 'deadly' : 'cute');
+                if (currentLessonId) {
+                    loadLesson(currentLessonId);
+                }
+            });
+            
+            // Initialize navigation
+            initializeLessonNav();
+            
+            // Update UI with current progress
+            updateProgressUI();
+            
+            // Setup welcome screen stats
+            showWelcome();
+        });
 
         // Add animation styles
         const style = document.createElement('style');
@@ -1576,11 +1798,21 @@ print("Score:", score)`
                 background: #3a1a1a !important;
                 border-color: #dc3545 !important;
             }
+            
+            .btn:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+            
+            .success {
+                color: #4CAF50;
+            }
+            
+            .info {
+                color: #2196F3;
+            }
         `;
         document.head.appendChild(style);
-
-        // Initialize with first lesson
-        loadLesson('python_basics');
     </script>
 </body>
 </html>
