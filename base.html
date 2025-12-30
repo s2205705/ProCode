@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Pathfinder: Code & Conquer</title>
+    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="cute_mode.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="cute-theme">
+    <nav class="navbar cute">
+        <a href="dashboard.html" class="logo cute">
+            <i class="fas fa-code"></i> Python Pathfinder
+        </a>
+        <div class="nav-links">
+            <a href="dashboard.html" class="nav-link cute">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a href="game.html" class="nav-link cute">
+                <i class="fas fa-gamepad"></i> Play
+            </a>
+            <a href="multiplayer.html" class="nav-link cute">
+                <i class="fas fa-users"></i> Multiplayer
+            </a>
+            <a href="lessons.html" class="nav-link cute">
+                <i class="fas fa-book"></i> Lessons
+            </a>
+            <a href="login.html" class="nav-link cute">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </a>
+            <a href="register.html" class="nav-link cute">
+                <i class="fas fa-user-plus"></i> Register
+            </a>
+            <button id="themeToggle" class="btn cute small">
+                Switch to Deadly Mode
+            </button>
+        </div>
+    </nav>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="{{ theme if theme else 'cute' }}-footer">
+        <div class="footer-content">
+            <p>Python Pathfinder: Code & Conquer &copy; 2024</p>
+            <p>Learn Python and Web Development through play!</p>
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a> | 
+                <a href="#">Terms of Service</a> | 
+                <a href="#">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="game.js"></script>
+    <script src="code_editor.js"></script>
+
+    <script>
+    // Theme toggle for static version (stores choice in localStorage)
+    (function() {
+        const THEME_KEY = 'pp_theme';
+        const btn = document.getElementById('themeToggle');
+
+        function applyTheme(theme) {
+            // Update body class
+            document.body.classList.remove('cute-theme','deadly-theme');
+            document.body.classList.add(theme + '-theme');
+
+            // Swap element classes named 'cute' <-> 'deadly'
+            document.querySelectorAll('.cute, .deadly').forEach(el => {
+                if (theme === 'cute') {
+                    el.classList.remove('deadly');
+                    el.classList.add('cute');
+                } else {
+                    el.classList.remove('cute');
+                    el.classList.add('deadly');
+                }
+            });
+
+            // Update toggle text
+            if (btn) btn.innerText = theme === 'cute' ? 'Switch to Deadly Mode' : 'Switch to Cute Mode';
+        }
+
+        let theme = localStorage.getItem(THEME_KEY) || 'cute';
+        applyTheme(theme);
+
+        if (btn) btn.addEventListener('click', () => {
+            theme = theme === 'cute' ? 'deadly' : 'cute';
+            localStorage.setItem(THEME_KEY, theme);
+            applyTheme(theme);
+        });
+    })();
+    </script>
+    
+</body>
+</html>

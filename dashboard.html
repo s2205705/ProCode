@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — Python Pathfinder</title>
+    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="cute_mode.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>/* small safety overrides if needed */</style>
+</head>
+<body class="cute-theme">
+    <nav class="navbar cute">
+        <a href="dashboard.html" class="logo cute"><i class="fas fa-code"></i> Python Pathfinder</a>
+        <div class="nav-links">
+            <a href="dashboard.html" class="nav-link cute"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="game.html" class="nav-link cute"><i class="fas fa-gamepad"></i> Play</a>
+            <a href="multiplayer.html" class="nav-link cute"><i class="fas fa-users"></i> Multiplayer</a>
+            <a href="lessons.html" class="nav-link cute"><i class="fas fa-book"></i> Lessons</a>
+            <a href="login.html" class="nav-link cute"><i class="fas fa-sign-in-alt"></i> Login</a>
+            <a href="register.html" class="nav-link cute"><i class="fas fa-user-plus"></i> Register</a>
+            <button id="themeToggle" class="btn cute small">Switch to Deadly Mode</button>
+        </div>
+    </nav>
+
+<main>
+<div class="dashboard cute">
+    <!-- Welcome Banner -->
+    <div class="welcome-banner cute">
+        <div class="welcome-content">
+            <h1>Welcome back, <span id="username">Player</span>! 👋</h1>
+            <p>Ready to continue your coding adventure?</p>
+            <div class="user-level">
+                <span class="level-badge" id="levelBadge">Level 1</span>
+                <span class="xp-progress">
+                    <div class="xp-bar">
+                        <div class="xp-fill" id="xpFill" style="width:0%"></div>
+                    </div>
+                    <span class="xp-text" id="xpText">0/10 challenges completed</span>
+                </span>
+            </div>
+        </div>
+        <div class="user-avatar cute">
+            <div class="avatar-character cute"></div>
+            <div class="avatar-status online"></div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions {{ theme }}">
+        <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
+        <div class="actions-grid">
+            <a href="#" id="continueLink" class="action-card cute">
+                <div class="action-icon continue">
+                    <i class="fas fa-play-circle"></i>
+                </div>
+                <h3>Continue Learning</h3>
+                <p id="continueText">Resume from Level 1</p>
+            </a>
+            
+            <a href="{{ url_for('multiplayer') }}" class="action-card {{ theme }}">
+                <div class="action-icon battle">
+                    <i class="fas fa-crosshairs"></i>
+                </div>
+                <h3>Multiplayer Battle</h3>
+                <p>Challenge other players in real-time</p>
+            </a>
+            
+            <a href="{{ url_for('lessons', topic='python_basics') }}" class="action-card {{ theme }}">
+                <div class="action-icon lessons">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <h3>Review Lessons</h3>
+                <p>Brush up on Python fundamentals</p>
+            </a>
+            
+            <a href="#" class="action-card {{ theme }}">
+                <div class="action-icon profile">
+                    <i class="fas fa-user-cog"></i>
+                </div>
+                <h3>Edit Profile</h3>
+                <p>Customize your settings and theme</p>
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="stats-overview cute">
+        <h2><i class="fas fa-chart-line"></i> Your Progress</h2>
+        <div class="stats-grid">
+            <div class="stat-card {{ theme }}">
+                <div class="stat-header">
+                    <i class="fas fa-star"></i>
+                    <h3>Total Score</h3>
+                </div>
+                <div class="stat-value" id="totalScore">0</div>
+                <div class="stat-trend positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+120 this week</span>
+                </div>
+            </div>
+            
+            <div class="stat-card {{ theme }}">
+                <div class="stat-header">
+                    <i class="fas fa-flag-checkered"></i>
+                    <h3>Levels Completed</h3>
+                </div>
+                <div class="stat-value" id="levelsCompleted">0</div>
+                <div class="stat-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="levelsProgress" style="width:0%"></div>
+                    </div>
+                    <span id="levelsPercent">0%</span>
+                </div>
+            </div>
+            
+            <div class="stat-card {{ theme }}">
+                <div class="stat-header">
+                    <i class="fas fa-trophy"></i>
+                    <h3>Achievements</h3>
+                </div>
+                <div class="stat-value">3/15</div>
+                <div class="achievement-preview">
+                    <span class="achievement-icon">🏆</span>
+                    <span class="achievement-icon">🐍</span>
+                    <span class="achievement-icon">⚡</span>
+                    <span class="achievement-more">+12 more</span>
+                </div>
+            </div>
+            
+            <div class="stat-card {{ theme }}">
+                <div class="stat-header">
+                    <i class="fas fa-ranking-star"></i>
+                    <h3>Global Rank</h3>
+                </div>
+                <div class="stat-value">#42</div>
+                <div class="rank-change positive">
+                    <i class="fas fa-caret-up"></i>
+                    <span>Up 3 positions</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="recent-activity {{ theme }}">
+        <h2><i class="fas fa-history"></i> Recent Activity</h2>
+        <div class="activity-timeline">
+            <div class="activity-item {{ theme }} success">
+                <div class="activity-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="activity-content">
+                    <h4>Completed Level 3: Python Functions</h4>
+                    <p class="activity-meta">2 hours ago • Score: 95/100</p>
+                </div>
+                <span class="activity-badge">+95 points</span>
+            </div>
+            
+            <div class="activity-item {{ theme }} multiplayer">
+                <div class="activity-icon">
+                    <i class="fas fa-crosshairs"></i>
+                </div>
+                <div class="activity-content">
+                    <h4>Won against coder_pro in Multiplayer</h4>
+                    <p class="activity-meta">Yesterday • Rating: +25</p>
+                </div>
+                <span class="activity-badge victory">Victory!</span>
+            </div>
+            
+            <div class="activity-item {{ theme }} achievement">
+                <div class="activity-icon">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <div class="activity-content">
+                    <h4>Unlocked "Python Prodigy" achievement</h4>
+                    <p class="activity-meta">2 days ago • 50 points</p>
+                </div>
+                <span class="activity-badge achievement-badge">🏆 New!</span>
+            </div>
+            
+            <div class="activity-item {{ theme }} learning">
+                <div class="activity-icon">
+                    <i class="fas fa-book"></i>
+                </div>
+                <div class="activity-content">
+                    <h4>Completed HTML Basics lesson</h4>
+                    <p class="activity-meta">3 days ago • 100% score</p>
+                </div>
+                <span class="activity-badge">Perfect!</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Learning Path -->
+    <div class="learning-path {{ theme }}">
+        <h2><i class="fas fa-road"></i> Your Learning Path</h2>
+        <div class="path-container" id="pathContainer">
+            <!-- Ten static nodes; JS will mark completed/current/upcoming and set labels -->
+        </div>
+    </div>
+
+    <!-- Multiplayer Stats -->
+    <div class="multiplayer-stats {{ theme }}">
+        <h2><i class="fas fa-swords"></i> Multiplayer Stats</h2>
+        <div class="multiplayer-grid">
+            <div class="dashboard-decoration cute" id="dashboardDecoration">
+                <div class="floating-clouds"></div>
+                <div class="cute-mascot"></div>
+            </div>
+        </div>
+
+        <!-- Script: populate dynamic parts from a client-side stats object -->
+        <script>
+        // Example data (replace or fetch from API if available)
+        const stats = {
+            username: 'Player',
+            highest_level: 1,
+            levels_completed: 0,
+            total_score: 0
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Apply stats to DOM
+            document.getElementById('username').textContent = stats.username;
+            document.getElementById('levelBadge').textContent = 'Level ' + (stats.highest_level || 1);
+            document.getElementById('xpText').textContent = (stats.levels_completed || 0) + '/10 challenges completed';
+            const xpPercent = ((stats.levels_completed || 0) / 10) * 100;
+            document.getElementById('xpFill').style.width = xpPercent + '%';
+            document.getElementById('totalScore').textContent = stats.total_score || 0;
+            document.getElementById('levelsCompleted').textContent = stats.levels_completed || 0;
+            document.getElementById('levelsProgress').style.width = xpPercent + '%';
+            document.getElementById('levelsPercent').textContent = Math.round(xpPercent) + '%';
+            document.getElementById('continueText').textContent = 'Resume from Level ' + (stats.highest_level || 1);
+            document.getElementById('continueLink').setAttribute('href', 'game.html?level=' + (stats.highest_level || 1));
+
+            // Build learning path nodes
+            const descs = [
+                'Python Variables','Basic Functions','HTML Structure','CSS Styling','JavaScript Basics',
+                'Python Lists','Flask Routes','Database CRUD','API Development','Final Project'
+            ];
+            const container = document.getElementById('pathContainer');
+            for (let i = 1; i <= 10; i++) {
+                const node = document.createElement('div');
+                node.className = 'path-node cute';
+                node.setAttribute('data-level', i);
+                const icon = document.createElement('div'); icon.className = 'node-icon';
+                const iconI = document.createElement('i'); iconI.className = 'fas fa-lock'; icon.appendChild(iconI);
+                const content = document.createElement('div'); content.className = 'node-content';
+                const h4 = document.createElement('h4'); h4.textContent = 'Level ' + i;
+                const p = document.createElement('p'); p.className = 'node-desc'; p.textContent = descs[i-1] || '';
+                content.appendChild(h4); content.appendChild(p);
+                const action = document.createElement('a'); action.className = 'node-action btn cute small';
+                // Determine state
+                if (i <= (stats.levels_completed || 0)) {
+                    node.classList.add('completed'); iconI.className = 'fas fa-check-circle'; action.textContent = 'Review';
+                    action.href = 'game.html?level=' + i;
+                } else if (i === (stats.highest_level || 1)) {
+                    node.classList.add('current'); iconI.className = 'fas fa-play-circle'; action.textContent = 'Continue';
+                    action.href = 'game.html?level=' + i;
+                } else {
+                    node.classList.add('upcoming'); iconI.className = 'fas fa-lock'; action.textContent = 'Locked'; action.href = '#';
+                }
+                node.appendChild(icon); node.appendChild(content); node.appendChild(action);
+                container.appendChild(node);
+            }
+
+            // Populate leaderboard top 5
+            const lb = document.getElementById('leaderboardList');
+            for (let i = 1; i <= 5; i++) {
+                const item = document.createElement('div'); item.className = 'leaderboard-item cute';
+                const rank = document.createElement('span'); rank.className = 'rank ' + (i <= 3 ? 'top-3' : ''); rank.textContent = '#' + i;
+                const pname = document.createElement('span'); pname.className = 'player-name';
+                const avatar = document.createElement('span'); avatar.className = 'player-avatar small cute'; pname.appendChild(avatar); pname.appendChild(document.createTextNode(' Player ' + i));
+                const score = document.createElement('span'); score.className = 'player-score'; score.textContent = (1500 - (i * 50)) + ' pts';
+                item.appendChild(rank); item.appendChild(pname); item.appendChild(score);
+                lb.appendChild(item);
+            }
+
+            // Setup UI interactions (animations, hover, click)
+            document.querySelectorAll('.action-card').forEach(card => {
+                card.addEventListener('mouseenter', function() { this.style.transform = 'translateY(-10px)'; this.style.boxShadow = '0 15px 30px rgba(0,0,0,0.2)'; });
+                card.addEventListener('mouseleave', function() { this.style.transform = 'translateY(0)'; this.style.boxShadow = ''; });
+                card.addEventListener('click', function(e) { if (this.getAttribute('href') === '#') { e.preventDefault(); alert('This feature is coming soon!'); } });
+            });
+
+            // Activity items animate in
+            document.querySelectorAll('.activity-item').forEach((item, idx) => { item.style.animationDelay = `${idx * 0.1}s`; item.classList.add('animate-in'); });
+
+            // Cute decoration hearts
+            const decor = document.getElementById('dashboardDecoration');
+            for (let i = 0; i < 6; i++) {
+                const heart = document.createElement('div'); heart.className = 'floating-heart';
+                heart.style.cssText = `position:absolute;width:${12+Math.random()*12}px;height:${12+Math.random()*12}px;background:var(--cute-primary);transform:rotate(45deg);animation:float ${3+Math.random()*3}s ease-in-out infinite;opacity:${0.15+Math.random()*0.4};left:${Math.random()*100}%;top:${Math.random()*100}%`; decor.appendChild(heart);
+            }
+        });
+
+        // Simple theme toggle compatible with other pages
+        (function() {
+            const THEME_KEY = 'pp_theme';
+            const btn = document.getElementById('themeToggle');
+            function applyTheme(theme) {
+                document.body.classList.remove('cute-theme','deadly-theme');
+                document.body.classList.add(theme + '-theme');
+                document.querySelectorAll('.cute, .deadly').forEach(el => {
+                    if (theme === 'cute') { el.classList.remove('deadly'); el.classList.add('cute'); }
+                    else { el.classList.remove('cute'); el.classList.add('deadly'); }
+                });
+                if (btn) btn.innerText = theme === 'cute' ? 'Switch to Deadly Mode' : 'Switch to Cute Mode';
+            }
+            let theme = localStorage.getItem(THEME_KEY) || 'cute';
+            applyTheme(theme);
+            if (btn) btn.addEventListener('click', () => { theme = theme === 'cute' ? 'deadly' : 'cute'; localStorage.setItem(THEME_KEY, theme); applyTheme(theme); });
+        })();
+        </script>
+
+        <style>
+        /* (Preserve the original styles from the template) */
+        /* The large style block from the original file is kept below unchanged */
+@keyframes float {
+    0%, 100% { transform: rotate(45deg) translateY(0); }
+    50% { transform: rotate(45deg) translateY(-20px); }
+}
+
+@keyframes scan {
+    0% { top: 0; }
+    100% { top: 100%; }
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.activity-item.animate-in {
+    animation: slideIn 0.5s ease-out forwards;
+    opacity: 0;
+}
+
+.floating-heart:before,
+.floating-heart:after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: inherit;
+    border-radius: 50%;
+}
+
+.floating-heart:before {
+    top: -50%;
+    left: 0;
+}
+
+.floating-heart:after {
+    top: 0;
+    left: -50%;
+}
+
+.dashboard {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.welcome-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem;
+    border-radius: 20px;
+    margin-bottom: 2rem;
+}
+
+.dashboard.cute .welcome-banner {
+    background: linear-gradient(135deg, var(--cute-primary), var(--cute-secondary));
+    color: white;
+}
+
+.dashboard.deadly .welcome-banner {
+    background: linear-gradient(135deg, var(--deadly-primary), var(--deadly-secondary));
+    color: var(--deadly-text);
+}
+
+.welcome-content h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.user-level {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.level-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-weight: bold;
+}
+
+.dashboard.cute .level-badge {
+    background: white;
+    color: var(--cute-primary);
+}
+
+.dashboard.deadly .level-badge {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--deadly-accent);
+    border: 1px solid var(--deadly-accent);
+}
+
+.xp-progress {
+    flex: 1;
+    max-width: 300px;
+}
+
+.xp-bar {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.xp-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.dashboard.cute .xp-fill {
+    background: white;
+}
+
+.dashboard.deadly .xp-fill {
+    background: var(--deadly-accent);
+}
+
+.xp-text {
+    display: block;
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+    opacity: 0.9;
+}
+
+.user-avatar {
+    position: relative;
+    width: 100px;
+    height: 100px;
+}
+
+.avatar-character {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+
+.dashboard.cute .avatar-character {
+    background: linear-gradient(135deg, white, var(--cute-secondary));
+    border: 3px solid white;
+}
+
+.dashboard.deadly .avatar-character {
+    background: linear-gradient(135deg, var(--deadly-accent), #000);
+    border: 2px solid var(--deadly-primary);
+}
+
+.avatar-status {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+
+.avatar-status.online {
+    background: #4CAF50;
+}
+
+.quick-actions {
+    margin-bottom: 2rem;
+}
+
+.quick-actions h2 {
+    margin-bottom: 1rem;
+}
+
+.dashboard.cute .quick-actions h2 {
+    color: var(--cute-text);
+}
+
+.dashboard.deadly .quick-actions h2 {
+    color: var(--deadly-accent);
+}
+
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.action-card {
+    padding: 1.5rem;
+    border-radius: 15px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: block;
+}
+
+.dashboard.cute .action-card {
+    background: white;
+    border: 2px solid var(--cute-primary);
+    color: var(--cute-text);
+}
+
+.dashboard.deadly .action-card {
+    background: var(--deadly-secondary);
+    border: 1px solid var(--deadly-primary);
+    color: var(--deadly-text);
+}
+
+.action-card:hover {
+    transform: translateY(-5px);
+}
+
+.action-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.dashboard.cute .action-icon {
+    background: var(--cute-bg);
+    color: var(--cute-primary);
+}
+
+.dashboard.deadly .action-icon {
+    background: rgba(255, 70, 85, 0.1);
+    color: var(--deadly-primary);
+}
+
+.action-card h3 {
+    margin-bottom: 0.5rem;
+}
+
+.action-card p {
+    opacity: 0.8;
+    font-size: 0.9rem;
+}
+
+.stats-overview {
+    margin-bottom: 2rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.stat-card {
+    padding: 1.5rem;
+    border-radius: 15px;
+}
+
+.dashboard.cute .stat-card {
+    background: white;
+    border: 2px solid var(--cute-secondary);
+}
+
+.dashboard.deadly .stat-card {
+    background: var(--deadly-secondary);
+    border: 1px solid #444;
+}
+
+.stat-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.dashboard.cute .stat-header {
+    color: var(--cute-text);
+}
+
+.dashboard.deadly .stat-header {
+    color: var(--deadly-text);
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.dashboard.cute .stat-value {
+    color: var(--cute-primary);
+}
+
+.dashboard.deadly .stat-value {
+    color: var(--deadly-accent);
+}
+
+.stat-trend, .rank-change {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.9rem;
+}
+
+.stat-trend.positive, .rank-change.positive {
+    color: #4CAF50;
+}
+
+.stat-progress {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.progress-bar {
+    flex: 1;
+    height: 6px;
+    background: #eee;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.dashboard.deadly .progress-bar {
+    background: #333;
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.5s ease;
+}
+
+.dashboard.cute .progress-fill {
+    background: var(--cute-primary);
+}
+
+.dashboard.deadly .progress-fill {
+    background: var(--deadly-accent);
+}
+
+.achievement-preview {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.achievement-icon {
+    font-size: 1.5rem;
+}
+
+.achievement-more {
+    font-size: 0.9rem;
+    opacity: 0.7;
+}
+
+.recent-activity {
+    margin-bottom: 2rem;
+}
+
+.activity-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 10px;
+}
+
+.dashboard.cute .activity-item {
+    background: white;
+    border-left: 4px solid var(--cute-primary);
+}
+
+.dashboard.deadly .activity-item {
+    background: var(--deadly-secondary);
+    border-left: 4px solid var(--deadly-primary);
+}
+
+.activity-item.success {
+    border-left-color: #4CAF50;
+}
+
+.activity-item.multiplayer {
+    border-left-color: #FF9800;
+}
+
+.activity-item.achievement {
+    border-left-color: #9C27B0;
+}
+
+.activity-item.learning {
+    border-left-color: #2196F3;
+}
+
+.activity-icon {
+    font-size: 1.5rem;
+}
+
+.activity-item.success .activity-icon {
+    color: #4CAF50;
+}
+
+.activity-item.multiplayer .activity-icon {
+    color: #FF9800;
+}
+
+.activity-item.achievement .activity-icon {
+    color: #9C27B0;
+}
+
+.activity-item.learning .activity-icon {
+    color: #2196F3;
+}
+
+.activity-content {
+    flex: 1;
+}
+
+.activity-content h4 {
+    margin-bottom: 0.25rem;
+}
+
+.activity-meta {
+    font-size: 0.9rem;
+    opacity: 0.7;
+}
+
+.activity-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.activity-item.success .activity-badge {
+    background: #4CAF50;
+    color: white;
+}
+
+.activity-item.multiplayer .activity-badge {
+    background: #FF9800;
+    color: white;
+}
+
+.activity-item.achievement .activity-badge {
+    background: #9C27B0;
+    color: white;
+}
+
+.activity-item.learning .activity-badge {
+    background: #2196F3;
+    color: white;
+}
+
+.learning-path {
+    margin-bottom: 2rem;
+}
+
+.path-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.path-node {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.dashboard.cute .path-node {
+    background: white;
+    border: 2px solid var(--cute-secondary);
+}
+
+.dashboard.deadly .path-node {
+    background: var(--deadly-secondary);
+    border: 1px solid #444;
+}
+
+.path-node.completed .node-icon {
+    color: #4CAF50;
+}
+
+.path-node.current .node-icon {
+    color: #FF9800;
+}
+
+.path-node.upcoming .node-icon {
+    color: #9E9E9E;
+}
+
+.node-content {
+    flex: 1;
+}
+
+.node-content h4 {
+    margin-bottom: 0.25rem;
+}
+
+.node-content p {
+    font-size: 0.9rem;
+    opacity: 0.7;
+}
+
+.node-action.btn.small {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+}
+
+.multiplayer-stats {
+    margin-bottom: 2rem;
+}
+
+.multiplayer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.vs-card {
+    padding: 1.5rem;
+    border-radius: 15px;
+}
+
+.dashboard.cute .vs-card {
+    background: white;
+    border: 2px solid var(--cute-primary);
+}
+
+.dashboard.deadly .vs-card {
+    background: var(--deadly-secondary);
+    border: 1px solid var(--deadly-primary);
+}
+
+.vs-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.player {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.player-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.dashboard.cute .player-avatar {
+    background: var(--cute-primary);
+}
+
+.dashboard.deadly .player-avatar {
+    background: var(--deadly-primary);
+}
+
+.player-avatar.opponent {
+    background: #666;
+}
+
+.vs-label {
+    font-size: 1.5rem;
+    font-weight: bold;
+    padding: 0 1rem;
+}
+
+.dashboard.cute .vs-label {
+    color: var(--cute-primary);
+}
+
+.dashboard.deadly .vs-label {
+    color: var(--deadly-accent);
+}
+
+.vs-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 1.5rem;
+}
+
+.stat-left, .stat-center, .stat-right {
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.dashboard.cute .stat-value {
+    color: var(--cute-primary);
+}
+
+.dashboard.deadly .stat-value {
+    color: var(--deadly-accent);
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    opacity: 0.7;
+}
+
+.win-rate {
+    text-align: center;
+}
+
+.rate-bar {
+    height: 8px;
+    background: #eee;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 0.5rem;
+}
+
+.dashboard.deadly .rate-bar {
+    background: #333;
+}
+
+.rate-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.dashboard.cute .rate-fill {
+    background: var(--cute-primary);
+}
+
+.dashboard.deadly .rate-fill {
+    background: var(--deadly-accent);
+}
+
+.leaderboard-preview {
+    padding: 1.5rem;
+    border-radius: 15px;
+}
+
+.dashboard.cute .leaderboard-preview {
+    background: white;
+    border: 2px solid var(--cute-secondary);
+}
+
+.dashboard.deadly .leaderboard-preview {
+    background: var(--deadly-secondary);
+    border: 1px solid #444;
+}
+
+.leaderboard-preview h3 {
+    margin-bottom: 1rem;
+}
+
+.leaderboard-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.leaderboard-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem;
+    border-radius: 5px;
+}
+
+.dashboard.cute .leaderboard-item {
+    background: var(--cute-bg);
+}
+
+.dashboard.deadly .leaderboard-item {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.rank {
+    width: 30px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.rank.top-3 {
+    color: #FFD700;
+}
+
+.player-avatar.small {
+    width: 25px;
+    height: 25px;
+}
+
+.player-name {
+    flex: 1;
+}
+
+.view-all {
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.dashboard-decoration {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+}
+
+@media (max-width: 768px) {
+    .dashboard {
+        padding: 1rem;
+    }
+    
+    .welcome-banner {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+    
+    .user-level {
+        flex-direction: column;
+    }
+    
+    .actions-grid,
+    .stats-grid,
+    .multiplayer-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .path-node {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+</style>
+{% endblock %}

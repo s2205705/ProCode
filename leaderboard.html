@@ -1,0 +1,1776 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="leaderboard-container {{ theme }}">
+    <div class="leaderboard-header {{ theme }}">
+        <h1><i class="fas fa-crown"></i> Global Leaderboard</h1>
+        <p class="subtitle {{ theme }}">Top players in Python Pathfinder</p>
+        
+        <div class="leaderboard-tabs {{ theme }}">
+            <button class="tab-btn {{ theme }} active" data-tab="overall">
+                <i class="fas fa-trophy"></i> Overall
+            </button>
+            <button class="tab-btn {{ theme }}" data-tab="weekly">
+                <i class="fas fa-calendar-week"></i> Weekly
+            </button>
+            <button class="tab-btn {{ theme }}" data-tab="multiplayer">
+                <i class="fas fa-crosshairs"></i> Multiplayer
+            </button>
+            <button class="tab-btn {{ theme }}" data-tab="friends">
+                <i class="fas fa-users"></i> Friends
+            </button>
+        </div>
+    </div>
+
+    <div class="leaderboard-content {{ theme }}">
+        <!-- Overall Leaderboard -->
+        <div class="tab-content active" id="overall-tab">
+            <div class="leaderboard-top3 {{ theme }}">
+                {% for i in range(1, 4) %}
+                <div class="top-player rank-{{ i }} {{ theme }}">
+                    <div class="rank-badge {{ theme }}">
+                        <div class="rank-number">{{ i }}</div>
+                        <div class="rank-crown">
+                            {% if i == 1 %}<i class="fas fa-crown"></i>{% endif %}
+                            {% if i == 2 %}<i class="fas fa-medal"></i>{% endif %}
+                            {% if i == 3 %}<i class="fas fa-award"></i>{% endif %}
+                        </div>
+                    </div>
+                    <div class="player-info {{ theme }}">
+                        <div class="player-avatar {{ theme }}">
+                            {% if i == 1 %}<i class="fas fa-fire"></i>{% endif %}
+                            {% if i == 2 %}<i class="fas fa-bolt"></i>{% endif %}
+                            {% if i == 3 %}<i class="fas fa-star"></i>{% endif %}
+                        </div>
+                        <div class="player-details">
+                            <h3 class="player-name">TopPlayer{{ i }}</h3>
+                            <p class="player-title">
+                                {% if i == 1 %}Grand Master{% endif %}
+                                {% if i == 2 %}Master Coder{% endif %}
+                                {% if i == 3 %}Expert Developer{% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="player-stats {{ theme }}">
+                        <div class="stat {{ theme }}">
+                            <span class="stat-value">{{ 5000 - (i * 500) }}</span>
+                            <span class="stat-label">Score</span>
+                        </div>
+                        <div class="stat {{ theme }}">
+                            <span class="stat-value">10</span>
+                            <span class="stat-label">Levels</span>
+                        </div>
+                        <div class="stat {{ theme }}">
+                            <span class="stat-value">{{ 95 - (i * 5) }}%</span>
+                            <span class="stat-label">Win Rate</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="leaderboard-list {{ theme }}">
+                <div class="list-header {{ theme }}">
+                    <div class="header-rank">Rank</div>
+                    <div class="header-player">Player</div>
+                    <div class="header-score">Score</div>
+                    <div class="header-level">Level</div>
+                    <div class="header-wins">Wins</div>
+                    <div class="header-rating">Rating</div>
+                </div>
+                
+                <div class="list-body">
+                    {% for i in range(4, 51) %}
+                    <div class="leaderboard-row {{ theme }} {{ 'current-user' if i == 25 else '' }}">
+                        <div class="row-rank">
+                            <span class="rank-number">{{ i }}</span>
+                            {% if i <= 10 %}
+                            <span class="rank-icon">
+                                <i class="fas fa-star"></i>
+                            </span>
+                            {% endif %}
+                        </div>
+                        <div class="row-player">
+                            <div class="player-avatar small {{ theme }}">
+                                <span class="avatar-text">
+                                    {% if i == 25 %}ME{% else %}P{{ i }}{% endif %}
+                                </span>
+                            </div>
+                            <div class="player-info">
+                                <span class="player-name">
+                                    {% if i == 25 %}{{ session.username|default('You') }}{% else %}Player{{ i }}{% endif %}
+                                </span>
+                                <span class="player-status online"></span>
+                            </div>
+                        </div>
+                        <div class="row-score">{{ 4000 - (i * 70) }}</div>
+                        <div class="row-level">
+                            <span class="level-badge {{ theme }}">{{ 10 - ((i-1)//5) }}</span>
+                        </div>
+                        <div class="row-wins">{{ 50 - i }}</div>
+                        <div class="row-rating">
+                            <span class="rating-value {{ theme }}">{{ 1500 - (i * 25) }}</span>
+                            <span class="rating-change {{ 'positive' if i % 3 == 0 else 'negative' if i % 5 == 0 else 'neutral' }}">
+                                {% if i % 3 == 0 %}+{% elif i % 5 == 0 %}-{% endif %}{{ i % 10 }}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Weekly Leaderboard -->
+        <div class="tab-content" id="weekly-tab">
+            <div class="weekly-stats {{ theme }}">
+                <h2><i class="fas fa-chart-line"></i> This Week's Top Performers</h2>
+                <p class="week-range">Nov 20 - Nov 26, 2024</p>
+                
+                <div class="weekly-leaderboard">
+                    {% for i in range(1, 21) %}
+                    <div class="weekly-row {{ theme }}">
+                        <div class="weekly-rank">{{ i }}</div>
+                        <div class="weekly-player">
+                            <span class="player-name">WeeklyPlayer{{ i }}</span>
+                            <span class="player-progress {{ 'positive' if i % 2 == 0 else 'neutral' }}">
+                                {% if i % 2 == 0 %}+{{ i * 2 }} positions{% else %}—{% endif %}
+                            </span>
+                        </div>
+                        <div class="weekly-points">
+                            <span class="points-value">{{ 1000 - (i * 45) }}</span>
+                            <span class="points-label">points</span>
+                        </div>
+                        <div class="weekly-activity">
+                            <div class="activity-bar">
+                                {% for day in range(7) %}
+                                <div class="activity-day {{ 'active' if day < 7-i//3 else '' }}"></div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Multiplayer Leaderboard -->
+        <div class="tab-content" id="multiplayer-tab">
+            <div class="multiplayer-leaderboard {{ theme }}">
+                <h2><i class="fas fa-swords"></i> Battle Rankings</h2>
+                
+                <div class="battle-stats {{ theme }}">
+                    <div class="battle-stat {{ theme }}">
+                        <div class="stat-value">1,234</div>
+                        <div class="stat-label">Total Matches</div>
+                    </div>
+                    <div class="battle-stat {{ theme }}">
+                        <div class="stat-value">892</div>
+                        <div class="stat-label">Players Online</div>
+                    </div>
+                    <div class="battle-stat {{ theme }}">
+                        <div class="stat-value">45</div>
+                        <div class="stat-label">Active Tournaments</div>
+                    </div>
+                </div>
+                
+                <div class="elo-ratings {{ theme }}">
+                    <h3><i class="fas fa-chess-queen"></i> Elo Rating Top 20</h3>
+                    <div class="elo-list">
+                        {% for i in range(1, 21) %}
+                        <div class="elo-player {{ theme }}">
+                            <div class="elo-rank">{{ i }}</div>
+                            <div class="elo-info">
+                                <span class="player-name">BattleMaster{{ i }}</span>
+                                <div class="player-record">
+                                    <span class="wins">{{ 50 - i }}W</span>
+                                    <span class="losses">{{ i }}L</span>
+                                    <span class="win-rate">{{ (100 - i*3) }}%</span>
+                                </div>
+                            </div>
+                            <div class="elo-rating">
+                                <span class="rating {{ 'grandmaster' if i == 1 else 'master' if i <= 5 else 'expert' if i <= 10 else 'advanced' }}">
+                                    {{ 2200 - (i * 50) }}
+                                </span>
+                                <span class="rating-change {{ 'positive' if i % 4 == 0 else 'negative' if i % 3 == 0 else 'neutral' }}">
+                                    {% if i % 4 == 0 %}+{{ i }}{% elif i % 3 == 0 %}-{{ i }}{% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Friends Leaderboard -->
+        <div class="tab-content" id="friends-tab">
+            <div class="friends-leaderboard {{ theme }}">
+                <h2><i class="fas fa-user-friends"></i> Your Friends</h2>
+                
+                <div class="friends-stats {{ theme }}">
+                    <div class="friend-count {{ theme }}">
+                        <div class="count-value">12</div>
+                        <div class="count-label">Friends</div>
+                    </div>
+                    <div class="friend-search {{ theme }}">
+                        <input type="text" placeholder="Add friends by username..." class="{{ theme }}">
+                        <button class="btn {{ theme }} small">
+                            <i class="fas fa-user-plus"></i> Add
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="friends-list">
+                    {% for i in range(1, 13) %}
+                    <div class="friend-row {{ theme }} {{ 'online' if i % 3 != 0 else 'offline' }}">
+                        <div class="friend-info">
+                            <div class="friend-avatar {{ theme }}">
+                                <span class="avatar-text">F{{ i }}</span>
+                                <div class="friend-status {{ 'online' if i % 3 != 0 else 'offline' }}"></div>
+                            </div>
+                            <div class="friend-details">
+                                <h4>Friend{{ i }}</h4>
+                                <p class="friend-status-text">
+                                    {% if i % 3 != 0 %}Online • Playing Level {{ i }}{% else %}Offline • 2h ago{% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="friend-rank">
+                            <span class="rank">{{ i * 4 }}</span>
+                            <span class="rank-change {{ 'positive' if i % 2 == 0 else 'negative' }}">
+                                {% if i % 2 == 0 %}+{% else %}-{% endif %}{{ i }}
+                            </span>
+                        </div>
+                        <div class="friend-actions">
+                            <button class="action-btn {{ theme }}" title="Challenge to duel">
+                                <i class="fas fa-crosshairs"></i>
+                            </button>
+                            <button class="action-btn {{ theme }}" title="Send message">
+                                <i class="fas fa-comment"></i>
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Your Stats Sidebar -->
+    <div class="your-stats {{ theme }}">
+        <div class="stats-card {{ theme }}">
+            <h3><i class="fas fa-user"></i> Your Ranking</h3>
+            
+            <div class="your-ranking {{ theme }}">
+                <div class="rank-display {{ theme }}">
+                    <div class="rank-number">#25</div>
+                    <div class="rank-progress {{ theme }}">
+                        <div class="progress-text">Up 3 positions this week</div>
+                        <div class="progress-bar {{ theme }}">
+                            <div class="progress-fill" style="width: 60%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stats-grid {{ theme }}">
+                    <div class="stat-item {{ theme }}">
+                        <div class="stat-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">2,850</div>
+                            <div class="stat-label">Total Score</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-item {{ theme }}">
+                        <div class="stat-icon">
+                            <i class="fas fa-flag-checkered"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">7/10</div>
+                            <div class="stat-label">Levels Completed</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-item {{ theme }}">
+                        <div class="stat-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">5</div>
+                            <div class="stat-label">Achievements</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-item {{ theme }}">
+                        <div class="stat-icon">
+                            <i class="fas fa-crosshairs"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">1,350</div>
+                            <div class="stat-label">Battle Rating</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="achievements-preview {{ theme }}">
+                <h4><i class="fas fa-award"></i> Recent Achievements</h4>
+                <div class="achievements-list">
+                    {% for i in range(1, 4) %}
+                    <div class="achievement {{ theme }}">
+                        <div class="achievement-icon">{{ ['🏆', '🐍', '⚡'][i-1] }}</div>
+                        <div class="achievement-info">
+                            <div class="achievement-name">
+                                {% if i == 1 %}Python Prodigy{% endif %}
+                                {% if i == 2 %}Speed Coder{% endif %}
+                                {% if i == 3 %}Multiplayer Champion{% endif %}
+                            </div>
+                            <div class="achievement-date">2 days ago</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="next-milestone {{ theme }}">
+                <h4><i class="fas fa-bullseye"></i> Next Milestone</h4>
+                <div class="milestone-content">
+                    <div class="milestone-title">Reach Top 20</div>
+                    <div class="milestone-progress">
+                        <div class="progress-text">150 points to go</div>
+                        <div class="progress-bar {{ theme }}">
+                            <div class="progress-fill" style="width: 75%"></div>
+                        </div>
+                    </div>
+                    <button class="btn {{ theme }} small">
+                        <i class="fas fa-play"></i> Play Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Tab switching
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const tabId = this.dataset.tab;
+            
+            // Update active tab button
+            tabBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Show corresponding content
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+                if (content.id === `${tabId}-tab`) {
+                    content.classList.add('active');
+                }
+            });
+            
+            // Update URL hash
+            history.pushState(null, null, `#${tabId}`);
+        });
+    });
+    
+    // Check URL hash on load
+    const hash = window.location.hash.substring(1);
+    if (hash && ['overall', 'weekly', 'multiplayer', 'friends'].includes(hash)) {
+        const btn = document.querySelector(`.tab-btn[data-tab="${hash}"]`);
+        if (btn) btn.click();
+    }
+    
+    // Real-time updates
+    function updateLeaderboard() {
+        // Simulate real-time updates
+        const rows = document.querySelectorAll('.leaderboard-row');
+        rows.forEach(row => {
+            if (Math.random() > 0.7) {
+                const ratingChange = row.querySelector('.rating-change');
+                if (ratingChange) {
+                    const change = Math.random() > 0.5 ? '+' + Math.floor(Math.random() * 10) : 
+                                 '-' + Math.floor(Math.random() * 10);
+                    ratingChange.textContent = change;
+                    ratingChange.className = `rating-change ${change.startsWith('+') ? 'positive' : 'negative'}`;
+                }
+            }
+        });
+    }
+    
+    // Update every 30 seconds
+    setInterval(updateLeaderboard, 30000);
+    
+    // Add friend functionality
+    const addFriendBtn = document.querySelector('.friend-search button');
+    const addFriendInput = document.querySelector('.friend-search input');
+    
+    if (addFriendBtn && addFriendInput) {
+        addFriendBtn.addEventListener('click', function() {
+            const username = addFriendInput.value.trim();
+            if (username) {
+                alert(`Friend request sent to ${username}!`);
+                addFriendInput.value = '';
+            }
+        });
+        
+        addFriendInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addFriendBtn.click();
+            }
+        });
+    }
+    
+    // Challenge friend buttons
+    const challengeBtns = document.querySelectorAll('.action-btn .fa-crosshairs');
+    challengeBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const friendRow = this.closest('.friend-row');
+            const friendName = friendRow.querySelector('h4').textContent;
+            if (confirm(`Challenge ${friendName} to a coding duel?`)) {
+                alert(`Challenge sent to ${friendName}!`);
+            }
+        });
+    });
+    
+    // Animate rank changes
+    function animateRankChanges() {
+        const changes = document.querySelectorAll('.rating-change');
+        changes.forEach(change => {
+            if (change.textContent !== '—' && !change.classList.contains('animated')) {
+                change.classList.add('animated');
+                setTimeout(() => change.classList.remove('animated'), 1000);
+            }
+        });
+    }
+    
+    // Initial animation
+    setTimeout(animateRankChanges, 1000);
+    
+    // Refresh button (could be added to UI)
+    function refreshLeaderboard() {
+        const rows = document.querySelectorAll('.leaderboard-row');
+        rows.forEach(row => {
+            row.style.opacity = '0.5';
+            setTimeout(() => row.style.opacity = '1', 300);
+        });
+        animateRankChanges();
+    }
+    
+    // Auto-refresh every 2 minutes
+    setInterval(refreshLeaderboard, 120000);
+});
+
+// Add animations
+const style = document.createElement('style');
+style.textContent = `
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes highlight {
+    0% { background-color: transparent; }
+    50% { background-color: rgba(255, 255, 0, 0.1); }
+    100% { background-color: transparent; }
+}
+
+.leaderboard-row {
+    animation: slideIn 0.3s ease-out forwards;
+    opacity: 0;
+}
+
+.leaderboard-row:nth-child(1) { animation-delay: 0.1s; }
+.leaderboard-row:nth-child(2) { animation-delay: 0.2s; }
+.leaderboard-row:nth-child(3) { animation-delay: 0.3s; }
+/* Continue pattern... */
+
+.rating-change.positive.animated {
+    animation: pulse 1s ease;
+    color: #4CAF50 !important;
+}
+
+.rating-change.negative.animated {
+    animation: pulse 1s ease;
+    color: #F44336 !important;
+}
+
+.current-user {
+    animation: highlight 2s ease;
+}
+
+.player-status.online:before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #4CAF50;
+    border-radius: 50%;
+    margin-right: 5px;
+    animation: pulse 2s infinite;
+}
+`;
+document.head.appendChild(style);
+</script>
+
+<style>
+.leaderboard-container {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 2rem;
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    min-height: 100vh;
+}
+
+.leaderboard-header {
+    grid-column: 1 / -1;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.leaderboard-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.leaderboard-header.cute h1 {
+    color: var(--cute-primary);
+}
+
+.leaderboard-header.deadly h1 {
+    color: var(--deadly-accent);
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    opacity: 0.8;
+    margin-bottom: 2rem;
+}
+
+.leaderboard-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.tab-btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tab-btn.cute {
+    background: var(--cute-bg);
+    color: var(--cute-text);
+    border: 2px solid var(--cute-secondary);
+}
+
+.tab-btn.deadly {
+    background: var(--deadly-secondary);
+    color: var(--deadly-text);
+    border: 1px solid #444;
+}
+
+.tab-btn.active {
+    transform: translateY(-2px);
+}
+
+.tab-btn.cute.active {
+    background: var(--cute-primary);
+    color: white;
+    border-color: var(--cute-primary);
+    box-shadow: 0 4px 15px rgba(255, 158, 216, 0.3);
+}
+
+.tab-btn.deadly.active {
+    background: var(--deadly-primary);
+    color: white;
+    border-color: var(--deadly-primary);
+    box-shadow: 0 4px 15px rgba(255, 70, 85, 0.3);
+}
+
+.leaderboard-content {
+    grid-column: 1;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.5s ease;
+}
+
+/* Top 3 Players */
+.leaderboard-top3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 3rem;
+}
+
+.top-player {
+    padding: 2rem;
+    border-radius: 15px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.top-player.cute {
+    background: white;
+    border: 3px solid transparent;
+}
+
+.top-player.deadly {
+    background: var(--deadly-secondary);
+    border: 1px solid transparent;
+}
+
+.rank-1.cute {
+    border-color: #FFD700;
+    background: linear-gradient(135deg, #fff9e6, white);
+}
+
+.rank-2.cute {
+    border-color: #C0C0C0;
+    background: linear-gradient(135deg, #f5f5f5, white);
+}
+
+.rank-3.cute {
+    border-color: #CD7F32;
+    background: linear-gradient(135deg, #f8f0e6, white);
+}
+
+.rank-1.deadly {
+    border-color: #FFD700;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), var(--deadly-secondary));
+}
+
+.rank-2.deadly {
+    border-color: #C0C0C0;
+    background: linear-gradient(135deg, rgba(192, 192, 192, 0.1), var(--deadly-secondary));
+}
+
+.rank-3.deadly {
+    border-color: #CD7F32;
+    background: linear-gradient(135deg, rgba(205, 127, 50, 0.1), var(--deadly-secondary));
+}
+
+.rank-badge {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.rank-1 .rank-badge.cute {
+    background: #FFD700;
+    color: #333;
+}
+
+.rank-2 .rank-badge.cute {
+    background: #C0C0C0;
+    color: #333;
+}
+
+.rank-3 .rank-badge.cute {
+    background: #CD7F32;
+    color: white;
+}
+
+.rank-1 .rank-badge.deadly {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: #333;
+}
+
+.rank-2 .rank-badge.deadly {
+    background: linear-gradient(135deg, #C0C0C0, #999);
+    color: #333;
+}
+
+.rank-3 .rank-badge.deadly {
+    background: linear-gradient(135deg, #CD7F32, #8B4513);
+    color: white;
+}
+
+.rank-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.rank-crown {
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.5rem;
+}
+
+.player-info {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+.player-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin: 0 auto 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+}
+
+.top-player.cute .player-avatar {
+    background: var(--cute-bg);
+    color: var(--cute-primary);
+}
+
+.top-player.deadly .player-avatar {
+    background: rgba(255, 70, 85, 0.1);
+    color: var(--deadly-primary);
+}
+
+.player-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+}
+
+.player-title {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.player-stats {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.player-stats .stat {
+    text-align: center;
+}
+
+.stat-value {
+    display: block;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+}
+
+.top-player.cute .stat-value {
+    color: var(--cute-primary);
+}
+
+.top-player.deadly .stat-value {
+    color: var(--deadly-accent);
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+
+/* Leaderboard List */
+.leaderboard-list {
+    background: var(--bg-color);
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.leaderboard-list.cute {
+    --bg-color: white;
+    border: 2px solid var(--cute-secondary);
+}
+
+.leaderboard-list.deadly {
+    --bg-color: var(--deadly-secondary);
+    border: 1px solid #444;
+}
+
+.list-header {
+    display: grid;
+    grid-template-columns: 80px 2fr 1fr 1fr 1fr 1fr;
+    padding: 1rem;
+    font-weight: bold;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.leaderboard-list.cute .list-header {
+    --border-color: var(--cute-secondary);
+    background: var(--cute-bg);
+    color: var(--cute-text);
+}
+
+.leaderboard-list.deadly .list-header {
+    --border-color: #444;
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--deadly-text);
+}
+
+.list-body {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.leaderboard-row {
+    display: grid;
+    grid-template-columns: 80px 2fr 1fr 1fr 1fr 1fr;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.leaderboard-row:hover {
+    transform: translateX(5px);
+}
+
+.leaderboard-row.cute {
+    --border-color: var(--cute-secondary);
+    background: white;
+}
+
+.leaderboard-row.deadly {
+    --border-color: #333;
+    background: var(--deadly-secondary);
+}
+
+.leaderboard-row.cute:hover {
+    background: var(--cute-bg);
+}
+
+.leaderboard-row.deadly:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.current-user {
+    position: relative;
+}
+
+.current-user.cute:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--cute-primary);
+}
+
+.current-user.deadly:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--deadly-accent);
+}
+
+.row-rank {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.rank-number {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.rank-icon {
+    color: #FFD700;
+}
+
+.row-player {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.player-avatar.small {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.leaderboard-row.cute .player-avatar.small {
+    background: var(--cute-primary);
+    color: white;
+}
+
+.leaderboard-row.deadly .player-avatar.small {
+    background: var(--deadly-primary);
+    color: white;
+}
+
+.avatar-text {
+    font-size: 0.8rem;
+}
+
+.player-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.player-name {
+    font-weight: 600;
+}
+
+.current-user .player-name {
+    font-weight: bold;
+}
+
+.row-score, .row-wins {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.level-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.leaderboard-row.cute .level-badge {
+    background: var(--cute-bg);
+    color: var(--cute-primary);
+}
+
+.leaderboard-row.deadly .level-badge {
+    background: rgba(31, 192, 255, 0.1);
+    color: var(--deadly-accent);
+}
+
+.row-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.rating-value {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.leaderboard-row.cute .rating-value {
+    color: var(--cute-primary);
+}
+
+.leaderboard-row.deadly .rating-value {
+    color: var(--deadly-accent);
+}
+
+.rating-change {
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.rating-change.positive {
+    color: #4CAF50;
+}
+
+.rating-change.negative {
+    color: #F44336;
+}
+
+.rating-change.neutral {
+    color: #9E9E9E;
+}
+
+/* Weekly Leaderboard */
+.weekly-stats {
+    padding: 2rem;
+    border-radius: 15px;
+}
+
+.weekly-stats.cute {
+    background: white;
+    border: 2px solid var(--cute-secondary);
+}
+
+.weekly-stats.deadly {
+    background: var(--deadly-secondary);
+    border: 1px solid #444;
+}
+
+.weekly-stats h2 {
+    margin-bottom: 0.5rem;
+}
+
+.week-range {
+    opacity: 0.8;
+    margin-bottom: 2rem;
+    font-style: italic;
+}
+
+.weekly-leaderboard {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.weekly-row {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.weekly-stats.cute .weekly-row {
+    --border-color: var(--cute-secondary);
+}
+
+.weekly-stats.deadly .weekly-row {
+    --border-color: #444;
+}
+
+.weekly-rank {
+    width: 50px;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.weekly-player {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.player-progress {
+    font-size: 0.8rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 10px;
+}
+
+.player-progress.positive {
+    background: rgba(76, 175, 80, 0.1);
+    color: #4CAF50;
+}
+
+.player-progress.neutral {
+    background: rgba(158, 158, 158, 0.1);
+    color: #9E9E9E;
+}
+
+.weekly-points {
+    width: 100px;
+    text-align: right;
+}
+
+.points-value {
+    display: block;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.weekly-stats.cute .points-value {
+    color: var(--cute-primary);
+}
+
+.weekly-stats.deadly .points-value {
+    color: var(--deadly-accent);
+}
+
+.weekly-activity {
+    width: 150px;
+}
+
+.activity-bar {
+    display: flex;
+    gap: 2px;
+    height: 20px;
+    align-items: flex-end;
+}
+
+.activity-day {
+    flex: 1;
+    background: var(--activity-color);
+    border-radius: 2px;
+}
+
+.weekly-stats.cute .activity-day {
+    --activity-color: var(--cute-secondary);
+}
+
+.weekly-stats.deadly .activity-day {
+    --activity-color: #444;
+}
+
+.weekly-stats.cute .activity-day.active {
+    --activity-color: var(--cute-primary);
+}
+
+.weekly-stats.deadly .activity-day.active {
+    --activity-color: var(--deadly-accent);
+}
+
+/* Multiplayer Leaderboard */
+.multiplayer-leaderboard {
+    padding: 2rem;
+    border-radius: 15px;
+}
+
+.multiplayer-leaderboard.cute {
+    background: white;
+    border: 2px solid var(--cute-secondary);
+}
+
+.multiplayer-leaderboard.deadly {
+    background: var(--deadly-secondary);
+    border: 1px solid #444;
+}
+
+.multiplayer-leaderboard h2 {
+    margin-bottom: 2rem;
+}
+
+.battle-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.battle-stat {
+    text-align: center;
+    padding: 1.5rem;
+    border-radius: 10px;
+}
+
+.battle-stat.cute {
+    background: var(--cute-bg);
+    border: 2px solid var(--cute-secondary);
+}
+
+.battle-stat.deadly {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #444;
+}
+
+.battle-stat .stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.battle-stat.cute .stat-value {
+    color: var(--cute-primary);
+}
+
+.battle-stat.deadly .stat-value {
+    color: var(--deadly-accent);
+}
+
+.elo-ratings h3 {
+    margin-bottom: 1rem;
+}
+
+.elo-list {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.elo-player {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.multiplayer-leaderboard.cute .elo-player {
+    --border-color: var(--cute-secondary);
+}
+
+.multiplayer-leaderboard.deadly .elo-player {
+    --border-color: #444;
+}
+
+.elo-rank {
+    width: 50px;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.elo-info {
+    flex: 1;
+}
+
+.player-record {
+    display: flex;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.wins {
+    color: #4CAF50;
+}
+
+.losses {
+    color: #F44336;
+}
+
+.elo-rating {
+    width: 100px;
+    text-align: right;
+}
+
+.elo-rating .rating {
+    display: block;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.rating.grandmaster {
+    color: #FFD700;
+}
+
+.rating.master {
+    color: #C0C0C0;
+}
+
+.rating.expert {
+    color: #CD7F32;
+}
+
+.rating.advanced {
+    color: #2196F3;
+}
+
+/* Friends Leaderboard */
+.friends-leaderboard {
+    padding: 2rem;
+    border-radius: 15px;
+}
+
+.friends-leaderboard.cute {
+    background: white;
+    border: 2px solid var(--cute-secondary);
+}
+
+.friends-leaderboard.deadly {
+    background: var(--deadly-secondary);
+    border: 1px solid #444;
+}
+
+.friends-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.friend-count {
+    text-align: center;
+}
+
+.count-value {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+}
+
+.friend-count.cute .count-value {
+    color: var(--cute-primary);
+}
+
+.friend-count.deadly .count-value {
+    color: var(--deadly-accent);
+}
+
+.friend-search {
+    display: flex;
+    gap: 0.5rem;
+    flex: 1;
+    max-width: 400px;
+}
+
+.friend-search input {
+    flex: 1;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+}
+
+.friend-search.cute input {
+    --border-color: var(--cute-secondary);
+    background: var(--cute-bg);
+    color: var(--cute-text);
+}
+
+.friend-search.deadly input {
+    --border-color: #444;
+    background: var(--deadly-secondary);
+    color: var(--deadly-text);
+}
+
+.friends-list {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.friend-row {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-radius: 10px;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.friend-row.cute {
+    background: var(--cute-bg);
+    border: 2px solid var(--cute-secondary);
+}
+
+.friend-row.deadly {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #444;
+}
+
+.friend-row:hover {
+    transform: translateX(5px);
+}
+
+.friend-row.offline {
+    opacity: 0.7;
+}
+
+.friend-info {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.friend-avatar {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.friend-row.cute .friend-avatar {
+    background: var(--cute-primary);
+    color: white;
+}
+
+.friend-row.deadly .friend-avatar {
+    background: var(--deadly-primary);
+    color: white;
+}
+
+.friend-status {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+
+.friend-status.online {
+    background: #4CAF50;
+}
+
+.friend-status.offline {
+    background: #9E9E9E;
+}
+
+.friend-details h4 {
+    margin-bottom: 0.25rem;
+}
+
+.friend-status-text {
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+.friend-rank {
+    width: 80px;
+    text-align: center;
+}
+
+.friend-rank .rank {
+    display: block;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: 0.25rem;
+}
+
+.friend-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.action-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.action-btn.cute {
+    background: var(--cute-bg);
+    color: var(--cute-primary);
+    border: 2px solid var(--cute-secondary);
+}
+
+.action-btn.deadly {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--deadly-text);
+    border: 1px solid #444;
+}
+
+.action-btn:hover {
+    transform: scale(1.1);
+}
+
+.action-btn.cute:hover {
+    background: var(--cute-primary);
+    color: white;
+}
+
+.action-btn.deadly:hover {
+    background: var(--deadly-primary);
+    color: white;
+}
+
+/* Your Stats Sidebar */
+.your-stats {
+    position: sticky;
+    top: 2rem;
+    height: fit-content;
+}
+
+.stats-card {
+    padding: 2rem;
+    border-radius: 15px;
+}
+
+.stats-card.cute {
+    background: white;
+    border: 3px solid var(--cute-primary);
+}
+
+.stats-card.deadly {
+    background: var(--deadly-secondary);
+    border: 2px solid var(--deadly-primary);
+}
+
+.stats-card h3 {
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.stats-card.cute h3 {
+    color: var(--cute-primary);
+}
+
+.stats-card.deadly h3 {
+    color: var(--deadly-accent);
+}
+
+.your-ranking {
+    margin-bottom: 2rem;
+}
+
+.rank-display {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.rank-number {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.stats-card.cute .rank-number {
+    color: var(--cute-primary);
+}
+
+.stats-card.deadly .rank-number {
+    color: var(--deadly-accent);
+}
+
+.rank-progress {
+    font-size: 0.9rem;
+}
+
+.progress-bar {
+    height: 6px;
+    background: var(--progress-bg);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 0.5rem;
+}
+
+.stats-card.cute .progress-bar {
+    --progress-bg: var(--cute-secondary);
+}
+
+.stats-card.deadly .progress-bar {
+    --progress-bg: #444;
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 1s ease;
+}
+
+.stats-card.cute .progress-fill {
+    background: var(--cute-primary);
+}
+
+.stats-card.deadly .progress-fill {
+    background: var(--deadly-accent);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-radius: 10px;
+}
+
+.stat-item.cute {
+    background: var(--cute-bg);
+    border: 2px solid var(--cute-secondary);
+}
+
+.stat-item.deadly {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #444;
+}
+
+.stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.stat-item.cute .stat-icon {
+    background: var(--cute-primary);
+    color: white;
+}
+
+.stat-item.deadly .stat-icon {
+    background: var(--deadly-primary);
+    color: white;
+}
+
+.stat-value {
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: 0.25rem;
+}
+
+.stat-item.cute .stat-value {
+    color: var(--cute-primary);
+}
+
+.stat-item.deadly .stat-value {
+    color: var(--deadly-accent);
+}
+
+.achievements-preview {
+    margin-bottom: 2rem;
+}
+
+.achievements-preview h4 {
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.achievement {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    border-radius: 10px;
+    margin-bottom: 0.5rem;
+}
+
+.achievement.cute {
+    background: var(--cute-bg);
+    border: 2px solid var(--cute-secondary);
+}
+
+.achievement.deadly {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #444;
+}
+
+.achievement-icon {
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.achievement-name {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.achievement-date {
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+
+.next-milestone {
+    padding: 1.5rem;
+    border-radius: 10px;
+}
+
+.next-milestone.cute {
+    background: linear-gradient(135deg, var(--cute-primary), var(--cute-accent));
+    color: white;
+}
+
+.next-milestone.deadly {
+    background: linear-gradient(135deg, var(--deadly-primary), var(--deadly-accent));
+    color: white;
+}
+
+.next-milestone h4 {
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.milestone-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.milestone-progress {
+    margin-bottom: 1rem;
+}
+
+.next-milestone .progress-bar {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.next-milestone .progress-fill {
+    background: white;
+}
+
+@media (max-width: 1024px) {
+    .leaderboard-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .your-stats {
+        position: static;
+        margin-top: 2rem;
+    }
+    
+    .leaderboard-top3 {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .leaderboard-container {
+        padding: 1rem;
+    }
+    
+    .list-header,
+    .leaderboard-row {
+        grid-template-columns: 60px 1fr 1fr;
+        font-size: 0.9rem;
+    }
+    
+    .header-level,
+    .header-wins,
+    .header-rating,
+    .row-level,
+    .row-wins,
+    .row-rating {
+        display: none;
+    }
+    
+    .battle-stats {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}

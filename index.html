@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Pathfinder: Code & Conquer</title>
+    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="cute_mode.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* small override so demo toggle works on load before other CSS */
+    </style>
+</head>
+<body class="cute-theme">
+    <nav class="navbar cute">
+        <a href="dashboard.html" class="logo cute"><i class="fas fa-code"></i> Python Pathfinder</a>
+        <div class="nav-links">
+            <a href="dashboard.html" class="nav-link cute"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="game.html" class="nav-link cute"><i class="fas fa-gamepad"></i> Play</a>
+            <a href="multiplayer.html" class="nav-link cute"><i class="fas fa-users"></i> Multiplayer</a>
+            <a href="lessons.html" class="nav-link cute"><i class="fas fa-book"></i> Lessons</a>
+            <a href="login.html" class="nav-link cute"><i class="fas fa-sign-in-alt"></i> Login</a>
+            <a href="register.html" class="nav-link cute"><i class="fas fa-user-plus"></i> Register</a>
+            <button id="themeToggle" class="btn cute small">Switch to Deadly Mode</button>
+        </div>
+    </nav>
+
+    <main>
+<div class="hero cute">
+    <div class="hero-background cute">
+        <div class="cute-elements">
+            <div class="floating-cloud"></div>
+            <div class="floating-cloud"></div>
+            <div class="floating-heart"></div>
+            <div class="floating-star"></div>
+            <div class="mascot cute-mascot"></div>
+        </div>
+        <div class="deadly-elements" style="display:none;">
+            <div class="circuit-grid"></div>
+            <div class="neon-glow"></div>
+            <div class="data-stream"></div>
+            <div class="mascot deadly-mascot"></div>
+        </div>
+    </div>
+    
+    <div class="hero-content cute">
+        <h1 class="hero-title cute">
+            <span class="title-part">Python</span>
+            <span class="title-part">Pathfinder</span>
+            <span class="subtitle cute">Code & Conquer</span>
+        </h1>
+        
+        <p class="hero-description cute">
+            Master Python and Web Development through interactive gameplay.
+            Choose your theme: <span class="theme-highlight cute">Cute Mode</span>
+        </p>
+        
+        <div class="hero-buttons">
+            <a href="register.html" class="btn cute primary"><i class="fas fa-rocket"></i> Start Free Journey</a>
+            <a href="login.html" class="btn cute secondary"><i class="fas fa-sign-in-alt"></i> Login</a>
+            <a href="#features" class="btn cute outline"><i class="fas fa-info-circle"></i> Learn More</a>
+        </div>
+        
+        <div class="hero-stats cute">
+            <div class="stat cute">
+                <div class="stat-value">1,500+</div>
+                <div class="stat-label">Active Coders</div>
+            </div>
+            <div class="stat cute">
+                <div class="stat-value">50+</div>
+                <div class="stat-label">Challenges</div>
+            </div>
+            <div class="stat cute">
+                <div class="stat-value">10k+</div>
+                <div class="stat-label">Lines of Code</div>
+            </div>
+            <div class="stat cute">
+                <div class="stat-value">24/7</div>
+                <div class="stat-label">Multiplayer</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- (omitted remaining feature sections for brevity — the original CSS/JS handles appearance) -->
+
+<!-- Include the interactive scripts from the original template -->
+<script src="game.js"></script>
+<script>
+// Theme toggle demo + apply theme at runtime
+(function(){
+    const THEME_KEY = 'pp_theme';
+    const btn = document.getElementById('themeToggle');
+    function applyTheme(theme){
+        document.body.classList.remove('cute-theme','deadly-theme');
+        document.body.classList.add(theme + '-theme');
+        document.querySelectorAll('.cute, .deadly').forEach(el => {
+            if(theme==='cute'){ el.classList.remove('deadly'); el.classList.add('cute'); }
+            else { el.classList.remove('cute'); el.classList.add('deadly'); }
+        });
+        // show/hide elements that exist in both variants
+        document.querySelectorAll('.cute-elements').forEach(el => el.style.display = theme==='cute' ? '' : 'none');
+        document.querySelectorAll('.deadly-elements').forEach(el => el.style.display = theme==='deadly' ? '' : 'none');
+        if(btn) btn.innerText = theme === 'cute' ? 'Switch to Deadly Mode' : 'Switch to Cute Mode';
+    }
+    let theme = localStorage.getItem(THEME_KEY) || 'cute';
+    applyTheme(theme);
+    if(btn) btn.addEventListener('click', ()=>{ theme = theme==='cute' ? 'deadly' : 'cute'; localStorage.setItem(THEME_KEY, theme); applyTheme(theme); });
+})();
+
+// Small subset of interactive JS from original index (stat counter + parallax + floating)
+document.addEventListener('DOMContentLoaded', function() {
+    const statValues = document.querySelectorAll('.stat-value');
+    statValues.forEach(stat => {
+        const finalValue = parseInt(stat.textContent.replace(/[^0-9]/g,''));
+        if (!isNaN(finalValue)) {
+            let current = 0;
+            const increment = Math.max(1, Math.floor(finalValue / 50));
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= finalValue) {
+                    stat.textContent = finalValue.toLocaleString() + (stat.textContent.indexOf('+')!==-1?'+':'');
+                    clearInterval(timer);
+                } else {
+                    stat.textContent = Math.floor(current).toLocaleString();
+                }
+            }, 30);
+        }
+    });
+
+    window.addEventListener('scroll', function() {
+        const scrolled = window.pageYOffset;
+        const heroBg = document.querySelector('.hero-background');
+        if (heroBg) { heroBg.style.transform = `translateY(${scrolled * 0.5}px)`; }
+    });
+
+    if (document.body.classList.contains('cute-theme')) { /* createFloatingElements from game.js will handle it if present */ }
+});
+</script>
+
+<footer class="cute-footer">
+    <div class="footer-content">
+        <p>Python Pathfinder: Code & Conquer &copy; 2024</p>
+        <p>Learn Python and Web Development through play!</p>
+        <div class="footer-links">
+            <a href="#">Privacy Policy</a> | 
+            <a href="#">Terms of Service</a> | 
+            <a href="#">Contact</a>
+        </div>
+    </div>
+</footer>
+</main>
+</body>
+</html>
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero {{ theme }}">
+    <div class="hero-background {{ theme }}">
+        {% if theme == 'cute' %}
+        <div class="cute-elements">
+            <div class="floating-cloud"></div>
+            <div class="floating-cloud"></div>
+            <div class="floating-heart"></div>
+            <div class="floating-star"></div>
+            <div class="mascot cute-mascot"></div>
+        </div>
+        {% else %}
+        <div class="deadly-elements">
+            <div class="circuit-grid"></div>
+            <div class="neon-glow"></div>
+            <div class="data-stream"></div>
+            <div class="mascot deadly-mascot"></div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="hero-content {{ theme }}">
+        <h1 class="hero-title {{ theme }}">
+            <span class="title-part">Python</span>
+            <span class="title-part">Pathfinder</span>
+            <span class="subtitle {{ theme }}">Code & Conquer</span>
+        </h1>
+        
+        <p class="hero-description {{ theme }}">
+            Master Python and Web Development through interactive gameplay.
+            Choose your theme: <span class="theme-highlight {{ theme }}">{{ theme|title }} Mode</span>
+        </p>
+        
+        <div class="hero-buttons">
+            {% if session.username %}
+            <a href="{{ url_for('dashboard') }}" class="btn {{ theme }} primary">
+                <i class="fas fa-play-circle"></i> Continue Adventure
+            </a>
+            {% else %}
+            <a href="{{ url_for('register') }}" class="btn {{ theme }} primary">
+                <i class="fas fa-rocket"></i> Start Free Journey
+            </a>
+            <a href="{{ url_for('login') }}" class="btn {{ theme }} secondary">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </a>
+            {% endif %}
+            <a href="#features" class="btn {{ theme }} outline">
+                <i class="fas fa-info-circle"></i> Learn More
+            </a>
+        </div>
+        
+        <div class="hero-stats {{ theme }}">
+            <div class="stat {{ theme }}">
+                <div class="stat-value">1,500+</div>
+                <div class="stat-label">Active Coders</div>
+            </div>
+            <div class="stat {{ theme }}">
+                <div class="stat-value">50+</div>
+                <div class="stat-label">Challenges</div>
+            </div>
+            <div class="stat {{ theme }}">
+                <div class="stat-value">10k+</div>
+                <div class="stat-label">Lines of Code</div>
+            </div>
+            <div class="stat {{ theme }}">
+                <div class="stat-value">24/7</div>
+                <div class="stat-label">Multiplayer</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<section id="features" class="features-section {{ theme }}">
+    <div class="container">
+        <h2 class="section-title {{ theme }}">
+            <i class="fas fa-star"></i> Why Choose Python Pathfinder?
+        </h2>
+        <p class="section-subtitle {{ theme }}">
+            An interactive learning platform that turns coding education into an exciting adventure
+        </p>
+        
+        <div class="features-grid">
+            <div class="feature-card {{ theme }}">
+                <div class="feature-icon {{ theme }}">
+                    <i class="fas fa-gamepad"></i>
+                </div>
+                <h3>Game-Based Learning</h3>
+                <p>Learn Python and web development through interactive challenges and puzzles</p>
+                <ul class="feature-list">
+                    <li>Progressive difficulty levels</li>
+                    <li>Real-time code execution</li>
+                    <li>Instant feedback and hints</li>
+                </ul>
+            </div>
+            
+            <div class="feature-card {{ theme }}">
+                <div class="feature-icon {{ theme }}">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>Multiplayer Battles</h3>
+                <p>Challenge other players in real-time coding duels and tournaments</p>
+                <ul class="feature-list">
+                    <li>1v1 coding battles</li>
+                    <li>Team competitions</li>
+                    <li>Global leaderboards</li>
+                </ul>
+            </div>
+            
+            <div class="feature-card {{ theme }}">
+                <div class="feature-icon {{ theme }}">
+                    <i class="fas fa-palette"></i>
+                </div>
+                <h3>Dual Themes</h3>
+                <p>Choose between Cute and Deadly visual styles for your coding journey</p>
+                <ul class="feature-list">
+                    <li>Cute: Friendly, colorful interface</li>
+                    <li>Deadly: Dark, cyberpunk aesthetic</li>
+                    <li>Switch themes anytime</li>
+                </ul>
+            </div>
+            
+            <div class="feature-card {{ theme }}">
+                <div class="feature-icon {{ theme }}">
+                    <i class="fas fa-road"></i>
+                </div>
+                <h3>Structured Path</h3>
+                <p>Follow a carefully designed learning path from beginner to advanced</p>
+                <ul class="feature-list">
+                    <li>Python fundamentals</li>
+                    <li>Web development (HTML/CSS/JS)</li>
+                    <li>Flask and database skills</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Learning Path Section -->
+<section class="learning-path-section {{ theme }}">
+    <div class="container">
+        <h2 class="section-title {{ theme }}">
+            <i class="fas fa-map-signs"></i> Your Coding Journey
+        </h2>
+        
+        <div class="path-timeline {{ theme }}">
+            {% for level in range(1, 11) %}
+            <div class="path-step {{ theme }}">
+                <div class="step-number">{{ level }}</div>
+                <div class="step-content">
+                    <h4>
+                        {% if level == 1 %}Python Basics{% endif %}
+                        {% if level == 2 %}Functions & Loops{% endif %}
+                        {% if level == 3 %}HTML Fundamentals{% endif %}
+                        {% if level == 4 %}CSS Styling{% endif %}
+                        {% if level == 5 %}JavaScript Basics{% endif %}
+                        {% if level == 6 %}Python OOP{% endif %}
+                        {% if level == 7 %}Flask Introduction{% endif %}
+                        {% if level == 8 %}Database CRUD{% endif %}
+                        {% if level == 9 %}API Development{% endif %}
+                        {% if level == 10 %}Capstone Project{% endif %}
+                    </h4>
+                    <p>
+                        {% if level == 1 %}Variables, data types, and basic operations{% endif %}
+                        {% if level == 2 %}Control structures and reusable code{% endif %}
+                        {% if level == 3 %}Building web page structures{% endif %}
+                        {% if level == 4 %}Styling and layout techniques{% endif %}
+                        {% if level == 5 %}Interactive web elements{% endif %}
+                        {% if level == 6 %}Object-oriented programming concepts{% endif %}
+                        {% if level == 7 %}Building web applications{% endif %}
+                        {% if level == 8 %}Data storage and retrieval{% endif %}
+                        {% if level == 9 %}Creating and consuming APIs{% endif %}
+                        {% if level == 10 %}Build a full-stack application{% endif %}
+                    </p>
+                </div>
+                <div class="step-reward">
+                    <span class="reward-badge {{ theme }}">{{ level * 100 }} pts</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Theme Preview Section -->
+<section class="theme-preview-section {{ theme }}">
+    <div class="container">
+        <h2 class="section-title {{ theme }}">
+            <i class="fas fa-magic"></i> Choose Your Style
+        </h2>
+        
+        <div class="theme-comparison {{ theme }}">
+            <div class="theme-option {{ theme }} cute-preview">
+                <div class="theme-header">
+                    <h3><i class="fas fa-heart"></i> Cute Mode</h3>
+                    <div class="theme-tag">Friendly & Playful</div>
+                </div>
+                <div class="theme-features">
+                    <div class="feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Pastel color scheme</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Friendly characters</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Soft animations</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Encouraging feedback</span>
+                    </div>
+                </div>
+                <div class="theme-character cute-character"></div>
+            </div>
+            
+            <div class="theme-divider {{ theme }}">
+                <div class="divider-text">OR</div>
+            </div>
+            
+            <div class="theme-option {{ theme }} deadly-preview">
+                <div class="theme-header">
+                    <h3><i class="fas fa-skull-crossbones"></i> Deadly Mode</h3>
+                    <div class="theme-tag">Intense & Competitive</div>
+                </div>
+                <div class="theme-features">
+                    <div class="feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Neon color scheme</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Cyberpunk aesthetic</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Glitch effects</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Competitive edge</span>
+                    </div>
+                </div>
+                <div class="theme-character deadly-character"></div>
+            </div>
+        </div>
+        
+        <div class="theme-switch-demo {{ theme }}">
+            <button id="themeToggleDemo" class="btn {{ theme }} large">
+                <i class="fas fa-sync-alt"></i>
+                Switch to {{ 'Deadly' if theme == 'cute' else 'Cute' }} Mode
+            </button>
+            <p class="demo-note">You can switch themes anytime in your profile!</p>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="testimonials-section {{ theme }}">
+    <div class="container">
+        <h2 class="section-title {{ theme }}">
+            <i class="fas fa-comments"></i> What Players Say
+        </h2>
+        
+        <div class="testimonials-grid">
+            <div class="testimonial {{ theme }}">
+                <div class="testimonial-header">
+                    <div class="testimonial-avatar cute-avatar"></div>
+                    <div class="testimonial-info">
+                        <h4>Sarah Chen</h4>
+                        <p>Computer Science Student</p>
+                    </div>
+                    <div class="testimonial-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                <p class="testimonial-text">
+                    "Python Pathfinder made learning web development fun! The cute theme kept me motivated, 
+                    and the multiplayer battles really pushed me to improve my skills faster."
+                </p>
+            </div>
+            
+            <div class="testimonial {{ theme }}">
+                <div class="testimonial-header">
+                    <div class="testimonial-avatar deadly-avatar"></div>
+                    <div class="testimonial-info">
+                        <h4>Marcus Rodriguez</h4>
+                        <p>Junior Developer</p>
+                    </div>
+                    <div class="testimonial-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                <p class="testimonial-text">
+                    "The deadly theme with its cyberpunk vibe is amazing! The 1v1 coding battles are intense 
+                    and have helped me prepare for technical interviews in a fun way."
+                </p>
+            </div>
+            
+            <div class="testimonial {{ theme }}">
+                <div class="testimonial-header">
+                    <div class="testimonial-avatar cute-avatar"></div>
+                    <div class="testimonial-info">
+                        <h4>Emily Johnson</h4>
+                        <p>Bootcamp Graduate</p>
+                    </div>
+                    <div class="testimonial-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                </div>
+                <p class="testimonial-text">
+                    "Coming from a non-tech background, Python Pathfinder was the perfect way to learn. 
+                    The structured path and interactive challenges made complex concepts easy to understand."
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section {{ theme }}">
+    <div class="container">
+        <div class="cta-content {{ theme }}">
+            <h2 class="cta-title {{ theme }}">
+                Ready to Start Your Coding Adventure?
+            </h2>
+            <p class="cta-description {{ theme }}">
+                Join thousands of developers who are learning Python and web development through gameplay.
+                It's free, fun, and effective!
+            </p>
+            
+            <div class="cta-buttons">
+                {% if session.username %}
+                <a href="{{ url_for('game', level=1) }}" class="btn {{ theme }} primary large">
+                    <i class="fas fa-play"></i> Play Now
+                </a>
+                <a href="{{ url_for('multiplayer') }}" class="btn {{ theme }} secondary large">
+                    <i class="fas fa-crosshairs"></i> Battle Others
+                </a>
+                {% else %}
+                <a href="{{ url_for('register') }}" class="btn {{ theme }} primary large">
+                    <i class="fas fa-user-plus"></i> Sign Up Free
+                </a>
+                <a href="{{ url_for('login') }}" class="btn {{ theme }} outline large">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+                {% endif %}
+            </div>
+            
+            <div class="cta-features {{ theme }}">
+                <div class="feature {{ theme }}">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>No credit card required</span>
+                </div>
+                <div class="feature {{ theme }}">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>Learn at your own pace</span>
+                </div>
+                <div class="feature {{ theme }}">
+                    <i class="fas fa-trophy"></i>
+                    <span>Earn achievements & badges</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Theme toggle demo
+    const themeToggle = document.getElementById('themeToggleDemo');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', function() {
+            const currentTheme = document.body.classList.contains('cute-theme') ? 'cute' : 'deadly';
+            const newTheme = currentTheme === 'cute' ? 'deadly' : 'cute';
+            
+            // Update button text
+            this.innerHTML = `<i class="fas fa-sync-alt"></i> Switch to ${currentTheme === 'cute' ? 'Cute' : 'Deadly'} Mode`;
+            
+            // Show notification
+            alert(`In the actual game, this would switch to ${newTheme} mode!`);
+        });
+    }
+    
+    // Animate stats counters
+    const statValues = document.querySelectorAll('.stat-value');
+    statValues.forEach(stat => {
+        const finalValue = parseInt(stat.textContent);
+        if (!isNaN(finalValue)) {
+            let current = 0;
+            const increment = finalValue / 50;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= finalValue) {
+                    stat.textContent = finalValue.toLocaleString() + '+';
+                    clearInterval(timer);
+                } else {
+                    stat.textContent = Math.floor(current).toLocaleString();
+                }
+            }, 30);
+        }
+    });
+    
+    // Add parallax effect to hero background
+    window.addEventListener('scroll', function() {
+        const scrolled = window.pageYOffset;
+        const heroBg = document.querySelector('.hero-background');
+        if (heroBg) {
+            heroBg.style.transform = `translateY(${scrolled * 0.5}px)`;
+        }
+    });
+    
+    // Add floating animation to elements
+    if (document.body.classList.contains('cute-theme')) {
+        createFloatingElements();
+    } else {
+        createGlowingElements();
+    }
+});
+
+function createFloatingElements() {
+    const cuteElements = document.querySelector('.cute-elements');
+    if (!cuteElements) return;
+    
+    for (let i = 0; i < 8; i++) {
+        const element = document.createElement('div');
+        element.className = Math.random() > 0.5 ? 'floating-shape heart' : 'floating-shape star';
+        element.style.cssText = `
+            position: absolute;
+            width: ${20 + Math.random() * 20}px;
+            height: ${20 + Math.random() * 20}px;
+            opacity: ${0.3 + Math.random() * 0.4};
+            animation: float ${3 + Math.random() * 4}s ease-in-out infinite;
+            left: ${Math.random() * 100}%;
+            top: ${Math.random() * 100}%;
+            animation-delay: ${Math.random() * 2}s;
+        `;
+        
+        if (element.className.includes('heart')) {
+            element.style.background = 'var(--cute-primary)';
+            element.style.transform = 'rotate(45deg)';
+        } else {
+            element.style.background = 'var(--cute-accent)';
+            element.style.clipPath = 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)';
+        }
+        
+        cuteElements.appendChild(element);
+    }
+}
+
+function createGlowingElements() {
+    const deadlyElements = document.querySelector('.deadly-elements');
+    if (!deadlyElements) return;
+    
+    for (let i = 0; i < 6; i++) {
+        const element = document.createElement('div');
+        element.className = 'glowing-orb';
+        element.style.cssText = `
+            position: absolute;
+            width: ${10 + Math.random() * 20}px;
+            height: ${10 + Math.random() * 20}px;
+            background: radial-gradient(circle, var(--deadly-accent), transparent);
+            border-radius: 50%;
+            opacity: ${0.2 + Math.random() * 0.3};
+            animation: pulse ${2 + Math.random() * 3}s ease-in-out infinite;
+            left: ${Math.random() * 100}%;
+            top: ${Math.random() * 100}%;
+            animation-delay: ${Math.random() * 1.5}s;
+            box-shadow: 0 0 ${20 + Math.random() * 30}px var(--deadly-accent);
+        `;
+        
+        deadlyElements.appendChild(element);
+    }
+}
+</script>
+
+<style>
+/* Hero Section */
+.hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    padding: 2rem;
+}
+
+.hero.cute {
+    background: linear-gradient(135deg, var(--cute-bg) 0%, #ffffff 100%);
+}
+
+.hero.deadly {
+    background: linear-gradient(135deg, var(--deadly-bg) 0%, #000000 100%);
+}
+
+.hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+.cute-elements, .deadly-elements {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.mascot {
+    position: absolute;
+    bottom: 50px;
+    right: 100px;
+    width: 200px;
+    height: 200px;
+}
+
+.cute-mascot {
+    background: linear-gradient(135deg, var(--cute-primary), var(--cute-secondary));
+    border-radius: 50%;
+    animation: bounce 3s ease-in-out infinite;
+}
+
+.deadly-mascot {
+    background: linear-gradient(135deg, var(--deadly-primary), var(--deadly-accent));
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+    animation: rotate 10s linear infinite;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    max-width: 800px;
+}
+
+.hero-title {
+    font-size: 4rem;
+    font-weight: 900;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+}
+
+.hero-title.cute {
+    background: linear-gradient(45deg, var(--cute-primary), var(--cute-accent));
+    -webkit-text-fill-color: transparent;
+}
+
+.hero-title.deadly {
+    color: var(--deadly-text);
+    text-shadow: 0 0 30px rgba(31, 192, 255, 0.8);
+}
+
+.title-part {
+    display: block;
+}
+
+.subtitle {
+    font-size: 1.5rem;
+    font-weight: 300;
+    margin-top: 0.5rem;
+}
+
+.subtitle.cute {
+    color: var(--cute-text);
+}
+
+.subtitle.deadly {
+    color: var(--deadly-accent);
+}
+
+.hero-description {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.hero-description.cute {
+    color: var(--cute-text);
+}
+
+.hero-description.deadly {
+    color: var(--deadly-text);
+}
+
+.theme-highlight {
+    font-weight: bold;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+}
+
+.theme-highlight.cute {
+    background: var(--cute-primary);
+    color: white;
+}
+
+.theme-highlight.deadly {
+    background: var(--deadly-primary);
+    color: white;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+}
+
+.hero-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.stat {
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+}
+
+.stat.cute .stat-value {
+    color: var(--cute-primary);
+}
+
+.stat.deadly .stat-value {
+    color: var(--deadly-accent);
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+/* Features Section */
+.features-section {
+    padding: 5rem 2rem;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.section-title.cute {
+    color: var(--cute-text);
+}
+
+.section-title.deadly {
+    color: var(--deadly-accent);
+}
+
+.section-subtitle {
+    text-align: center;
+    font-size: 1.1rem;
+    margin-bottom: 3rem;
+    opacity: 0.8;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.feature-card {
+    padding: 2rem;
+    border-radius: 15px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card.cute {
+    background: white;
+    border: 2px solid var(--cute-secondary);
+    box-shadow: 0 10px 30px rgba(255, 158, 216, 0.1);
+}
+
+.feature-card.deadly {
+    background: var(--deadly-secondary);
+    border: 1px solid #444;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+}
+
+.feature-card.cute:hover {
+    box-shadow: 0 20px 40px rgba(255, 158, 216, 0.2);
+}
+
+.feature-card.deadly:hover {
+    box-shadow: 0 20px 40px rgba(255, 70, 85, 0.2);
+}
+
+.feature-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.feature-card.cute .feature-icon {
+    background: var(--cute-bg);
+    color: var(--cute-primary);
+}
+
+.feature-card.deadly .feature-icon {
+    background: rgba(255, 70, 85, 0.1);
+    color: var(--deadly-primary);
+}
+
+.feature-card h3 {
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+.feature-card.cute h3 {
+    color: var(--cute-text);
+}
+
+.feature-card.deadly h3 {
+    color: var(--deadly-text);
+}
+
+.feature-card p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+.feature-list {
+    list-style: none;
+    padding: 0;
+}
+
+.feature-list li {
+    padding: 0.25rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.feature-list li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+}
+
+.feature-card.cute .feature-list li:before {
+    color: var(--cute-primary);
+}
+
+.feature-card.deadly .feature-list li:before {
+    color: var(--deadly-accent);
+}
+
+/* Learning Path */
+.learning-path-section {
+    padding: 5rem 2rem;
+}
+
+.path-timeline {
+    position: relative;
+    padding-left: 50px;
+}
+
+.path-timeline:before {
+    content: '';
+    position: absolute;
+    left: 25px;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+}
+
+.path-timeline.cute:before {
+    background: linear-gradient(to bottom, var(--cute-primary), var(--cute-accent));
+}
+
+.path-timeline.deadly:before {
+    background: linear-gradient(to bottom, var(--deadly-primary), var(--deadly-accent));
+}
+
+.path-step {
+    position: relative;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.path-step.cute {
+    background: white;
+    border-left: 4px solid var(--cute-primary);
+}
+
+.path-step.deadly {
+    background: var(--deadly-secondary);
+    border-left: 4px solid var(--deadly-primary);
+}
+
+.step-number {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.path-step.cute .step-number {
+    background: var(--cute-primary);
+    color: white;
+}
+
+.path-step.deadly .step-number {
+    background: var(--deadly-primary);
+    color: white;
+}
+
+.step-content {
+    flex: 1;
+}
+
+.step-content h4 {
+    margin-bottom: 0.5rem;
+}
+
+.path-step.cute .step-content h4 {
+    color: var(--cute-text);
+}
+
+.path-step.deadly .step-content h4 {
+    color: var(--deadly-text);
+}
+
+.reward-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.path-step.cute .reward-badge {
+    background: var(--cute-accent);
+    color: white;
+}
+
+.path-step.deadly .reward-badge {
+    background: var(--deadly-accent);
+    color: white;
+}
+
+/* Theme Preview */
+.theme-preview-section {
+    padding: 5rem 2rem;
+}
+
+.theme-comparison {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 2rem;
+    align-items: center;
+    margin-bottom: 3rem;
+}
+
+.theme-option {
+    padding: 2rem;
+    border-radius: 15px;
+    position: relative;
+    overflow: hidden;
+    min-height: 300px;
+}
+
+.cute-preview {
+    background: linear-gradient(135deg, #fff0f7, #ffffff);
+    border: 3px solid var(--cute-primary);
+}
+
+.deadly-preview {
+    background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+    border: 2px solid var(--deadly-primary);
+}
+
+.theme-header {
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 1;
+}
+
+.theme-header h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.cute-preview .theme-header h3 {
+    color: var(--cute-primary);
+}
+
+.deadly-preview .theme-header h3 {
+    color: var(--deadly-accent);
+}
+
+.theme-tag {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.cute-preview .theme-tag {
+    background: var(--cute-bg);
+    color: var(--cute-primary);
+}
+
+.deadly-preview .theme-tag {
+    background: rgba(255, 70, 85, 0.1);
+    color: var(--deadly-accent);
+}
+
+.theme-features {
+    position: relative;
+    z-index: 1;
+}
+
+.theme-features .feature {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.cute-preview .theme-features .feature {
+    color: var(--cute-text);
+}
+
+.deadly-preview .theme-features .feature {
+    color: var(--deadly-text);
+}
+
+.theme-character {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 100px;
+    height: 100px;
+}
+
+.cute-character {
+    background: linear-gradient(135deg, var(--cute-primary), var(--cute-accent));
+    border-radius: 50%;
+    animation: float 3s ease-in-out infinite;
+}
+
+.deadly-character {
+    background: linear-gradient(135deg, var(--deadly-primary), var(--deadly-accent));
+    clip-path: polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.theme-divider {
+    text-align: center;
+}
+
+.divider-text {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin: 0 auto;
+}
+
+.theme-divider.cute .divider-text {
+    background: var(--cute-bg);
+    color: var(--cute-primary);
+    border: 2px solid var(--cute-primary);
+}
+
+.theme-divider.deadly .divider-text {
+    background: var(--deadly-secondary);
+    color: var(--deadly-accent);
+    border: 1px solid var(--deadly-accent);
+}
+
+.theme-switch-demo {
+    text-align: center;
+}
+
+.demo-note {
+    margin-top: 1rem;
+    opacity: 0.8;
+}
+
+/* Testimonials */
+.testimonials-section {
+    padding: 5rem 2rem;
+}
+
+.testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.testimonial {
+    padding: 2rem;
+    border-radius: 15px;
+}
+
+.testimonial.cute {
+    background: white;
+    border: 2px solid var(--cute-secondary);
+}
+
+.testimonial.deadly {
+    background: var(--deadly-secondary);
+    border: 1px solid #444;
+}
+
+.testimonial-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.testimonial-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.cute-avatar {
+    background: linear-gradient(135deg, var(--cute-primary), var(--cute-accent));
+}
+
+.deadly-avatar {
+    background: linear-gradient(135deg, var(--deadly-primary), var(--deadly-accent));
+}
+
+.testimonial-info h4 {
+    margin-bottom: 0.25rem;
+}
+
+.testimonial-rating {
+    color: #FFD700;
+    margin-left: auto;
+}
+
+.testimonial-text {
+    line-height: 1.6;
+    font-style: italic;
+}
+
+/* CTA Section */
+.cta-section {
+    padding: 5rem 2rem;
+    text-align: center;
+}
+
+.cta-content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 4rem;
+    border-radius: 20px;
+}
+
+.cta-content.cute {
+    background: linear-gradient(135deg, var(--cute-primary), var(--cute-accent));
+    color: white;
+}
+
+.cta-content.deadly {
+    background: linear-gradient(135deg, var(--deadly-primary), var(--deadly-secondary));
+    color: var(--deadly-text);
+}
+
+.cta-title {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.cta-description {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+.cta-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+}
+
+.cta-features {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.cta-features .feature {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+}
+
+/* Animations */
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-30px); }
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.2; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.1); }
+}
+
+.floating-shape {
+    animation: float 3s ease-in-out infinite;
+}
+
+.floating-shape.heart:before,
+.floating-shape.heart:after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: inherit;
+    border-radius: 50%;
+}
+
+.floating-shape.heart:before {
+    top: -50%;
+    left: 0;
+}
+
+.floating-shape.heart:after {
+    top: 0;
+    left: -50%;
+}
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .hero-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .theme-comparison {
+        grid-template-columns: 1fr;
+    }
+    
+    .cta-buttons,
+    .hero-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .btn {
+        width: 100%;
+        max-width: 300px;
+    }
+    
+    .mascot {
+        display: none;
+    }
+}
+</style>
+{% endblock %}

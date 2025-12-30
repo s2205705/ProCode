@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login — Python Pathfinder</title>
+    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="cute_mode.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="cute-theme">
+    <nav class="navbar cute">
+        <a href="dashboard.html" class="logo cute"><i class="fas fa-code"></i> Python Pathfinder</a>
+        <div class="nav-links">
+            <a href="dashboard.html" class="nav-link cute"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="register.html" class="nav-link cute"><i class="fas fa-user-plus"></i> Register</a>
+            <button id="themeToggle" class="btn cute small">Switch to Deadly Mode</button>
+        </div>
+    </nav>
+
+<main>
+<div class="auth-container cute">
+    <div class="auth-card cute">
+        <div class="auth-header cute">
+            <h2><i class="fas fa-sign-in-alt"></i> Welcome Back!</h2>
+            <p>Continue your coding adventure in Python Pathfinder</p>
+        </div>
+        
+        <form method="POST" action="/login" class="auth-form cute">
+            <div class="form-group cute">
+                <label for="username">
+                    <i class="fas fa-user"></i> Username or Email
+                </label>
+                <input type="text" id="username" name="username" required 
+                       placeholder="Enter your username or email">
+            </div>
+            
+            <div class="form-group {{ theme }}">
+                <label for="password">
+                    <i class="fas fa-lock"></i> Password
+                </label>
+                <input type="password" id="password" name="password" required 
+                       placeholder="Enter your password">
+                <div class="password-actions">
+                    <a href="#" class="{{ theme }}-link forgot-password">
+                        <i class="fas fa-key"></i> Forgot password?
+                    </a>
+                </div>
+            </div>
+            
+            <div class="form-group {{ theme }}">
+                <div class="remember-me">
+                    <input type="checkbox" id="remember" name="remember">
+                    <label for="remember">Remember me</label>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn {{ theme }} auth-btn">
+                <i class="fas fa-play"></i> Continue Adventure
+            </button>
+            
+            <div class="social-login {{ theme }}">
+                <p class="divider">or continue with</p>
+                <div class="social-buttons">
+                    <button type="button" class="social-btn github {{ theme }}">
+                        <i class="fab fa-github"></i> GitHub
+                    </button>
+                    <button type="button" class="social-btn google {{ theme }}">
+                        <i class="fab fa-google"></i> Google
+                    </button>
+                    <button type="button" class="social-btn discord {{ theme }}">
+                        <i class="fab fa-discord"></i> Discord
+                    </button>
+                </div>
+            </div>
+            
+            <div class="auth-footer cute">
+                <p>New to Python Pathfinder? 
+                    <a href="register.html" class="cute-link">
+                        <i class="fas fa-user-plus"></i> Create account
+                    </a>
+                </p>
+            </div>
+        </form>
+        
+        <div class="auth-decoration cute" id="authDecorationCute">
+            <div class="floating-cloud"></div>
+            <div class="floating-heart"></div>
+            <div class="welcome-back">
+                <p>We missed you! 🌈</p>
+            </div>
+        </div>
+        <div class="auth-decoration deadly" id="authDecorationDeadly" style="display:none;">
+            <div class="scanning-line"></div>
+            <div class="data-grid"></div>
+            <div class="welcome-back">
+                <p>Systems online. Ready for combat. ⚡</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="login-features cute">
+        <h3>What's new since you've been away?</h3>
+        <div class="updates-grid">
+            <div class="update {{ theme }}">
+                <span class="update-badge new">NEW</span>
+                <h4>Multiplayer Arena</h4>
+                <p>Battle other coders in real-time 1v1 matches</p>
+            </div>
+            <div class="update {{ theme }}">
+                <span class="update-badge improved">IMPROVED</span>
+                <h4>5 New Challenges</h4>
+                <p>Master advanced Python concepts and web development</p>
+            </div>
+            <div class="update {{ theme }}">
+                <span class="update-badge event">EVENT</span>
+                <h4>Weekly Tournament</h4>
+                <p>Compete for exclusive rewards and climb the leaderboard</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Load saved username if remember me was checked
+    const savedUsername = localStorage.getItem('remembered_username');
+    if (savedUsername) {
+        const el = document.getElementById('username'); if (el) el.value = savedUsername;
+        const rememberEl = document.getElementById('remember'); if (rememberEl) rememberEl.checked = true;
+    }
+    
+    // Form submission
+    const form = document.querySelector('.auth-form');
+    if (form) form.addEventListener('submit', function(e) {
+        const remember = document.getElementById('remember') ? document.getElementById('remember').checked : false;
+        const username = document.getElementById('username') ? document.getElementById('username').value : '';
+        
+        if (remember && username) {
+            localStorage.setItem('remembered_username', username);
+        } else {
+            localStorage.removeItem('remembered_username');
+        }
+        
+        // Add loading state
+        const submitBtn = this.querySelector('.auth-btn');
+        if (submitBtn) {
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+            submitBtn.disabled = true;
+            setTimeout(() => { submitBtn.innerHTML = originalText; submitBtn.disabled = false; }, 3000);
+        }
+    });
+    
+    // Social login buttons
+    document.querySelectorAll('.social-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const provider = this.classList.contains('github') ? 'GitHub' :
+                           this.classList.contains('google') ? 'Google' : 'Discord';
+            alert(`In a real implementation, this would redirect to ${provider} OAuth login`);
+            const originalText = this.innerHTML;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
+            this.disabled = true;
+            setTimeout(() => { this.innerHTML = originalText; this.disabled = false; }, 2000);
+        });
+    });
+    
+    // Forgot password
+    const forgot = document.querySelector('.forgot-password');
+    if (forgot) forgot.addEventListener('click', function(e) {
+        e.preventDefault();
+        const email = prompt('Please enter your email address to reset your password:');
+        if (email) { alert(`Password reset instructions have been sent to ${email} (demo)`); }
+    });
+    
+    // Theme-specific decorations handled by shared theme toggle
+});
+
+// Theme toggle (shared pattern)
+(function() {
+    const THEME_KEY = 'pp_theme';
+    const btn = document.getElementById('themeToggle');
+    function applyTheme(theme) {
+        document.body.classList.remove('cute-theme','deadly-theme');
+        document.body.classList.add(theme + '-theme');
+        document.querySelectorAll('.cute, .deadly').forEach(el => {
+            if (theme === 'cute') { el.classList.remove('deadly'); el.classList.add('cute'); }
+            else { el.classList.remove('cute'); el.classList.add('deadly'); }
+        });
+        document.getElementById('authDecorationCute').style.display = theme === 'cute' ? '' : 'none';
+        document.getElementById('authDecorationDeadly').style.display = theme === 'deadly' ? '' : 'none';
+        if (btn) btn.innerText = theme === 'cute' ? 'Switch to Deadly Mode' : 'Switch to Cute Mode';
+    }
+    let theme = localStorage.getItem(THEME_KEY) || 'cute';
+    applyTheme(theme);
+    if (btn) btn.addEventListener('click', () => { theme = theme === 'cute' ? 'deadly' : 'cute'; localStorage.setItem(THEME_KEY, theme); applyTheme(theme); });
+})();
+</script>
+
+<style>
+.auth-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    min-height: 100vh;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 450px;
+    background: var(--bg-color);
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 3rem;
+}
+
+.auth-container.cute .auth-card {
+    --bg-color: white;
+    border: 3px solid var(--cute-primary);
+}
+
+.auth-container.deadly .auth-card {
+    --bg-color: var(--deadly-secondary);
+    border: 2px solid var(--deadly-primary);
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.auth-container.cute .auth-header h2 {
+    color: var(--cute-text);
+    background: linear-gradient(45deg, var(--cute-primary), var(--cute-accent));
+    -webkit-text-fill-color: transparent;
+}
+
+.auth-container.deadly .auth-header h2 {
+    color: var(--deadly-accent);
+    text-shadow: 0 0 10px rgba(31, 192, 255, 0.5);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.auth-container.cute .form-group label {
+    color: var(--cute-text);
+}
+
+.auth-container.deadly .form-group label {
+    color: var(--deadly-text);
+}
+
+.password-actions {
+    text-align: right;
+    margin-top: 0.5rem;
+}
+
+.forgot-password {
+    font-size: 0.9rem;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.auth-btn {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.1rem;
+    margin: 1rem 0;
+}
+
+.social-login {
+    margin: 1.5rem 0;
+}
+
+.divider {
+    text-align: center;
+    position: relative;
+    margin: 1.5rem 0;
+    color: #666;
+}
+
+.auth-container.deadly .divider {
+    color: #aaa;
+}
+
+.divider:before,
+.divider:after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 45%;
+    height: 1px;
+    background: #ddd;
+}
+
+.auth-container.deadly .divider:before,
+.auth-container.deadly .divider:after {
+    background: #444;
+}
+
+.divider:before {
+    left: 0;
+}
+
+.divider:after {
+    right: 0;
+}
+
+.social-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+}
+
+.social-btn {
+    padding: 0.8rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.auth-container.cute .social-btn {
+    background: #f5f5f5;
+    color: #333;
+}
+
+.auth-container.cute .social-btn:hover {
+    background: #e8e8e8;
+    transform: translateY(-2px);
+}
+
+.auth-container.deadly .social-btn {
+    background: #2a2a2a;
+    color: var(--deadly-text);
+    border: 1px solid #444;
+}
+
+.auth-container.deadly .social-btn:hover {
+    background: #333;
+    border-color: var(--deadly-accent);
+    transform: translateY(-2px);
+}
+
+.social-btn.github:hover {
+    background: #333;
+    color: white;
+}
+
+.social-btn.google:hover {
+    background: #DB4437;
+    color: white;
+}
+
+.social-btn.discord:hover {
+    background: #5865F2;
+    color: white;
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #eee;
+}
+
+.auth-container.cute .auth-footer {
+    border-color: var(--cute-secondary);
+}
+
+.auth-container.deadly .auth-footer {
+    border-color: #444;
+}
+
+.login-features {
+    width: 100%;
+    max-width: 800px;
+    text-align: center;
+}
+
+.auth-container.cute .login-features h3 {
+    color: var(--cute-text);
+}
+
+.auth-container.deadly .login-features h3 {
+    color: var(--deadly-accent);
+}
+
+.updates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.update {
+    padding: 1.5rem;
+    border-radius: 15px;
+    position: relative;
+    transition: transform 0.3s ease;
+}
+
+.update:hover {
+    transform: translateY(-5px);
+}
+
+.auth-container.cute .update {
+    background: white;
+    border: 2px solid var(--cute-secondary);
+}
+
+.auth-container.deadly .update {
+    background: var(--deadly-secondary);
+    border: 1px solid var(--deadly-primary);
+}
+
+.update h4 {
+    margin: 0.5rem 0;
+}
+
+.auth-container.cute .update h4 {
+    color: var(--cute-text);
+}
+
+.auth-container.deadly .update h4 {
+    color: var(--deadly-text);
+}
+
+.auth-container.cute .update p {
+    color: var(--cute-text);
+    opacity: 0.8;
+}
+
+.auth-container.deadly .update p {
+    color: var(--deadly-text);
+    opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+    .auth-container {
+        padding: 1rem;
+    }
+    
+    .auth-card {
+        padding: 1.5rem;
+    }
+    
+    .social-buttons {
+        grid-template-columns: 1fr;
+    }
+    
+    .updates-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}

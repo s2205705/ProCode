@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game — Python Pathfinder</title>
+    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="cute_mode.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="cute-theme">
+    <nav class="navbar cute">
+        <a href="dashboard.html" class="logo cute"><i class="fas fa-code"></i> Python Pathfinder</a>
+        <div class="nav-links">
+            <a href="dashboard.html" class="nav-link cute"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="multiplayer.html" class="nav-link cute"><i class="fas fa-users"></i> Multiplayer</a>
+            <button id="themeToggle" class="btn cute small">Switch to Deadly Mode</button>
+        </div>
+    </nav>
+
+<main>
+<div class="game-container cute">
+    <div class="game-sidebar">
+        <div class="level-info cute">
+            <h2 class="level-title">Level <span id="levelNumber">1</span></h2>
+            <h3 id="levelTitle">Python Basics</h3>
+            
+            <div class="progress-container cute">
+                <div id="progressBar" class="progress-bar cute" style="width:0%"></div>
+            </div>
+            
+            <div class="stats cute">
+                <div class="stat">
+                    <i class="fas fa-star"></i>
+                    <span>Score: <span id="scoreValue">0</span></span>
+                </div>
+                <div class="stat">
+                    <i class="fas fa-trophy"></i>
+                    <span>Level: <span id="levelDisplay">1</span>/10</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="challenge-description cute">
+            <h3><i class="fas fa-question-circle"></i> Challenge</h3>
+            <p id="challengeText">Complete the coding challenge</p>
+            
+            <div class="hint-box cute">
+                <h4><i class="fas fa-lightbulb"></i> Hint</h4>
+                <p id="challengeHint">Read the instructions carefully and test your code before submitting.</p>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button id="runCode" class="btn cute">
+                <i class="fas fa-play"></i> Run Code
+            </button>
+            <button id="submitCode" class="btn cute">
+                <i class="fas fa-check"></i> Submit Solution
+            </button>
+            <button id="nextLevel" class="btn cute" disabled>
+                <i class="fas fa-arrow-right"></i> Next Level
+            </button>
+        </div>
+    </div>
+    
+    <div class="game-main">
+        <div class="code-editor">
+            <div class="editor-header cute">
+                <span><i class="fas fa-code"></i> editor.py</span>
+                <div class="editor-actions">
+                    <button class="editor-btn" title="Format code">
+                        <i class="fas fa-align-left"></i>
+                    </button>
+                    <button class="editor-btn" title="Reset code" id="resetCodeBtn">
+                        <i class="fas fa-redo"></i>
+                    </button>
+                </div>
+            </div>
+            <textarea id="codeInput" class="cute" spellcheck="false"># Python Challenge
+# Write your solution here
+
+# Your code goes below this line
+
+            </textarea>
+        </div>
+        
+        <div class="game-output cute">
+            <h3><i class="fas fa-terminal"></i> Output</h3>
+            <pre id="output">Run your code to see output here...</pre>
+        </div>
+        
+        <div class="cute-characters" id="cuteChars">
+            <div class="character float"></div>
+            <div class="cloud"></div>
+            <div class="cloud"></div>
+        </div>
+        <div class="deadly-effects" id="deadlyEffects" style="display:none;">
+            <div class="cyber-character"></div>
+            <div class="hex-grid"></div>
+        </div>
+    </div>
+</div>
+
+<script src="game.js"></script>
+<script>
+// Basic page JS for the static game page
+document.addEventListener('DOMContentLoaded', () => {
+    // Example challenge data; replace with fetch if needed
+    const challenge = {
+        level: 1,
+        title: 'Python Basics',
+        description: 'Write a function that returns the sum of two numbers.',
+        hint: 'Use the + operator.'
+    };
+
+    document.getElementById('levelNumber').textContent = challenge.level;
+    document.getElementById('levelDisplay').textContent = challenge.level;
+    document.getElementById('levelTitle').textContent = challenge.title;
+    document.getElementById('challengeText').textContent = challenge.description;
+    document.getElementById('challengeHint').textContent = challenge.hint;
+
+    // Run code (demo): evaluate simple print statements only
+    const runBtn = document.getElementById('runCode');
+    const output = document.getElementById('output');
+    if (runBtn) runBtn.addEventListener('click', () => {
+        const code = document.getElementById('codeInput').value;
+        // Very small sandbox: capture console.log calls
+        try {
+            // eslint-disable-next-line no-eval
+            const consoleLog = [];
+            const consoleObj = { log: (...args) => consoleLog.push(args.join(' ')) };
+            const func = new Function('console', code + '\nreturn null;');
+            func(consoleObj);
+            output.textContent = consoleLog.join('\n') || 'No output';
+        } catch (err) {
+            output.textContent = 'Error: ' + err.message;
+        }
+    });
+
+    const resetBtn = document.getElementById('resetCodeBtn');
+    if (resetBtn) resetBtn.addEventListener('click', () => { document.getElementById('codeInput').value = '# Python Challenge\n# Write your solution here\n'; });
+
+    // Theme toggle compatibility
+    (function() {
+        const THEME_KEY = 'pp_theme';
+        const btn = document.getElementById('themeToggle');
+        function applyTheme(theme) {
+            document.body.classList.remove('cute-theme','deadly-theme');
+            document.body.classList.add(theme + '-theme');
+            document.querySelectorAll('.cute, .deadly').forEach(el => {
+                if (theme === 'cute') { el.classList.remove('deadly'); el.classList.add('cute'); }
+                else { el.classList.remove('cute'); el.classList.add('deadly'); }
+            });
+            document.getElementById('cuteChars').style.display = theme === 'cute' ? '' : 'none';
+            document.getElementById('deadlyEffects').style.display = theme === 'deadly' ? '' : 'none';
+            if (btn) btn.innerText = theme === 'cute' ? 'Switch to Deadly Mode' : 'Switch to Cute Mode';
+        }
+        let theme = localStorage.getItem(THEME_KEY) || 'cute';
+        applyTheme(theme);
+        if (btn) btn.addEventListener('click', () => { theme = theme === 'cute' ? 'deadly' : 'cute'; localStorage.setItem(THEME_KEY, theme); applyTheme(theme); });
+    })();
+});
+</script>
+
+<style>

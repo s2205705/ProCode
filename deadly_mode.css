@@ -1,0 +1,193 @@
+/* Deadly Theme Extensions */
+.deadly-theme {
+    /* Neon Glow Effects */
+    .neon-text {
+        text-shadow: 
+            0 0 5px var(--deadly-accent),
+            0 0 10px var(--deadly-accent),
+            0 0 20px var(--deadly-accent),
+            0 0 40px var(--deadly-primary);
+        animation: flicker 3s infinite alternate;
+    }
+    
+    @keyframes flicker {
+        0%, 18%, 22%, 25%, 53%, 57%, 100% {
+            text-shadow: 
+                0 0 5px var(--deadly-accent),
+                0 0 10px var(--deadly-accent),
+                0 0 20px var(--deadly-accent),
+                0 0 40px var(--deadly-primary);
+        }
+        20%, 24%, 55% {       
+            text-shadow: none;
+        }
+    }
+    
+    /* Circuit Board Pattern */
+    .circuit-bg {
+        background-image: 
+            linear-gradient(90deg, transparent 79px, rgba(31, 192, 255, 0.1) 79px, rgba(31, 192, 255, 0.1) 81px, transparent 81px),
+            linear-gradient(#1a1a1a 0.1em, transparent 0.1em);
+        background-size: 100% 1.2em, 100% 1.2em;
+    }
+    
+    /* Character Design */
+    .cyber-character {
+        position: relative;
+        width: 150px;
+        height: 150px;
+        margin: 0 auto;
+        background: linear-gradient(45deg, #0f1923, #1a1a1a);
+        border-radius: 50%;
+        overflow: hidden;
+        box-shadow: 
+            0 0 20px rgba(31, 192, 255, 0.5),
+            inset 0 0 20px rgba(0, 0, 0, 0.8);
+    }
+    
+    .cyber-character::before {
+        content: '';
+        position: absolute;
+        top: 20%;
+        left: 25%;
+        width: 30px;
+        height: 30px;
+        background: var(--deadly-accent);
+        border-radius: 50%;
+        box-shadow: 50px 0 var(--deadly-accent);
+        animation: scan 4s linear infinite;
+    }
+    
+    @keyframes scan {
+        0% { opacity: 1; }
+        50% { opacity: 0.3; }
+        100% { opacity: 1; }
+    }
+    
+    /* Energy Bars */
+    .energy-bar {
+        height: 10px;
+        background: linear-gradient(90deg, 
+            var(--deadly-primary) 0%, 
+            var(--deadly-accent) 50%, 
+            var(--deadly-primary) 100%);
+        border-radius: 5px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 0 10px rgba(255, 70, 85, 0.5);
+    }
+    
+    .energy-bar::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, 
+            transparent, 
+            rgba(255, 255, 255, 0.4), 
+            transparent);
+        animation: energy-flow 2s linear infinite;
+    }
+    
+    @keyframes energy-flow {
+        0% { left: -100%; }
+        100% { left: 100%; }
+    }
+    
+    /* Glitch Effect */
+    .glitch {
+        position: relative;
+        animation: glitch-skew 1s infinite linear alternate-reverse;
+    }
+    
+    .glitch::before,
+    .glitch::after {
+        content: attr(data-text);
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        clip: rect(0, 900px, 0, 0);
+    }
+    
+    .glitch::before {
+        left: 2px;
+        text-shadow: -2px 0 var(--deadly-primary);
+        animation: glitch-anim 5s infinite linear alternate-reverse;
+    }
+    
+    .glitch::after {
+        left: -2px;
+        text-shadow: 2px 0 var(--deadly-accent);
+        animation: glitch-anim2 1s infinite linear alternate-reverse;
+    }
+    
+    @keyframes glitch-anim {
+        0% { clip: rect(42px, 9999px, 44px, 0); }
+        5% { clip: rect(12px, 9999px, 59px, 0); }
+        10% { clip: rect(48px, 9999px, 29px, 0); }
+        15% { clip: rect(42px, 9999px, 73px, 0); }
+        20% { clip: rect(63px, 9999px, 27px, 0); }
+        25% { clip: rect(34px, 9999px, 55px, 0); }
+        30% { clip: rect(86px, 9999px, 73px, 0); }
+        35% { clip: rect(20px, 9999px, 20px, 0); }
+        40% { clip: rect(26px, 9999px, 60px, 0); }
+        45% { clip: rect(25px, 9999px, 66px, 0); }
+        50% { clip: rect(57px, 9999px, 98px, 0); }
+        55% { clip: rect(5px, 9999px, 46px, 0); }
+        60% { clip: rect(82px, 9999px, 31px, 0); }
+        65% { clip: rect(54px, 9999px, 27px, 0); }
+        70% { clip: rect(28px, 9999px, 99px, 0); }
+        75% { clip: rect(45px, 9999px, 69px, 0); }
+        80% { clip: rect(23px, 9999px, 85px, 0); }
+        85% { clip: rect(54px, 9999px, 84px, 0); }
+        90% { clip: rect(45px, 9999px, 47px, 0); }
+        95% { clip: rect(37px, 9999px, 20px, 0); }
+        100% { clip: rect(4px, 9999px, 91px, 0); }
+    }
+    
+    /* Hex Grid Background */
+    .hex-grid {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: 
+            radial-gradient(circle at 25% 25%, rgba(255, 70, 85, 0.1) 0%, transparent 55%),
+            radial-gradient(circle at 75% 75%, rgba(31, 192, 255, 0.1) 0%, transparent 55%);
+        background-size: 100px 100px;
+        opacity: 0.3;
+        z-index: -1;
+    }
+}
+
+/* Matrix Rain Effect */
+.matrix-rain {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -2;
+    opacity: 0.1;
+}
+
+.matrix-column {
+    position: absolute;
+    top: -100px;
+    color: var(--deadly-accent);
+    font-family: monospace;
+    font-size: 14px;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    animation: matrix-fall linear infinite;
+}
+
+@keyframes matrix-fall {
+    to { top: 100vh; }
+}

@@ -1,0 +1,148 @@
+/* Cute Theme Extensions */
+.cute-theme {
+    /* Character designs */
+    .character {
+        background: linear-gradient(135deg, #ffb6e6, #ffd6f4);
+        border-radius: 50%;
+        width: 150px;
+        height: 150px;
+        position: relative;
+        margin: 0 auto;
+        box-shadow: 0 10px 30px rgba(255, 182, 230, 0.4);
+    }
+    
+    .character::before,
+    .character::after {
+        content: '';
+        position: absolute;
+        background: white;
+        border-radius: 50%;
+    }
+    
+    .character::before {
+        width: 40px;
+        height: 40px;
+        top: 40px;
+        left: 35px;
+        box-shadow: 60px 0 white;
+    }
+    
+    .character::after {
+        width: 60px;
+        height: 30px;
+        bottom: 40px;
+        left: 45px;
+        border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    }
+    
+    /* Clouds */
+    .cloud {
+        position: absolute;
+        background: white;
+        border-radius: 50px;
+        box-shadow: 0 10px 20px rgba(255, 255, 255, 0.3);
+        z-index: 0;
+    }
+    
+    .cloud:nth-child(1) {
+        width: 100px;
+        height: 40px;
+        top: 20%;
+        left: 10%;
+        animation: float 15s ease-in-out infinite;
+    }
+    
+    .cloud:nth-child(2) {
+        width: 150px;
+        height: 60px;
+        top: 60%;
+        right: 10%;
+        animation: float 20s ease-in-out infinite reverse;
+    }
+    
+    /* Hearts */
+    .heart {
+        position: absolute;
+        background: var(--cute-primary);
+        transform: rotate(45deg);
+        animation: float 8s ease-in-out infinite;
+    }
+    
+    .heart:before,
+    .heart:after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: var(--cute-primary);
+        border-radius: 50%;
+    }
+    
+    .heart:before {
+        top: -50%;
+        left: 0;
+    }
+    
+    .heart:after {
+        top: 0;
+        left: -50%;
+    }
+    
+    /* Lesson Cards */
+    .lesson-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        margin: 1rem 0;
+        border: 3px dashed var(--cute-accent);
+        transition: all 0.3s ease;
+    }
+    
+    .lesson-card:hover {
+        transform: scale(1.05);
+        border-style: solid;
+        box-shadow: 0 15px 30px rgba(255, 209, 102, 0.3);
+    }
+    
+    /* Success Animation */
+    .success-animation {
+        color: #4CAF50;
+        font-size: 4rem;
+        animation: bounce 0.5s ease infinite alternate;
+    }
+    
+    @keyframes bounce {
+        from { transform: translateY(0); }
+        to { transform: translateY(-20px); }
+    }
+    
+    /* Game Elements */
+    .bubble {
+        background: white;
+        border-radius: 50%;
+        display: inline-block;
+        margin: 0 10px;
+        position: relative;
+        box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+    }
+    
+    .bubble::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        border-top: 10px solid white;
+    }
+}
+
+/* Background Patterns */
+.cute-bg-pattern {
+    background-image: 
+        radial-gradient(circle at 10% 20%, rgba(255, 182, 230, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(166, 227, 255, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 50% 50%, rgba(255, 209, 102, 0.1) 0%, transparent 20%);
+    background-size: 300px 300px;
+}

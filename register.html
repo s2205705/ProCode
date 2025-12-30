@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register — Python Pathfinder</title>
+    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="cute_mode.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="cute-theme">
+    <nav class="navbar cute">
+        <a href="dashboard.html" class="logo cute"><i class="fas fa-code"></i> Python Pathfinder</a>
+        <div class="nav-links">
+            <a href="dashboard.html" class="nav-link cute"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="game.html" class="nav-link cute"><i class="fas fa-gamepad"></i> Play</a>
+            <a href="login.html" class="nav-link cute"><i class="fas fa-sign-in-alt"></i> Login</a>
+            <button id="themeToggle" class="btn cute small">Switch to Deadly Mode</button>
+        </div>
+    </nav>
+
+<div class="auth-container cute">
+    <div class="auth-card cute">
+        <div class="auth-header cute">
+            <h2><i class="fas fa-user-plus"></i> Create Account</h2>
+            <p>Join Python Pathfinder and start your coding journey!</p>
+        </div>
+        
+        <form method="POST" action="/register" class="auth-form cute">
+            <div class="form-group cute">
+                <label for="username">
+                    <i class="fas fa-user"></i> Username
+                </label>
+                <input type="text" id="username" name="username" required 
+                       placeholder="Choose a cool username">
+                <div class="form-hint">3-20 characters, letters and numbers only</div>
+            </div>
+    <div class="auth-card {{ theme }}">
+        <div class="auth-header {{ theme }}">
+            <h2><i class="fas fa-user-plus"></i> Create Account</h2>
+            <p>Join Python Pathfinder and start your coding journey!</p>
+        </div>
+        
+        <form method="POST" action="{{ url_for('register.html') }}" class="auth-form {{ theme }}">
+            <div class="form-group {{ theme }}">
+                <label for="username">
+                    <i class="fas fa-user"></i> Username
+                </label>
+                <input type="text" id="username" name="username" required 
+                       placeholder="Choose a cool username">
+                <div class="form-hint">3-20 characters, letters and numbers only</div>
+            </div>
+            
+            <div class="form-group {{ theme }}">
+                <label for="email">
+                    <i class="fas fa-envelope"></i> Email
+                </label>
+                <input type="email" id="email" name="email" required 
+                       placeholder="your.email@example.com">
+            </div>
+            
+            <div class="form-group {{ theme }}">
+                <label for="password">
+                    <i class="fas fa-lock"></i> Password
+                </label>
+                <input type="password" id="password" name="password" required 
+                       placeholder="Create a strong password">
+                <div class="password-strength">
+                    <div class="strength-bar"></div>
+                    <span class="strength-text">Password strength: weak</span>
+                </div>
+            </div>
+            
+            <div class="form-group {{ theme }}">
+                <label for="confirm_password">
+                    <i class="fas fa-lock"></i> Confirm Password
+                </label>
+                <input type="password" id="confirm_password" name="confirm_password" required 
+                       placeholder="Repeat your password">
+            </div>
+            
+            <div class="form-group {{ theme }}">
+                <label for="theme">
+                    <i class="fas fa-palette"></i> Choose Your Theme
+                </label>
+                <div class="theme-selector">
+                    <div class="theme-option {{ theme == 'cute' ? 'active' : '' }}">
+                        <input type="radio" id="theme_cute" name="theme" value="cute" checked>
+                        <label for="theme_cute" class="cute-theme-label">
+                            <div class="theme-preview cute">
+                                <div class="preview-character cute"></div>
+                                <span>Cute Mode</span>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="theme-option {{ theme == 'deadly' ? 'active' : '' }}">
+                        <input type="radio" id="theme_deadly" name="theme" value="deadly">
+                        <label for="theme_deadly" class="deadly-theme-label">
+                            <div class="theme-preview deadly">
+                                <div class="preview-character deadly"></div>
+                                <span>Deadly Mode</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group {{ theme }}">
+                <div class="terms-agreement">
+                    <input type="checkbox" id="terms" name="terms" required>
+                    <label for="terms">
+                        I agree to the <a href="#" class="{{ theme }}-link">Terms of Service</a> 
+                        and <a href="#" class="{{ theme }}-link">Privacy Policy</a>
+                    </label>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn {{ theme }} auth-btn">
+                <i class="fas fa-rocket"></i> Start Coding Adventure!
+            </button>
+            
+            <div class="auth-footer {{ theme }}">
+                <p>Already have an account? 
+                    <a href="{{ url_for('login.html') }}" class="{{ theme }}-link">
+                        <i class="fas fa-sign-in-alt"></i> Login here
+                    </a>
+                </p>
+            </div>
+        </form>
+
+        <div class="auth-decoration cute">
+            <div class="floating-heart"></div>
+            <div class="floating-star"></div>
+            <div class="welcome-message">
+                <p>Welcome to the Cute Coder Club! 🎀</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="auth-features {{ theme }}">
+            </div>
+
+            <script src="code_editor.js"></script>
+            <script>
+            // Password strength checker
+            (function(){
+                const passwordEl = document.getElementById('password');
+                const confirmEl = document.getElementById('confirm_password');
+                if(passwordEl){
+                    passwordEl.addEventListener('input', function(e) {
+                        const password = e.target.value;
+                        const strengthBar = document.querySelector('.strength-bar');
+                        const strengthText = document.querySelector('.strength-text');
+                        let strength = 0;
+                        let text = 'Very weak';
+                        let color = '#ff4757';
+                        if (password.length >= 8) strength++;
+                        if (/[A-Z]/.test(password)) strength++;
+                        if (/[0-9]/.test(password)) strength++;
+                        if (/[^A-Za-z0-9]/.test(password)) strength++;
+                        switch(strength) {
+                            case 1: text = 'Weak'; color = '#ff4757'; break;
+                            case 2: text = 'Fair'; color = '#ffa502'; break;
+                            case 3: text = 'Good'; color = '#2ed573'; break;
+                            case 4: text = 'Strong'; color = '#1e90ff'; break;
+                        }
+                        if(strengthBar) strengthBar.style.width = (strength * 25) + '%';
+                        if(strengthBar) strengthBar.style.backgroundColor = color;
+                        if(strengthText) { strengthText.textContent = `Password strength: ${text}`; strengthText.style.color = color; }
+                    });
+                }
+                if(confirmEl){
+                    confirmEl.addEventListener('input', function(e){
+                        const password = document.getElementById('password').value;
+                        const confirm = e.target.value;
+                        if (confirm && password !== confirm) {
+                            e.target.style.borderColor = '#ff4757';
+                            e.target.setCustomValidity('Passwords do not match');
+                        } else {
+                            e.target.style.borderColor = '';
+                            e.target.setCustomValidity('');
+                        }
+                    });
+                }
+                // Simple form validation
+                const form = document.querySelector('.auth-form');
+                if(form){
+                    form.addEventListener('submit', function(e){
+                        const password = document.getElementById('password').value;
+                        const confirm = document.getElementById('confirm_password').value;
+                        const terms = document.getElementById('terms') ? document.getElementById('terms').checked : true;
+                        if (password !== confirm) { e.preventDefault(); alert('Passwords do not match!'); return; }
+                        if (!terms) { e.preventDefault(); alert('You must agree to the terms and conditions'); return; }
+                    });
+                }
+            })();
+
+            // Reuse theme toggle from base
+            (function() {
+                const THEME_KEY = 'pp_theme';
+                const btn = document.getElementById('themeToggle');
+                function applyTheme(theme) {
+                    document.body.classList.remove('cute-theme','deadly-theme');
+                    document.body.classList.add(theme + '-theme');
+                    document.querySelectorAll('.cute, .deadly').forEach(el => {
+                        if (theme === 'cute') { el.classList.remove('deadly'); el.classList.add('cute'); }
+                        else { el.classList.remove('cute'); el.classList.add('deadly'); }
+                    });
+                    if (btn) btn.innerText = theme === 'cute' ? 'Switch to Deadly Mode' : 'Switch to Cute Mode';
+                }
+                let theme = localStorage.getItem(THEME_KEY) || 'cute';
+                applyTheme(theme);
+                if (btn) btn.addEventListener('click', () => { theme = theme === 'cute' ? 'deadly' : 'cute'; localStorage.setItem(THEME_KEY, theme); applyTheme(theme); });
+            })();
+            </script>
+        </body>
+        </html>
+    const password = document.getElementById('password').value;
+    const confirm = document.getElementById('confirm_password').value;
+    const terms = document.getElementById('terms').checked;
+    
+    if (password !== confirm) {
+        e.preventDefault();
+        alert('Passwords do not match!');
+        return;
+    }
+    
+    if (!terms) {
+        e.preventDefault();
+        alert('You must agree to the terms and conditions');
+        return;
+    }
+    
+    // Additional validation can go here
+});
+</script>
+
+<style>
+.auth-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    min-height: 100vh;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 500px;
+    background: var(--bg-color);
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 3rem;
+}
+
+.auth-container.cute .auth-card {
+    --bg-color: white;
+    border: 3px solid var(--cute-primary);
+}
+
+.auth-container.deadly .auth-card {
+    --bg-color: var(--deadly-secondary);
+    border: 2px solid var(--deadly-primary);
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.auth-container.cute .auth-header h2 {
+    color: var(--cute-text);
+    background: linear-gradient(45deg, var(--cute-primary), var(--cute-accent));
+    -webkit-text-fill-color: transparent;
+}
+
+.auth-container.deadly .auth-header h2 {
+    color: var(--deadly-accent);
+    text-shadow: 0 0 10px rgba(31, 192, 255, 0.5);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.auth-container.cute .form-group label {
+    color: var(--cute-text);
+}
+
+.auth-container.deadly .form-group label {
+    color: var(--deadly-text);
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border-radius: 10px;
+    border: 2px solid #ddd;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.auth-container.cute .form-group input {
+    background: #fff9fd;
+    border-color: var(--cute-secondary);
+}
+
+.auth-container.cute .form-group input:focus {
+    border-color: var(--cute-primary);
+    box-shadow: 0 0 0 3px rgba(255, 158, 216, 0.2);
+    outline: none;
+}
+
+.auth-container.deadly .form-group input {
+    background: #2a2a2a;
+    border-color: #444;
+    color: var(--deadly-text);
+}
+
+.auth-container.deadly .form-group input:focus {
+    border-color: var(--deadly-primary);
+    box-shadow: 0 0 0 3px rgba(255, 70, 85, 0.2);
+    outline: none;
+}
+
+.password-strength {
+    margin-top: 0.5rem;
+}
+
+.strength-bar {
+    height: 4px;
+    width: 0%;
+    background: #ff4757;
+    border-radius: 2px;
+    transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.strength-text {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.theme-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.theme-option input[type="radio"] {
+    display: none;
+}
+
+.theme-preview {
+    padding: 1rem;
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.theme-preview.cute {
+    background: linear-gradient(135deg, #ffebf7, #fff0f7);
+    color: var(--cute-text);
+}
+
+.theme-preview.deadly {
+    background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+    color: var(--deadly-text);
+}
+
+.theme-preview.selected {
+    border-color: currentColor;
+    transform: scale(1.05);
+}
+
+.theme-preview.cute.selected {
+    border-color: var(--cute-primary);
+    box-shadow: 0 0 20px rgba(255, 158, 216, 0.3);
+}
+
+.theme-preview.deadly.selected {
+    border-color: var(--deadly-accent);
+    box-shadow: 0 0 20px rgba(31, 192, 255, 0.3);
+}
+
+.preview-character {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 0.5rem;
+    border-radius: 50%;
+}
+
+.preview-character.cute {
+    background: linear-gradient(135deg, var(--cute-primary), var(--cute-accent));
+}
+
+.preview-character.deadly {
+    background: linear-gradient(135deg, var(--deadly-primary), var(--deadly-accent));
+}
+
+.terms-agreement {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.terms-agreement input[type="checkbox"] {
+    width: auto;
+}
+
+.auth-btn {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.1rem;
+    margin-top: 1rem;
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #eee;
+}
+
+.auth-container.cute .auth-footer {
+    border-color: var(--cute-secondary);
+}
+
+.auth-container.deadly .auth-footer {
+    border-color: #444;
+}
+
+.auth-decoration {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.floating-heart, .floating-star, .glowing-orb, .circuit-line {
+    position: absolute;
+    opacity: 0.1;
+}
+
+.auth-features {
+    width: 100%;
+    max-width: 800px;
+    text-align: center;
+}
+
+.auth-container.cute .auth-features h3 {
+    color: var(--cute-text);
+}
+
+.auth-container.deadly .auth-features h3 {
+    color: var(--deadly-accent);
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.feature {
+    padding: 1.5rem;
+    border-radius: 15px;
+    transition: transform 0.3s ease;
+}
+
+.feature:hover {
+    transform: translateY(-5px);
+}
+
+.auth-container.cute .feature {
+    background: white;
+    border: 2px solid var(--cute-primary);
+}
+
+.auth-container.deadly .feature {
+    background: var(--deadly-secondary);
+    border: 1px solid var(--deadly-primary);
+}
+
+.feature i {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.auth-container.cute .feature i {
+    color: var(--cute-primary);
+}
+
+.auth-container.deadly .feature i {
+    color: var(--deadly-accent);
+}
+
+.feature h4 {
+    margin-bottom: 0.5rem;
+}
+
+.auth-container.cute .feature h4 {
+    color: var(--cute-text);
+}
+
+.auth-container.deadly .feature h4 {
+    color: var(--deadly-text);
+}
+
+.auth-container.cute .feature p {
+    color: var(--cute-text);
+    opacity: 0.8;
+}
+
+.auth-container.deadly .feature p {
+    color: var(--deadly-text);
+    opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+    .auth-container {
+        padding: 1rem;
+    }
+    
+    .auth-card {
+        padding: 1.5rem;
+    }
+    
+    .theme-selector {
+        grid-template-columns: 1fr;
+    }
+    
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
