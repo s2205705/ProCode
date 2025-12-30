@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="main.css">
     <link rel="stylesheet" href="cute_mode.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
 </head>
 <body class="cute-theme">
     <nav class="navbar cute">
@@ -14,6 +18,7 @@
         <div class="nav-links">
             <a href="dashboard.html" class="nav-link cute">Dashboard</a>
             <a href="game.html" class="nav-link cute">Play</a>
+            <a href="multiplayer.html" class="nav-link cute active">Multiplayer</a>
             <a href="leaderboard.html" class="nav-link cute">Leaderboard</a>
             <button id="themeToggle" class="btn cute small">Switch to Deadly Mode</button>
         </div>
@@ -27,84 +32,79 @@
         <p class="subtitle cute">Challenge other players in real-time coding battles</p>
         
         <div class="connection-status cute">
-            <div class="status-indicator connected">
+            <div class="status-indicator connected" id="statusIndicator">
                 <i class="fas fa-wifi"></i>
-                <span id="connectionStatus">Connected to Battle Server</span>
+                <span id="connectionStatus">Connecting...</span>
             </div>
             <div class="online-count cute">
                 <i class="fas fa-users"></i>
-                <span id="onlineCount">892 players online</span>
+                <span id="onlineCount">Loading...</span>
             </div>
         </div>
     </div>
 
-    <script>
-    // Local player name (replace with real auth if available)
-    const PLAYER_NAME = localStorage.getItem('pp_username') || 'Player';
-    </script>
-
     <!-- Main Content -->
-    <div class="multiplayer-content {{ theme }}">
+    <div class="multiplayer-content cute">
         <!-- Left Sidebar - Room Browser -->
-        <div class="room-browser {{ theme }}">
-            <div class="browser-header {{ theme }}">
+        <div class="room-browser cute">
+            <div class="browser-header cute">
                 <h2><i class="fas fa-door-open"></i> Available Rooms</h2>
                 <div class="browser-controls">
-                    <button class="btn {{ theme }} small" id="refreshRooms">
+                    <button class="btn cute small" id="refreshRooms">
                         <i class="fas fa-sync-alt"></i> Refresh
                     </button>
-                    <button class="btn {{ theme }} small" id="createRoomBtn">
+                    <button class="btn cute small" id="createRoomBtn">
                         <i class="fas fa-plus"></i> Create Room
                     </button>
                 </div>
             </div>
 
-            <!-- Room Creation Form (Initially Hidden) -->
-            <div class="room-creation {{ theme }}" id="roomCreationForm" style="display: none;">
+            <!-- Room Creation Form -->
+            <div class="room-creation cute" id="roomCreationForm" style="display: none;">
                 <h3><i class="fas fa-edit"></i> Create New Room</h3>
-                <div class="form-group {{ theme }}">
+                <div class="form-group cute">
                     <label for="roomName"><i class="fas fa-heading"></i> Room Name</label>
-                    <input type="text" id="roomName" placeholder="Enter room name" class="{{ theme }}">
+                    <input type="text" id="roomName" placeholder="Enter room name" class="cute">
                 </div>
                 <div class="form-group cute">
                     <label for="challengeSelect"><i class="fas fa-tasks"></i> Challenge</label>
                     <select id="challengeSelect" class="cute">
-                        <option value="">Random Challenge</option>
+                        <option value="random">Random Challenge</option>
                         <option value="1">Python Basics (Beginner)</option>
                         <option value="2">Functions & Loops (Intermediate)</option>
                         <option value="3">Data Structures (Advanced)</option>
                     </select>
                 </div>
-                <div class="form-group {{ theme }}">
+                <div class="form-group cute">
                     <label for="timeLimit"><i class="fas fa-clock"></i> Time Limit</label>
-                    <select id="timeLimit" class="{{ theme }}">
+                    <select id="timeLimit" class="cute">
+                        <option value="180">3 minutes</option>
                         <option value="300">5 minutes</option>
                         <option value="600">10 minutes</option>
-                        <option value="180">3 minutes</option>
                     </select>
                 </div>
-                <div class="form-group {{ theme }}">
-                    <label class="checkbox-label {{ theme }}">
+                <div class="form-group cute">
+                    <label class="checkbox-label cute">
                         <input type="checkbox" id="privateRoom">
                         <span class="checkmark"></span>
                         Private Room (Invite Only)
                     </label>
                 </div>
                 <div class="form-actions">
-                    <button class="btn {{ theme }}" id="confirmCreateRoom">
+                    <button class="btn cute" id="confirmCreateRoom">
                         <i class="fas fa-check"></i> Create Room
                     </button>
-                    <button class="btn {{ theme }} outline" id="cancelCreateRoom">
+                    <button class="btn cute outline" id="cancelCreateRoom">
                         <i class="fas fa-times"></i> Cancel
                     </button>
                 </div>
             </div>
 
             <!-- Quick Match -->
-            <div class="quick-match {{ theme }}">
+            <div class="quick-match cute">
                 <h3><i class="fas fa-bolt"></i> Quick Match</h3>
                 <p>Find an opponent instantly with similar skill level</p>
-                <button class="btn {{ theme }} large" id="quickMatchBtn">
+                <button class="btn cute large" id="quickMatchBtn">
                     <i class="fas fa-search"></i> Find Match
                 </button>
                 <div class="matchmaking-status" id="matchmakingStatus" style="display: none;">
@@ -112,21 +112,21 @@
                         <div class="pulse-dot"></div>
                         <span>Searching for opponent...</span>
                     </div>
-                    <button class="btn {{ theme }} small cancel" id="cancelMatchmaking">
+                    <button class="btn cute small cancel" id="cancelMatchmaking">
                         Cancel
                     </button>
                 </div>
             </div>
 
             <!-- Room List -->
-                <div class="room-list cute">
+            <div class="room-list cute">
                 <h3><i class="fas fa-list"></i> Active Rooms</h3>
-                <div class="room-filters {{ theme }}">
-                    <button class="filter-btn {{ theme }} active" data-filter="all">All</button>
-                    <button class="filter-btn {{ theme }}" data-filter="beginner">Beginner</button>
-                    <button class="filter-btn {{ theme }}" data-filter="intermediate">Intermediate</button>
-                    <button class="filter-btn {{ theme }}" data-filter="advanced">Advanced</button>
-                    <button class="filter-btn {{ theme }}" data-filter="empty">Empty</button>
+                <div class="room-filters cute">
+                    <button class="filter-btn cute active" data-filter="all">All</button>
+                    <button class="filter-btn cute" data-filter="beginner">Beginner</button>
+                    <button class="filter-btn cute" data-filter="intermediate">Intermediate</button>
+                    <button class="filter-btn cute" data-filter="advanced">Advanced</button>
+                    <button class="filter-btn cute" data-filter="empty">Empty</button>
                 </div>
                 
                 <div class="rooms-container" id="roomsContainer">
@@ -136,9 +136,9 @@
         </div>
 
         <!-- Main Arena -->
-        <div class="battle-arena {{ theme }}">
+        <div class="battle-arena cute">
             <!-- Waiting Lobby -->
-            <div class="waiting-lobby {{ theme }}" id="waitingLobby">
+            <div class="waiting-lobby cute" id="waitingLobby" style="display: none;">
                 <div class="lobby-content">
                     <div class="lobby-icon">
                         <i class="fas fa-users"></i>
@@ -146,22 +146,22 @@
                     <h2>Waiting for Opponent</h2>
                     <p>Share this room code with friends or wait for a random opponent</p>
                     
-                    <div class="room-code {{ theme }}">
+                    <div class="room-code cute">
                         <div class="code-display" id="roomCodeDisplay">----</div>
-                        <button class="btn {{ theme }} small" id="copyRoomCode">
+                        <button class="btn cute small" id="copyRoomCode">
                             <i class="fas fa-copy"></i> Copy Code
                         </button>
                     </div>
                     
-                    <div class="player-list {{ theme }}">
+                    <div class="player-list cute">
                         <div class="player you cute">
                             <div class="player-avatar cute">
-                                <span class="avatar-text" id="playerAvatarInitial">Y</span>
+                                <span class="avatar-text" id="playerAvatarInitial">P</span>
                                 <div class="player-status ready"></div>
                             </div>
                             <div class="player-info">
                                 <h4 id="playerName">You</h4>
-                                <p class="player-rating">Rating: 1350</p>
+                                <p class="player-rating">Rating: <span id="playerRating">1350</span></p>
                                 <div class="ready-status">
                                     <button class="btn cute small ready-btn" id="readyBtn">
                                         <i class="fas fa-check"></i> Ready
@@ -170,26 +170,26 @@
                             </div>
                         </div>
                         
-                        <div class="player {{ theme }} opponent">
-                            <div class="player-avatar {{ theme }}">
+                        <div class="player cute opponent">
+                            <div class="player-avatar cute">
                                 <i class="fas fa-user-clock"></i>
                                 <div class="player-status waiting"></div>
                             </div>
                             <div class="player-info">
-                                <h4>Waiting for opponent...</h4>
-                                <p class="player-rating">---</p>
+                                <h4 id="opponentNameDisplay">Waiting for opponent...</h4>
+                                <p class="player-rating">Rating: <span id="opponentRating">---</span></p>
                                 <div class="ready-status">
-                                    <span class="status-text">Not connected</span>
+                                    <span class="status-text" id="opponentStatusText">Not connected</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
                     <div class="lobby-actions">
-                        <button class="btn {{ theme }} secondary" id="inviteFriendBtn">
+                        <button class="btn cute secondary" id="inviteFriendBtn">
                             <i class="fas fa-user-plus"></i> Invite Friend
                         </button>
-                        <button class="btn {{ theme }} outline" id="leaveRoomBtn">
+                        <button class="btn cute outline" id="leaveRoomBtn">
                             <i class="fas fa-sign-out-alt"></i> Leave Room
                         </button>
                     </div>
@@ -197,27 +197,27 @@
             </div>
 
             <!-- Battle Interface -->
-            <div class="battle-interface {{ theme }}" id="battleInterface" style="display: none;">
+            <div class="battle-interface cute" id="battleInterface" style="display: none;">
                 <!-- Battle Header -->
-                <div class="battle-header {{ theme }}">
-                    <div class="battle-timer {{ theme }}" id="battleTimer">
+                <div class="battle-header cute">
+                    <div class="battle-timer cute" id="battleTimer">
                         <i class="fas fa-clock"></i>
                         <span id="timerDisplay">05:00</span>
                     </div>
                     <div class="battle-info">
                         <h3 id="battleChallenge">Python Variables Challenge</h3>
                         <div class="challenge-meta">
-                            <span class="difficulty-badge {{ theme }}" id="challengeDifficulty">Beginner</span>
-                            <span class="points-badge {{ theme }}" id="challengePoints">100 points</span>
+                            <span class="difficulty-badge cute" id="challengeDifficulty">Beginner</span>
+                            <span class="points-badge cute" id="challengePoints">100 points</span>
                         </div>
                     </div>
                     <div class="battle-scores">
-                        <div class="score-player {{ theme }}">
+                        <div class="score-player cute">
                             <span class="score-label">You</span>
                             <span class="score-value" id="playerScore">0</span>
                         </div>
-                        <div class="score-vs {{ theme }}">VS</div>
-                        <div class="score-opponent {{ theme }}">
+                        <div class="score-vs cute">VS</div>
+                        <div class="score-opponent cute">
                             <span class="score-label">Opponent</span>
                             <span class="score-value" id="opponentScore">0</span>
                         </div>
@@ -225,82 +225,82 @@
                 </div>
 
                 <!-- Battle Grid -->
-                <div class="battle-grid {{ theme }}">
+                <div class="battle-grid cute">
                     <!-- Player Side -->
-                    <div class="player-side {{ theme }}">
-                        <div class="player-header {{ theme }}">
-                            <div class="player-display {{ theme }}">
-                                <div class="player-avatar {{ theme }}">
-                                    <span class="avatar-text">{{ session.username|first|upper if session.username else 'Y' }}</span>
+                    <div class="player-side cute">
+                        <div class="player-header cute">
+                            <div class="player-display cute">
+                                <div class="player-avatar cute">
+                                    <span class="avatar-text" id="playerInitial">P</span>
                                 </div>
                                 <div class="player-details">
-                                    <h4>{{ session.username|default('You') }}</h4>
-                                    <p class="player-stats">Wins: 8 • Rating: 1350</p>
+                                    <h4 id="currentPlayerName">Player</h4>
+                                    <p class="player-stats" id="playerStats">Wins: 8 • Rating: 1350</p>
                                 </div>
                             </div>
-                            <div class="player-status-indicator {{ theme }}">
-                                <div class="status ready">
+                            <div class="player-status-indicator cute">
+                                <div class="status ready" id="playerStatusIndicator">
                                     <i class="fas fa-check-circle"></i>
                                     <span>Ready</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="code-editor-section {{ theme }}">
-                            <div class="editor-header {{ theme }}">
+                        <div class="code-editor-section cute">
+                            <div class="editor-header cute">
                                 <span><i class="fas fa-code"></i> your_solution.py</span>
                                 <div class="editor-actions">
-                                    <button class="editor-btn" title="Format code">
+                                    <button class="editor-btn" title="Format code" id="formatCodeBtn">
                                         <i class="fas fa-align-left"></i>
                                     </button>
-                                    <button class="editor-btn" title="Reset code">
+                                    <button class="editor-btn" title="Reset code" id="resetCodeBtn">
                                         <i class="fas fa-redo"></i>
                                     </button>
                                 </div>
                             </div>
-                            <textarea id="multiplayerCode" class="{{ theme }}" spellcheck="false">
+                            <textarea id="multiplayerCode" class="cute" spellcheck="false">
 # Multiplayer Challenge
 # Write your solution below
 
 def solve_challenge():
     # Your code here
-    pass
+    return "Hello, World!"
                             </textarea>
                         </div>
 
-                        <div class="player-controls {{ theme }}">
-                            <button class="btn {{ theme }}" id="runMultiplayerBtn">
+                        <div class="player-controls cute">
+                            <button class="btn cute" id="runMultiplayerBtn">
                                 <i class="fas fa-play"></i> Run Code
                             </button>
-                            <button class="btn {{ theme }} success" id="submitMultiplayerBtn">
+                            <button class="btn cute success" id="submitMultiplayerBtn">
                                 <i class="fas fa-paper-plane"></i> Submit Solution
                             </button>
-                            <button class="btn {{ theme }} outline" id="requestHintBtn">
+                            <button class="btn cute outline" id="requestHintBtn">
                                 <i class="fas fa-lightbulb"></i> Hint (-10s)
                             </button>
                         </div>
 
-                        <div class="player-output {{ theme }}">
+                        <div class="player-output cute">
                             <h4><i class="fas fa-terminal"></i> Your Output</h4>
                             <pre id="playerOutput">Run your code to see output...</pre>
                         </div>
                     </div>
 
                     <!-- VS Divider -->
-                    <div class="vs-divider {{ theme }}">
+                    <div class="vs-divider cute">
                         <div class="vs-icon">
                             <i class="fas fa-crosshairs"></i>
                         </div>
                         <div class="vs-info">
-                            <div class="info-item {{ theme }}">
+                            <div class="info-item cute">
                                 <i class="fas fa-code"></i>
                                 <span id="playerCodeLines">0 lines</span>
                             </div>
-                            <div class="info-item {{ theme }}">
+                            <div class="info-item cute">
                                 <i class="fas fa-bolt"></i>
-                                <span id="playerActivity">Typing...</span>
+                                <span id="playerActivity">Idle</span>
                             </div>
-                            <div class="info-item {{ theme }}">
+                            <div class="info-item cute">
                                 <i class="fas fa-history"></i>
                                 <span id="timeRemaining">5:00</span>
                             </div>
@@ -308,10 +308,10 @@ def solve_challenge():
                     </div>
 
                     <!-- Opponent Side -->
-                    <div class="opponent-side {{ theme }}">
-                        <div class="player-header {{ theme }}">
-                            <div class="player-display {{ theme }}">
-                                <div class="player-avatar {{ theme }}">
+                    <div class="opponent-side cute">
+                        <div class="player-header cute">
+                            <div class="player-display cute">
+                                <div class="player-avatar cute">
                                     <i class="fas fa-user-secret"></i>
                                 </div>
                                 <div class="player-details">
@@ -319,33 +319,33 @@ def solve_challenge():
                                     <p class="player-stats" id="opponentStats">Wins: --- • Rating: ---</p>
                                 </div>
                             </div>
-                            <div class="player-status-indicator {{ theme }}">
-                                <div class="status not-ready">
+                            <div class="player-status-indicator cute">
+                                <div class="status not-ready" id="opponentStatusIndicator">
                                     <i class="fas fa-clock"></i>
                                     <span>Not Ready</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="opponent-code {{ theme }}">
-                            <div class="editor-header {{ theme }}">
+                        <div class="opponent-code cute">
+                            <div class="editor-header cute">
                                 <span><i class="fas fa-code"></i> opponent_solution.py</span>
                                 <div class="editor-status">
-                                    <span id="opponentStatus">Not started</span>
+                                    <span id="opponentCodeStatus">Not started</span>
                                 </div>
                             </div>
-                            <div class="code-preview {{ theme }}">
+                            <div class="code-preview cute">
                                 <div class="code-mask"></div>
                                 <pre class="code-hidden">
 # Opponent's code is hidden during battle
 # You can see their progress indicators below
                                 </pre>
-                                <div class="progress-indicators">
-                                    <div class="indicator typing">
+                                <div class="progress-indicators" id="opponentProgressIndicators">
+                                    <div class="indicator typing" style="display: none;">
                                         <div class="indicator-bar"></div>
                                         <span>Typing...</span>
                                     </div>
-                                    <div class="indicator testing">
+                                    <div class="indicator testing" style="display: none;">
                                         <div class="indicator-bar"></div>
                                         <span>Testing...</span>
                                     </div>
@@ -353,23 +353,23 @@ def solve_challenge():
                             </div>
                         </div>
 
-                        <div class="opponent-info {{ theme }}">
-                            <div class="info-card {{ theme }}">
+                        <div class="opponent-info cute">
+                            <div class="info-card cute">
                                 <h5><i class="fas fa-chart-line"></i> Opponent Activity</h5>
                                 <div class="activity-meter">
                                     <div class="meter-bar">
-                                        <div class="meter-fill" id="opponentActivityBar" style="width: 30%"></div>
+                                        <div class="meter-fill" id="opponentActivityBar" style="width: 0%"></div>
                                     </div>
-                                    <span id="opponentProgress">30% complete</span>
+                                    <span id="opponentProgress">0% complete</span>
                                 </div>
                             </div>
-                            <div class="info-card {{ theme }}">
+                            <div class="info-card cute">
                                 <h5><i class="fas fa-exclamation-circle"></i> Last Action</h5>
-                                <p id="opponentLastAction">Joined the battle</p>
+                                <p id="opponentLastAction">Waiting for opponent...</p>
                             </div>
                         </div>
 
-                        <div class="opponent-output {{ theme }}">
+                        <div class="opponent-output cute">
                             <h4><i class="fas fa-eye"></i> Opponent's Status</h4>
                             <div class="status-display" id="opponentStatusDisplay">
                                 <div class="status-item">
@@ -391,8 +391,8 @@ def solve_challenge():
             </div>
 
             <!-- Results Screen -->
-            <div class="results-screen {{ theme }}" id="resultsScreen" style="display: none;">
-                <div class="results-content {{ theme }}">
+            <div class="results-screen cute" id="resultsScreen" style="display: none;">
+                <div class="results-content cute">
                     <div class="result-header">
                         <div class="result-icon victory">
                             <i class="fas fa-trophy"></i>
@@ -401,120 +401,89 @@ def solve_challenge():
                         <p class="result-subtitle" id="resultTitle">Victory!</p>
                     </div>
 
-                    <div class="result-comparison {{ theme }}">
-                        <div class="comparison-player {{ theme }}">
-                            <div class="comparison-avatar {{ theme }}">
-                                <span class="avatar-text">{{ session.username|first|upper if session.username else 'Y' }}</span>
+                    <div class="result-comparison cute">
+                        <div class="comparison-player cute">
+                            <div class="comparison-avatar cute">
+                                <span class="avatar-text" id="resultPlayerInitial">P</span>
                             </div>
-                            <h4>{{ session.username|default('You') }}</h4>
+                            <h4 id="resultPlayerName">You</h4>
                             <div class="comparison-score">
                                 <span class="score-label">Score</span>
-                                <span class="score-value" id="finalPlayerScore">100</span>
+                                <span class="score-value" id="finalPlayerScore">0</span>
                             </div>
                             <div class="comparison-stats">
-                                <div class="stat {{ theme }}">
+                                <div class="stat cute">
                                     <span class="stat-label">Time</span>
-                                    <span class="stat-value" id="playerTime">2:30</span>
+                                    <span class="stat-value" id="playerTime">0:00</span>
                                 </div>
-                                <div class="stat {{ theme }}">
+                                <div class="stat cute">
                                     <span class="stat-label">Lines</span>
-                                    <span class="stat-value" id="playerLines">15</span>
+                                    <span class="stat-value" id="playerLines">0</span>
                                 </div>
-                                <div class="stat {{ theme }}">
+                                <div class="stat cute">
                                     <span class="stat-label">Runs</span>
-                                    <span class="stat-value" id="playerRuns">3</span>
+                                    <span class="stat-value" id="playerRuns">0</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="comparison-vs {{ theme }}">
+                        <div class="comparison-vs cute">
                             <div class="vs-circle">VS</div>
-                            <div class="rating-change {{ theme }}">
+                            <div class="rating-change cute">
                                 <span class="change-label">Rating Change</span>
-                                <span class="change-value positive" id="ratingChange">+25</span>
+                                <span class="change-value positive" id="ratingChange">+0</span>
                             </div>
                         </div>
 
-                        <div class="comparison-opponent {{ theme }}">
-                            <div class="comparison-avatar {{ theme }}">
+                        <div class="comparison-opponent cute">
+                            <div class="comparison-avatar cute">
                                 <i class="fas fa-user-secret"></i>
                             </div>
                             <h4 id="finalOpponentName">Opponent</h4>
                             <div class="comparison-score">
                                 <span class="score-label">Score</span>
-                                <span class="score-value" id="finalOpponentScore">85</span>
+                                <span class="score-value" id="finalOpponentScore">0</span>
                             </div>
                             <div class="comparison-stats">
-                                <div class="stat {{ theme }}">
+                                <div class="stat cute">
                                     <span class="stat-label">Time</span>
-                                    <span class="stat-value" id="opponentTime">4:15</span>
+                                    <span class="stat-value" id="opponentTime">0:00</span>
                                 </div>
-                                <div class="stat {{ theme }}">
+                                <div class="stat cute">
                                     <span class="stat-label">Lines</span>
-                                    <span class="stat-value" id="opponentLines">22</span>
+                                    <span class="stat-value" id="opponentLines">0</span>
                                 </div>
-                                <div class="stat {{ theme }}">
+                                <div class="stat cute">
                                     <span class="stat-label">Runs</span>
-                                    <span class="stat-value" id="opponentRuns">5</span>
+                                    <span class="stat-value" id="opponentRuns">0</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="result-details {{ theme }}">
-                        <div class="detail-section {{ theme }}">
+                    <div class="result-details cute">
+                        <div class="detail-section cute">
                             <h5><i class="fas fa-award"></i> Rewards</h5>
-                            <div class="rewards-list">
-                                <div class="reward-item {{ theme }}">
-                                    <i class="fas fa-coins"></i>
-                                    <span>+100 XP</span>
-                                </div>
-                                <div class="reward-item {{ theme }}">
-                                    <i class="fas fa-trophy"></i>
-                                    <span>Victory Bonus</span>
-                                </div>
-                                <div class="reward-item {{ theme }}">
-                                    <i class="fas fa-star"></i>
-                                    <span>Win Streak: 2</span>
-                                </div>
+                            <div class="rewards-list" id="rewardsList">
+                                <!-- Dynamic rewards -->
                             </div>
                         </div>
-                        <div class="detail-section {{ theme }}">
+                        <div class="detail-section cute">
                             <h5><i class="fas fa-chart-bar"></i> Performance</h5>
-                            <div class="performance-metrics">
-                                <div class="metric {{ theme }}">
-                                    <span class="metric-label">Code Quality</span>
-                                    <div class="metric-bar">
-                                        <div class="metric-fill" style="width: 85%"></div>
-                                    </div>
-                                    <span class="metric-value">85%</span>
-                                </div>
-                                <div class="metric {{ theme }}">
-                                    <span class="metric-label">Speed</span>
-                                    <div class="metric-bar">
-                                        <div class="metric-fill" style="width: 95%"></div>
-                                    </div>
-                                    <span class="metric-value">95%</span>
-                                </div>
-                                <div class="metric {{ theme }}">
-                                    <span class="metric-label">Efficiency</span>
-                                    <div class="metric-bar">
-                                        <div class="metric-fill" style="width: 78%"></div>
-                                    </div>
-                                    <span class="metric-value">78%</span>
-                                </div>
+                            <div class="performance-metrics" id="performanceMetrics">
+                                <!-- Dynamic metrics -->
                             </div>
                         </div>
                     </div>
 
                     <div class="result-actions">
-                        <button class="btn {{ theme }}" id="rematchBtn">
+                        <button class="btn cute" id="rematchBtn">
                             <i class="fas fa-redo"></i> Rematch
                         </button>
-                        <button class="btn {{ theme }} secondary" id="nextOpponentBtn">
+                        <button class="btn cute secondary" id="nextOpponentBtn">
                             <i class="fas fa-user-plus"></i> New Opponent
                         </button>
-                        <button class="btn {{ theme }} outline" id="backToLobbyBtn">
+                        <button class="btn cute outline" id="backToLobbyBtn">
                             <i class="fas fa-home"></i> Back to Lobby
                         </button>
                     </div>
@@ -523,81 +492,68 @@ def solve_challenge():
         </div>
 
         <!-- Right Sidebar - Chat & Info -->
-        <div class="battle-sidebar {{ theme }}">
+        <div class="battle-sidebar cute">
             <!-- Battle Chat -->
-            <div class="battle-chat {{ theme }}">
-                <div class="chat-header {{ theme }}">
+            <div class="battle-chat cute">
+                <div class="chat-header cute">
                     <h3><i class="fas fa-comments"></i> Battle Chat</h3>
                     <div class="chat-controls">
-                        <button class="chat-btn" title="Toggle sounds">
+                        <button class="chat-btn" title="Toggle sounds" id="toggleSoundBtn">
                             <i class="fas fa-volume-up"></i>
                         </button>
-                        <button class="chat-btn" title="Clear chat">
+                        <button class="chat-btn" title="Clear chat" id="clearChatBtn">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
                 </div>
-                <div class="chat-messages {{ theme }}" id="chatMessages">
+                <div class="chat-messages cute" id="chatMessages">
                     <!-- Messages will be dynamically inserted here -->
-                    <div class="message system">
-                        <div class="message-content">
-                            <span class="message-text">Welcome to the battle arena!</span>
-                            <span class="message-time">Just now</span>
-                        </div>
-                    </div>
-                    <div class="message player">
-                        <div class="message-sender">You</div>
-                        <div class="message-content">
-                            <span class="message-text">Good luck everyone!</span>
-                            <span class="message-time">Just now</span>
-                        </div>
-                    </div>
                 </div>
-                <div class="chat-input {{ theme }}">
-                    <input type="text" id="chatInput" placeholder="Type your message..." class="{{ theme }}">
-                    <button class="btn {{ theme }} small" id="sendMessageBtn">
+                <div class="chat-input cute">
+                    <input type="text" id="chatInput" placeholder="Type your message..." class="cute">
+                    <button class="btn cute small" id="sendMessageBtn">
                         <i class="fas fa-paper-plane"></i>
                     </button>
                 </div>
             </div>
 
             <!-- Battle Statistics -->
-            <div class="battle-stats {{ theme }}">
+            <div class="battle-stats cute">
                 <h3><i class="fas fa-chart-pie"></i> Live Stats</h3>
                 <div class="stats-grid">
-                    <div class="stat-card {{ theme }}">
+                    <div class="stat-card cute">
                         <div class="stat-icon">
                             <i class="fas fa-fire"></i>
                         </div>
                         <div class="stat-content">
-                            <div class="stat-value" id="totalBattles">24</div>
+                            <div class="stat-value" id="totalBattles">0</div>
                             <div class="stat-label">Total Battles</div>
                         </div>
                     </div>
-                    <div class="stat-card {{ theme }}">
+                    <div class="stat-card cute">
                         <div class="stat-icon">
                             <i class="fas fa-trophy"></i>
                         </div>
                         <div class="stat-content">
-                            <div class="stat-value" id="winRate">67%</div>
+                            <div class="stat-value" id="winRate">0%</div>
                             <div class="stat-label">Win Rate</div>
                         </div>
                     </div>
-                    <div class="stat-card {{ theme }}">
+                    <div class="stat-card cute">
                         <div class="stat-icon">
                             <i class="fas fa-bolt"></i>
                         </div>
                         <div class="stat-content">
-                            <div class="stat-value" id="avgTime">3:45</div>
+                            <div class="stat-value" id="avgTime">0:00</div>
                             <div class="stat-label">Avg. Time</div>
                         </div>
                     </div>
-                    <div class="stat-card {{ theme }}">
+                    <div class="stat-card cute">
                         <div class="stat-icon">
                             <i class="fas fa-code"></i>
                         </div>
                         <div class="stat-content">
-                            <div class="stat-value" id="totalLines">1,234</div>
+                            <div class="stat-value" id="totalLines">0</div>
                             <div class="stat-label">Lines Written</div>
                         </div>
                     </div>
@@ -605,58 +561,21 @@ def solve_challenge():
             </div>
 
             <!-- Active Tournaments -->
-            <div class="tournaments {{ theme }}">
+            <div class="tournaments cute">
                 <h3><i class="fas fa-flag-checkered"></i> Active Tournaments</h3>
-                <div class="tournament-list">
-                    <div class="tournament-item {{ theme }}">
-                        <div class="tournament-header">
-                            <h4>Weekly Python Cup</h4>
-                            <span class="tournament-status active">Live</span>
-                        </div>
-                        <div class="tournament-details">
-                            <span class="detail">
-                                <i class="fas fa-users"></i>
-                                32/64 players
-                            </span>
-                            <span class="detail">
-                                <i class="fas fa-clock"></i>
-                                2h remaining
-                            </span>
-                        </div>
-                        <button class="btn {{ theme }} small">
-                            <i class="fas fa-play"></i> Join
-                        </button>
-                    </div>
-                    <div class="tournament-item {{ theme }}">
-                        <div class="tournament-header">
-                            <h4>Beginner Battle Royale</h4>
-                            <span class="tournament-status upcoming">Soon</span>
-                        </div>
-                        <div class="tournament-details">
-                            <span class="detail">
-                                <i class="fas fa-users"></i>
-                                0/16 players
-                            </span>
-                            <span class="detail">
-                                <i class="fas fa-clock"></i>
-                                Starts in 30m
-                            </span>
-                        </div>
-                        <button class="btn {{ theme }} small">
-                            <i class="fas fa-bell"></i> Notify
-                        </button>
-                    </div>
+                <div class="tournament-list" id="tournamentList">
+                    <!-- Dynamic tournaments -->
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Spectator Mode Notification -->
-    <div class="spectator-notification {{ theme }}" id="spectatorNotification" style="display: none;">
-        <div class="notification-content {{ theme }}">
+    <div class="spectator-notification cute" id="spectatorNotification" style="display: none;">
+        <div class="notification-content cute">
             <i class="fas fa-eye"></i>
             <span>You are spectating this match. Click here to join the next available battle.</span>
-            <button class="btn {{ theme }} small" id="joinBattleBtn">
+            <button class="btn cute small" id="joinBattleBtn">
                 <i class="fas fa-crosshairs"></i> Join Battle
             </button>
         </div>
@@ -664,98 +583,154 @@ def solve_challenge():
 </div>
 
 <script>
-// Socket.IO connection for real-time multiplayer
-const socket = io();
-
 // Game state
-let gameState = {
+const gameState = {
     currentRoom: null,
     opponent: null,
     battleActive: false,
-    timeRemaining: 300, // 5 minutes in seconds
+    timeRemaining: 300,
     timerInterval: null,
     playerReady: false,
     opponentReady: false,
     codeSubmitted: false,
-    matchResult: null
+    matchResult: null,
+    socket: null,
+    username: localStorage.getItem('pp_username') || 'Player' + Math.floor(Math.random() * 1000),
+    userId: localStorage.getItem('pp_userid') || 'user_' + Date.now(),
+    rating: parseInt(localStorage.getItem('pp_rating')) || 1350,
+    wins: parseInt(localStorage.getItem('pp_wins')) || 0,
+    totalBattles: parseInt(localStorage.getItem('pp_total_battles')) || 0,
+    soundsEnabled: true
 };
 
+// Mock server URL - replace with your actual server URL
+const SERVER_URL = window.location.hostname === 'localhost' 
+    ? 'http://localhost:3000' 
+    : 'https://your-server-url.com';
+
+// Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Socket.IO connection
+    initializePlayer();
     initializeSocket();
-    
-    // Setup event listeners
     setupEventListeners();
-    
-    // Load player stats
     loadPlayerStats();
-    
-    // Theme-specific initialization
-    if (document.body.classList.contains('cute-theme')) {
-        initializeCuteTheme();
-    } else {
-        initializeDeadlyTheme();
-    }
+    loadTournaments();
+    initializeCodeEditor();
 });
 
-function initializeSocket() {
-    // Socket.IO event handlers
-    socket.on('connect', () => {
-        console.log('Connected to multiplayer server');
-        updateConnectionStatus(true);
-    });
+function initializePlayer() {
+    // Set player name
+    document.getElementById('playerName').textContent = gameState.username;
+    document.getElementById('currentPlayerName').textContent = gameState.username;
+    document.getElementById('resultPlayerName').textContent = gameState.username;
     
-    socket.on('disconnect', () => {
+    // Set player initial
+    const initial = gameState.username.charAt(0).toUpperCase();
+    document.getElementById('playerAvatarInitial').textContent = initial;
+    document.getElementById('playerInitial').textContent = initial;
+    document.getElementById('resultPlayerInitial').textContent = initial;
+    
+    // Update player stats
+    document.getElementById('playerRating').textContent = gameState.rating;
+    document.getElementById('playerStats').textContent = `Wins: ${gameState.wins} • Rating: ${gameState.rating}`;
+}
+
+function initializeSocket() {
+    // Create Socket.IO connection
+    gameState.socket = io(SERVER_URL, {
+        transports: ['websocket', 'polling'],
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000
+    });
+
+    // Socket event handlers
+    gameState.socket.on('connect', () => {
+        console.log('Connected to server');
+        updateConnectionStatus(true);
+        gameState.socket.emit('register_player', {
+            username: gameState.username,
+            userId: gameState.userId,
+            rating: gameState.rating
+        });
+    });
+
+    gameState.socket.on('disconnect', () => {
         console.log('Disconnected from server');
         updateConnectionStatus(false);
     });
-    
-    socket.on('room_list', (rooms) => {
+
+    gameState.socket.on('connect_error', (error) => {
+        console.error('Connection error:', error);
+        showNotification('Connection error. Please refresh the page.', 'error');
+    });
+
+    gameState.socket.on('online_count', (count) => {
+        document.getElementById('onlineCount').textContent = `${count} players online`;
+    });
+
+    gameState.socket.on('room_list', (rooms) => {
         updateRoomList(rooms);
     });
-    
-    socket.on('joined_room', (data) => {
+
+    gameState.socket.on('room_created', (data) => {
+        handleRoomCreated(data);
+    });
+
+    gameState.socket.on('joined_room', (data) => {
         handleJoinedRoom(data);
     });
-    
-    socket.on('player_joined', (data) => {
+
+    gameState.socket.on('player_joined', (data) => {
         handlePlayerJoined(data);
     });
-    
-    socket.on('player_left', (data) => {
+
+    gameState.socket.on('player_left', (data) => {
         handlePlayerLeft(data);
     });
-    
-    socket.on('player_ready', (data) => {
+
+    gameState.socket.on('player_ready', (data) => {
         handlePlayerReady(data);
     });
-    
-    socket.on('challenge_start', (data) => {
+
+    gameState.socket.on('challenge_start', (data) => {
         startBattle(data);
     });
-    
-    socket.on('code_update', (data) => {
+
+    gameState.socket.on('code_update', (data) => {
         handleCodeUpdate(data);
     });
-    
-    socket.on('challenge_result', (data) => {
+
+    gameState.socket.on('challenge_result', (data) => {
         handleChallengeResult(data);
     });
-    
-    socket.on('match_complete', (data) => {
+
+    gameState.socket.on('match_complete', (data) => {
         handleMatchComplete(data);
     });
-    
-    socket.on('chat_message', (data) => {
+
+    gameState.socket.on('chat_message', (data) => {
         addChatMessage(data);
     });
-    
-    socket.on('matchmaking_update', (data) => {
+
+    gameState.socket.on('matchmaking_update', (data) => {
         updateMatchmakingStatus(data);
     });
-    
+
+    gameState.socket.on('system_message', (data) => {
+        addChatMessage({
+            username: 'System',
+            message: data.message,
+            type: 'system'
+        });
+    });
+
     // Request initial room list
-    socket.emit('get_rooms');
+    setTimeout(() => {
+        if (gameState.socket.connected) {
+            gameState.socket.emit('get_rooms');
+        }
+    }, 1000);
 }
 
 function setupEventListeners() {
@@ -767,14 +742,6 @@ function setupEventListeners() {
     // Quick match
     document.getElementById('quickMatchBtn').addEventListener('click', findQuickMatch);
     document.getElementById('cancelMatchmaking').addEventListener('click', cancelMatchmaking);
-    
-    // Room joining
-    document.querySelectorAll('.join-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const roomId = this.dataset.roomId;
-            joinRoom(roomId);
-        });
-    });
     
     // Room filters
     document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -791,6 +758,10 @@ function setupEventListeners() {
     document.getElementById('submitMultiplayerBtn').addEventListener('click', submitSolution);
     document.getElementById('requestHintBtn').addEventListener('click', requestHint);
     
+    // Code editor buttons
+    document.getElementById('formatCodeBtn').addEventListener('click', formatCode);
+    document.getElementById('resetCodeBtn').addEventListener('click', resetCode);
+    
     // Results actions
     document.getElementById('rematchBtn').addEventListener('click', requestRematch);
     document.getElementById('nextOpponentBtn').addEventListener('click', findNewOpponent);
@@ -803,21 +774,129 @@ function setupEventListeners() {
     
     // Chat
     document.getElementById('sendMessageBtn').addEventListener('click', sendChatMessage);
+    document.getElementById('clearChatBtn').addEventListener('click', clearChat);
+    document.getElementById('toggleSoundBtn').addEventListener('click', toggleSounds);
     document.getElementById('chatInput').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             sendChatMessage();
         }
     });
     
-    // Code editor
-    const codeEditor = document.getElementById('multiplayerCode');
-    codeEditor.addEventListener('input', function() {
-        updateCodeStats();
-        sendCodeUpdate();
-    });
+    // Spectator
+    document.getElementById('joinBattleBtn').addEventListener('click', findQuickMatch);
     
     // Refresh rooms
     document.getElementById('refreshRooms').addEventListener('click', refreshRooms);
+    
+    // Theme toggle
+    document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+    
+    // Code editor input
+    const codeEditor = document.getElementById('multiplayerCode');
+    let typingTimeout;
+    codeEditor.addEventListener('input', function() {
+        updateCodeStats();
+        
+        // Debounce sending code updates
+        clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(() => {
+            sendCodeUpdate();
+        }, 500);
+    });
+}
+
+function initializeCodeEditor() {
+    // Initialize CodeMirror for better code editing experience
+    const textarea = document.getElementById('multiplayerCode');
+    const editor = CodeMirror.fromTextArea(textarea, {
+        mode: 'python',
+        theme: 'default',
+        lineNumbers: true,
+        indentUnit: 4,
+        tabSize: 4,
+        indentWithTabs: false,
+        electricChars: true,
+        autoCloseBrackets: true,
+        matchBrackets: true,
+        extraKeys: {
+            "Tab": function(cm) {
+                cm.replaceSelection("    ", "end");
+            }
+        }
+    });
+    
+    // Store editor reference
+    gameState.codeEditor = editor;
+    
+    // Update stats on editor change
+    editor.on('change', function() {
+        updateCodeStats();
+    });
+}
+
+function updateCodeStats() {
+    if (!gameState.codeEditor) return;
+    
+    const code = gameState.codeEditor.getValue();
+    const lines = code.split('\n').length;
+    const chars = code.length;
+    
+    document.getElementById('playerCodeLines').textContent = `${lines} lines`;
+    document.getElementById('playerActivity').textContent = lines > 1 ? 'Coding...' : 'Idle';
+    
+    // Send code update to opponent
+    if (gameState.battleActive && !gameState.codeSubmitted) {
+        gameState.socket.emit('code_update', {
+            roomId: gameState.currentRoom,
+            lines: lines,
+            chars: chars,
+            username: gameState.username
+        });
+    }
+}
+
+function formatCode() {
+    if (!gameState.codeEditor) return;
+    
+    const code = gameState.codeEditor.getValue();
+    // Simple formatting - indent Python code
+    const lines = code.split('\n');
+    let indent = 0;
+    const formatted = lines.map(line => {
+        line = line.trim();
+        
+        // Decrease indent for dedent keywords
+        if (line.startsWith('return') || line.startsWith('pass') || line.startsWith('break') || 
+            line.startsWith('continue') || line.startsWith('raise')) {
+            indent = Math.max(0, indent - 1);
+        }
+        
+        const indentedLine = '    '.repeat(indent) + line;
+        
+        // Increase indent for block starters
+        if (line.endsWith(':') && !line.startsWith('#') && !line.includes('#')) {
+            indent++;
+        }
+        
+        return indentedLine;
+    }).join('\n');
+    
+    gameState.codeEditor.setValue(formatted);
+    showNotification('Code formatted!', 'success');
+}
+
+function resetCode() {
+    if (!gameState.codeEditor) return;
+    
+    const starterCode = `# Multiplayer Challenge
+# Write your solution below
+
+def solve_challenge():
+    # Your code here
+    return "Hello, World!"`;
+    
+    gameState.codeEditor.setValue(starterCode);
+    showNotification('Code reset!', 'info');
 }
 
 function showRoomCreation() {
@@ -831,21 +910,40 @@ function hideRoomCreation() {
 }
 
 function createRoom() {
-    const roomName = document.getElementById('roomName').value || `Room_${Date.now()}`;
+    const roomName = document.getElementById('roomName').value || `${gameState.username}'s Room`;
     const challengeId = document.getElementById('challengeSelect').value;
     const timeLimit = document.getElementById('timeLimit').value;
     const isPrivate = document.getElementById('privateRoom').checked;
     
-    socket.emit('create_room', {
+    if (!roomName.trim()) {
+        showNotification('Please enter a room name', 'error');
+        return;
+    }
+    
+    gameState.socket.emit('create_room', {
         name: roomName,
-        challengeId: challengeId || null,
+        challengeId: challengeId,
         timeLimit: parseInt(timeLimit),
         isPrivate: isPrivate,
-        username: PLAYER_NAME
+        username: gameState.username,
+        userId: gameState.userId,
+        rating: gameState.rating
     });
     
     hideRoomCreation();
-    showNotification('Room created successfully!', 'success');
+    showNotification('Creating room...', 'info');
+}
+
+function handleRoomCreated(data) {
+    gameState.currentRoom = data.roomId;
+    showWaitingLobby();
+    document.getElementById('roomCodeDisplay').textContent = data.roomCode || data.roomId.substring(0, 8).toUpperCase();
+    
+    addChatMessage({
+        username: 'System',
+        message: `Room "${data.roomName}" created successfully!`,
+        type: 'system'
+    });
 }
 
 function findQuickMatch() {
@@ -855,9 +953,10 @@ function findQuickMatch() {
     quickMatchBtn.style.display = 'none';
     matchmakingStatus.style.display = 'block';
     
-    socket.emit('find_quick_match', {
-        username: PLAYER_NAME,
-        rating: 1350, // This would come from user stats
+    gameState.socket.emit('find_quick_match', {
+        username: gameState.username,
+        userId: gameState.userId,
+        rating: gameState.rating,
         preferredDifficulty: 'any'
     });
     
@@ -871,21 +970,35 @@ function cancelMatchmaking() {
     quickMatchBtn.style.display = 'block';
     matchmakingStatus.style.display = 'none';
     
-    socket.emit('cancel_matchmaking');
+    gameState.socket.emit('cancel_matchmaking');
     showNotification('Matchmaking cancelled', 'warning');
 }
 
+function updateMatchmakingStatus(data) {
+    const statusText = document.querySelector('.searching-animation span');
+    if (statusText && data.message) {
+        statusText.textContent = data.message;
+    }
+    
+    if (data.found) {
+        showNotification('Opponent found! Joining room...', 'success');
+    }
+}
+
 function joinRoom(roomId) {
-    socket.emit('join_room', {
+    gameState.socket.emit('join_room', {
         roomId: roomId,
-        username: PLAYER_NAME
+        username: gameState.username,
+        userId: gameState.userId,
+        rating: gameState.rating
     });
 }
 
 function filterRooms(filter) {
     const rooms = document.querySelectorAll('.room-item');
     rooms.forEach(room => {
-        if (filter === 'all' || room.dataset.difficulty === filter) {
+        if (filter === 'all' || room.dataset.difficulty === filter || 
+            (filter === 'empty' && room.dataset.players === '1')) {
             room.style.display = 'flex';
         } else {
             room.style.display = 'none';
@@ -900,6 +1013,62 @@ function updateFilterButtons(activeButton) {
     activeButton.classList.add('active');
 }
 
+function handleJoinedRoom(data) {
+    gameState.currentRoom = data.roomId;
+    gameState.opponent = data.opponent;
+    
+    showWaitingLobby();
+    document.getElementById('roomCodeDisplay').textContent = data.roomCode || data.roomId.substring(0, 8).toUpperCase();
+    
+    // Update opponent info if already present
+    if (data.opponent) {
+        updateOpponentInfo(data.opponent);
+    }
+    
+    addChatMessage({
+        username: 'System',
+        message: `Joined room: ${data.roomName || data.roomId}`,
+        type: 'system'
+    });
+}
+
+function handlePlayerJoined(data) {
+    gameState.opponent = data.username;
+    updateOpponentInfo(data.username);
+    
+    if (data.rating) {
+        document.getElementById('opponentRating').textContent = data.rating;
+        document.getElementById('opponentStats').textContent = `Wins: ${data.wins || '???'} • Rating: ${data.rating}`;
+    }
+    
+    addChatMessage({
+        username: 'System',
+        message: `${data.username} joined the room`,
+        type: 'system'
+    });
+    
+    playSound('join');
+}
+
+function handlePlayerLeft(data) {
+    if (data.username === gameState.opponent) {
+        gameState.opponent = null;
+        gameState.opponentReady = false;
+        updateOpponentInfo('Waiting for opponent...');
+        
+        addChatMessage({
+            username: 'System',
+            message: `${data.username} left the room`,
+            type: 'system'
+        });
+        
+        // If battle was active, end it
+        if (gameState.battleActive) {
+            endBattleEarly();
+        }
+    }
+}
+
 function toggleReady() {
     const readyBtn = document.getElementById('readyBtn');
     gameState.playerReady = !gameState.playerReady;
@@ -912,180 +1081,16 @@ function toggleReady() {
         readyBtn.classList.remove('ready');
     }
     
-    socket.emit('player_ready', {
+    gameState.socket.emit('player_ready', {
         roomId: gameState.currentRoom,
         isReady: gameState.playerReady,
-        username: PLAYER_NAME
+        username: gameState.username,
+        userId: gameState.userId
     });
-}
-
-function runCode() {
-    const code = document.getElementById('multiplayerCode').value;
-    const output = document.getElementById('playerOutput');
-    
-    try {
-        // Simulate code execution
-        const result = simulateCodeExecution(code);
-        output.textContent = result;
-        output.className = 'success';
-        showNotification('Code executed successfully!', 'success');
-    } catch (error) {
-        output.textContent = `Error: ${error.message}`;
-        output.className = 'error';
-        showNotification('Code execution failed', 'error');
-    }
-}
-
-function submitSolution() {
-    if (!gameState.battleActive) {
-        showNotification('No active battle', 'error');
-        return;
-    }
-    
-    const code = document.getElementById('multiplayerCode').value;
-    gameState.codeSubmitted = true;
-    
-    socket.emit('submit_solution', {
-        roomId: gameState.currentRoom,
-        code: code,
-        username: '{{ session.username|default("Player") }}',
-        timestamp: Date.now()
-    });
-    
-    showNotification('Solution submitted!', 'success');
-    document.getElementById('submitMultiplayerBtn').disabled = true;
-}
-
-function requestHint() {
-    if (gameState.timeRemaining > 10) {
-        gameState.timeRemaining -= 10;
-        updateTimer();
-        showNotification('Hint: Check the function parameters', 'info');
-    } else {
-        showNotification('Not enough time for hint', 'warning');
-    }
-}
-
-function updateCodeStats() {
-    const code = document.getElementById('multiplayerCode').value;
-    const lines = code.split('\n').length;
-    const chars = code.length;
-    
-    document.getElementById('playerCodeLines').textContent = `${lines} lines`;
-    
-    // Send code update to opponent
-    if (gameState.battleActive && !gameState.codeSubmitted) {
-        socket.emit('code_update', {
-            roomId: gameState.currentRoom,
-            lines: lines,
-            chars: chars,
-            username: PLAYER_NAME
-        });
-    }
-}
-
-function sendCodeUpdate() {
-    if (!gameState.battleActive || gameState.codeSubmitted) return;
-    
-    const code = document.getElementById('multiplayerCode').value;
-    socket.emit('code_update', {
-        roomId: gameState.currentRoom,
-        codePreview: code.substring(0, 50), // Only send preview
-        username: PLAYER_NAME
-    });
-}
-
-function sendChatMessage() {
-    const input = document.getElementById('chatInput');
-    const message = input.value.trim();
-    
-    if (message) {
-        socket.emit('chat_message', {
-            roomId: gameState.currentRoom,
-            message: message,
-            username: PLAYER_NAME,
-            type: 'player'
-        });
-        
-        input.value = '';
-    }
-}
-
-function addChatMessage(data) {
-    const chatMessages = document.getElementById('chatMessages');
-    const messageDiv = document.createElement('div');
-    
-    messageDiv.className = `message ${data.type || 'player'}`;
-    messageDiv.innerHTML = `
-        ${data.type !== 'system' ? `<div class="message-sender">${data.username}</div>` : ''}
-        <div class="message-content">
-            <span class="message-text">${data.message}</span>
-            <span class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-        </div>
-    `;
-    
-    chatMessages.appendChild(messageDiv);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-
-// Socket event handlers
-function handleJoinedRoom(data) {
-    gameState.currentRoom = data.roomId;
-    gameState.opponent = data.opponent;
-    
-    // Show waiting lobby
-    document.getElementById('waitingLobby').style.display = 'block';
-    document.getElementById('battleInterface').style.display = 'none';
-    document.getElementById('resultsScreen').style.display = 'none';
-    
-    // Update room code display
-    document.getElementById('roomCodeDisplay').textContent = data.roomId;
-    
-    // Update opponent info if already present
-    if (data.opponent) {
-        updateOpponentInfo(data.opponent);
-    }
-    
-    showNotification(`Joined room: ${data.roomId}`, 'success');
-    addChatMessage({
-        type: 'system',
-        message: `You joined ${data.roomId}`
-    });
-}
-
-function handlePlayerJoined(data) {
-    gameState.opponent = data.username;
-    updateOpponentInfo(data.username);
-    
-    addChatMessage({
-        type: 'system',
-        message: `${data.username} joined the room`
-    });
-    
-    showNotification(`${data.username} joined!`, 'info');
-}
-
-function handlePlayerLeft(data) {
-    if (data.username === gameState.opponent) {
-        gameState.opponent = null;
-        updateOpponentInfo('Waiting for opponent...');
-        
-        addChatMessage({
-            type: 'system',
-            message: `${data.username} left the room`
-        });
-        
-        showNotification('Opponent left the room', 'warning');
-        
-        // If battle was active, end it
-        if (gameState.battleActive) {
-            endBattleEarly();
-        }
-    }
 }
 
 function handlePlayerReady(data) {
-    if (data.username === PLAYER_NAME) {
+    if (data.userId === gameState.userId) {
         gameState.playerReady = data.isReady;
     } else {
         gameState.opponentReady = data.isReady;
@@ -1093,15 +1098,18 @@ function handlePlayerReady(data) {
         
         if (data.isReady) {
             addChatMessage({
-                type: 'system',
-                message: `${data.username} is ready!`
+                username: 'System',
+                message: `${data.username} is ready!`,
+                type: 'system'
             });
         }
     }
     
     // Check if both players are ready
-    if (gameState.playerReady && gameState.opponentReady) {
-        socket.emit('start_battle', { roomId: gameState.currentRoom });
+    if (gameState.playerReady && gameState.opponentReady && gameState.currentRoom) {
+        gameState.socket.emit('start_battle', { 
+            roomId: gameState.currentRoom 
+        });
     }
 }
 
@@ -1121,9 +1129,15 @@ function startBattle(data) {
     document.getElementById('challengeDifficulty').textContent = data.challenge.difficulty;
     document.getElementById('challengePoints').textContent = `${data.challenge.points} points`;
     
+    // Load challenge description
+    if (data.challenge.description) {
+        const output = document.getElementById('playerOutput');
+        output.textContent = `Challenge: ${data.challenge.title}\n\n${data.challenge.description}\n\nRequirements:\n${data.challenge.requirements || 'Complete the challenge correctly'}`;
+    }
+    
     // Load starter code if provided
-    if (data.challenge.starter_code) {
-        document.getElementById('multiplayerCode').value = data.challenge.starter_code;
+    if (data.challenge.starter_code && gameState.codeEditor) {
+        gameState.codeEditor.setValue(data.challenge.starter_code);
     }
     
     // Start timer
@@ -1133,25 +1147,208 @@ function startBattle(data) {
     document.getElementById('submitMultiplayerBtn').disabled = false;
     
     addChatMessage({
-        type: 'system',
-        message: `Battle started: ${data.challenge.title}`
+        username: 'System',
+        message: `Battle started: ${data.challenge.title}`,
+        type: 'system'
     });
     
-    showNotification('Battle started! Good luck!', 'info');
+    playSound('battle_start');
+}
+
+function startTimer() {
+    clearInterval(gameState.timerInterval);
+    updateTimer();
+    
+    gameState.timerInterval = setInterval(() => {
+        if (gameState.timeRemaining > 0) {
+            gameState.timeRemaining--;
+            updateTimer();
+            
+            // Warning sounds
+            if (gameState.timeRemaining === 60) {
+                playSound('warning');
+            } else if (gameState.timeRemaining === 30) {
+                playSound('warning');
+            } else if (gameState.timeRemaining <= 10 && gameState.timeRemaining > 0) {
+                playSound('tick');
+            }
+            
+            // Auto-submit if time runs out
+            if (gameState.timeRemaining === 0 && !gameState.codeSubmitted) {
+                submitSolution();
+            }
+        } else {
+            clearInterval(gameState.timerInterval);
+        }
+    }, 1000);
+}
+
+function updateTimer() {
+    const minutes = Math.floor(gameState.timeRemaining / 60);
+    const seconds = gameState.timeRemaining % 60;
+    const timerDisplay = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    
+    document.getElementById('timerDisplay').textContent = timerDisplay;
+    document.getElementById('timeRemaining').textContent = timerDisplay;
+    
+    // Color code based on time remaining
+    const timerElement = document.getElementById('battleTimer');
+    timerElement.classList.remove('warning', 'critical');
+    
+    if (gameState.timeRemaining <= 60) {
+        timerElement.classList.add('warning');
+    }
+    if (gameState.timeRemaining <= 30) {
+        timerElement.classList.add('critical');
+    }
+}
+
+function runCode() {
+    if (!gameState.codeEditor) return;
+    
+    const code = gameState.codeEditor.getValue();
+    const output = document.getElementById('playerOutput');
+    
+    try {
+        // Create a safe execution environment
+        const result = executePythonCode(code);
+        output.textContent = result;
+        output.className = 'success';
+        showNotification('Code executed successfully!', 'success');
+        
+        // Update opponent status
+        gameState.socket.emit('code_update', {
+            roomId: gameState.currentRoom,
+            type: 'run',
+            username: gameState.username
+        });
+        
+    } catch (error) {
+        output.textContent = `Error: ${error.message}`;
+        output.className = 'error';
+        showNotification('Code execution failed', 'error');
+    }
+}
+
+function executePythonCode(code) {
+    // This is a mock execution - in a real app, you would send to a backend
+    // For now, we'll simulate execution
+    
+    // Check for basic Python syntax
+    if (!code.includes('def ') && !code.includes('return')) {
+        return "No function defined. Please define a function named 'solve_challenge()'.";
+    }
+    
+    // Simulate test cases
+    const testCases = [
+        { input: '', expected: "Hello, World!" },
+        { input: 'test', expected: "Hello, World!" }
+    ];
+    
+    let results = "Test Results:\n";
+    let passed = 0;
+    
+    testCases.forEach((test, i) => {
+        results += `\nTest ${i + 1}: `;
+        // Simple mock - in reality, you'd need a Python interpreter
+        if (code.includes('return "Hello, World!"')) {
+            results += "✓ PASSED";
+            passed++;
+        } else {
+            results += "✗ FAILED";
+        }
+    });
+    
+    results += `\n\n${passed}/${testCases.length} tests passed`;
+    
+    return results;
+}
+
+function submitSolution() {
+    if (!gameState.battleActive) {
+        showNotification('No active battle', 'error');
+        return;
+    }
+    
+    if (!gameState.codeEditor) return;
+    
+    const code = gameState.codeEditor.getValue();
+    gameState.codeSubmitted = true;
+    
+    // Calculate score based on time remaining and code quality
+    const timeBonus = Math.floor(gameState.timeRemaining / 10);
+    const codeLength = code.length;
+    const lengthPenalty = Math.max(0, Math.floor((codeLength - 100) / 50));
+    const score = 100 + timeBonus - lengthPenalty;
+    
+    const resultData = {
+        roomId: gameState.currentRoom,
+        code: code,
+        username: gameState.username,
+        userId: gameState.userId,
+        score: Math.max(10, score),
+        timeUsed: gameState.timeRemaining,
+        lines: code.split('\n').length,
+        runs: 1 // This would be tracked
+    };
+    
+    gameState.socket.emit('submit_solution', resultData);
+    
+    // Update UI
+    document.getElementById('playerScore').textContent = resultData.score;
+    document.getElementById('submitMultiplayerBtn').disabled = true;
+    
+    showNotification('Solution submitted!', 'success');
+    playSound('submit');
+}
+
+function requestHint() {
+    if (gameState.timeRemaining > 10) {
+        gameState.timeRemaining -= 10;
+        updateTimer();
+        showNotification('Hint: Check the function return statement', 'info');
+        playSound('hint');
+    } else {
+        showNotification('Not enough time for hint', 'warning');
+    }
 }
 
 function handleCodeUpdate(data) {
-    if (data.username !== PLAYER_NAME) {
+    if (data.userId !== gameState.userId) {
         // Update opponent activity indicators
         document.getElementById('opponentActivity').textContent = 'Typing...';
         document.getElementById('opponentCodeLength').textContent = data.chars || 0;
-        document.getElementById('opponentActivityBar').style.width = `${Math.min((data.chars || 0) / 500 * 100, 100)}%`;
         document.getElementById('opponentProgress').textContent = `${Math.min(Math.round((data.chars || 0) / 500 * 100), 100)}% complete`;
+        
+        // Update progress bar
+        const progress = Math.min((data.chars || 0) / 500 * 100, 100);
+        document.getElementById('opponentActivityBar').style.width = `${progress}%`;
+        
+        // Show/hide indicators
+        const typingIndicator = document.querySelector('.indicator.typing');
+        const testingIndicator = document.querySelector('.indicator.testing');
+        
+        if (data.type === 'run') {
+            if (typingIndicator) typingIndicator.style.display = 'none';
+            if (testingIndicator) testingIndicator.style.display = 'block';
+            document.getElementById('opponentLastAction').textContent = 'Testing code...';
+        } else {
+            if (typingIndicator) typingIndicator.style.display = 'block';
+            if (testingIndicator) testingIndicator.style.display = 'none';
+            document.getElementById('opponentLastAction').textContent = 'Writing code...';
+        }
+        
+        // Update run count
+        if (data.type === 'run') {
+            const current = parseInt(document.getElementById('opponentRunCount').textContent) || 0;
+            document.getElementById('opponentRunCount').textContent = current + 1;
+            document.getElementById('opponentLastTest').textContent = 'Just now';
+        }
     }
 }
 
 function handleChallengeResult(data) {
-    if (data.username === PLAYER_NAME) {
+    if (data.userId === gameState.userId) {
         // Player's result
         updatePlayerResult(data);
     } else {
@@ -1161,20 +1358,42 @@ function handleChallengeResult(data) {
     
     // Store result for comparison
     if (!gameState.matchResult) gameState.matchResult = {};
-    gameState.matchResult[data.username] = data;
+    gameState.matchResult[data.userId] = data;
     
     // Check if both results are in
-    const playerName = PLAYER_NAME;
-    if (gameState.matchResult[playerName] && gameState.matchResult[gameState.opponent]) {
+    if (gameState.matchResult[gameState.userId] && gameState.opponent && gameState.matchResult[gameState.opponent]) {
         determineWinner();
     }
 }
 
+function determineWinner() {
+    const playerResult = gameState.matchResult[gameState.userId];
+    const opponentResult = gameState.matchResult[gameState.opponent];
+
+    let winner = null;
+    if (playerResult.score > opponentResult.score) {
+        winner = gameState.username;
+    } else if (opponentResult.score > playerResult.score) {
+        winner = gameState.opponent;
+    }
+
+    gameState.socket.emit('match_result', {
+        roomId: gameState.currentRoom,
+        winner: winner,
+        player1: gameState.username,
+        player2: gameState.opponent,
+        player1Score: playerResult.score,
+        player2Score: opponentResult.score
+    });
+}
+
 function handleMatchComplete(data) {
     stopTimer();
+    
+    // Update results screen
     showResults(data);
     
-    // Update stats
+    // Update player stats
     updatePlayerStats(data);
     
     // Reset game state
@@ -1186,34 +1405,15 @@ function handleMatchComplete(data) {
         document.getElementById('battleInterface').style.display = 'none';
         document.getElementById('resultsScreen').style.display = 'block';
     }, 2000);
-}
-
-function determineWinner() {
-    const playerResult = gameState.matchResult[PLAYER_NAME];
-    const opponentResult = gameState.matchResult[gameState.opponent];
-
-    let winner = null;
-    if (playerResult.score > opponentResult.score) {
-        winner = PLAYER_NAME;
-    } else if (opponentResult.score > playerResult.score) {
-        winner = gameState.opponent;
-    }
-
-    socket.emit('match_result', {
-        roomId: gameState.currentRoom,
-        winner: winner,
-        player1: PLAYER_NAME,
-        player2: gameState.opponent,
-        player1Score: playerResult.score,
-        player2Score: opponentResult.score
-    });
+    
+    playSound(data.winner === gameState.username ? 'victory' : 'defeat');
 }
 
 function showResults(data) {
     const resultScreen = document.getElementById('resultsScreen');
     const resultTitle = document.getElementById('resultTitle');
     
-    if (data.winner === PLAYER_NAME) {
+    if (data.winner === gameState.username) {
         resultTitle.textContent = 'Victory! 🎉';
         resultScreen.classList.add('victory');
         resultScreen.classList.remove('defeat', 'draw');
@@ -1234,7 +1434,7 @@ function showResults(data) {
     
     // Update rating change
     const ratingChange = document.getElementById('ratingChange');
-    if (data.winner === '{{ session.username|default("Player") }}') {
+    if (data.winner === gameState.username) {
         ratingChange.textContent = `+${data.ratingChange || 25}`;
         ratingChange.className = 'change-value positive';
     } else if (data.winner === gameState.opponent) {
@@ -1244,51 +1444,92 @@ function showResults(data) {
         ratingChange.textContent = '±0';
         ratingChange.className = 'change-value neutral';
     }
+    
+    // Update rewards
+    updateRewardsList(data);
+    
+    // Update performance metrics
+    updatePerformanceMetrics(data);
 }
 
-function startTimer() {
-    clearInterval(gameState.timerInterval);
+function updateRewardsList(data) {
+    const rewardsList = document.getElementById('rewardsList');
+    rewardsList.innerHTML = '';
     
-    gameState.timerInterval = setInterval(() => {
-        if (gameState.timeRemaining > 0) {
-            gameState.timeRemaining--;
-            updateTimer();
-            
-            // Auto-submit if time runs out
-            if (gameState.timeRemaining === 0 && !gameState.codeSubmitted) {
-                submitSolution();
-            }
-        } else {
-            clearInterval(gameState.timerInterval);
-        }
-    }, 1000);
+    const rewards = [
+        { icon: 'fa-coins', text: `+${data.xp || 100} XP` },
+        { icon: 'fa-trophy', text: data.winner === gameState.username ? 'Victory Bonus' : 'Participation' },
+        { icon: 'fa-star', text: `Win Streak: ${data.winStreak || 1}` }
+    ];
+    
+    rewards.forEach(reward => {
+        const item = document.createElement('div');
+        item.className = 'reward-item cute';
+        item.innerHTML = `
+            <i class="fas ${reward.icon}"></i>
+            <span>${reward.text}</span>
+        `;
+        rewardsList.appendChild(item);
+    });
 }
 
-function stopTimer() {
-    clearInterval(gameState.timerInterval);
+function updatePerformanceMetrics(data) {
+    const metricsContainer = document.getElementById('performanceMetrics');
+    metricsContainer.innerHTML = '';
+    
+    const metrics = [
+        { label: 'Code Quality', value: data.codeQuality || 85 },
+        { label: 'Speed', value: data.speed || 95 },
+        { label: 'Efficiency', value: data.efficiency || 78 }
+    ];
+    
+    metrics.forEach(metric => {
+        const metricDiv = document.createElement('div');
+        metricDiv.className = 'metric cute';
+        metricDiv.innerHTML = `
+            <span class="metric-label">${metric.label}</span>
+            <div class="metric-bar">
+                <div class="metric-fill" style="width: ${metric.value}%"></div>
+            </div>
+            <span class="metric-value">${metric.value}%</span>
+        `;
+        metricsContainer.appendChild(metricDiv);
+    });
 }
 
-function updateTimer() {
-    const minutes = Math.floor(gameState.timeRemaining / 60);
-    const seconds = gameState.timeRemaining % 60;
-    const timerDisplay = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+function updatePlayerStats(data) {
+    // Update local storage
+    gameState.totalBattles++;
     
-    document.getElementById('timerDisplay').textContent = timerDisplay;
-    document.getElementById('timeRemaining').textContent = timerDisplay;
-    
-    // Color code based on time remaining
-    const timerElement = document.getElementById('battleTimer');
-    if (gameState.timeRemaining <= 60) {
-        timerElement.classList.add('warning');
+    if (data.winner === gameState.username) {
+        gameState.wins++;
+        gameState.rating += data.ratingChange || 25;
+    } else if (data.winner === gameState.opponent) {
+        gameState.rating = Math.max(0, gameState.rating - (data.ratingChange || 15));
     }
-    if (gameState.timeRemaining <= 30) {
-        timerElement.classList.add('critical');
-    }
+    
+    localStorage.setItem('pp_wins', gameState.wins);
+    localStorage.setItem('pp_rating', gameState.rating);
+    localStorage.setItem('pp_total_battles', gameState.totalBattles);
+    
+    // Update UI
+    document.getElementById('totalBattles').textContent = gameState.totalBattles;
+    const winRate = gameState.totalBattles > 0 ? Math.round((gameState.wins / gameState.totalBattles) * 100) : 0;
+    document.getElementById('winRate').textContent = `${winRate}%`;
+    
+    // Update player info
+    document.getElementById('playerRating').textContent = gameState.rating;
+    document.getElementById('playerStats').textContent = `Wins: ${gameState.wins} • Rating: ${gameState.rating}`;
 }
 
 function updateRoomList(rooms) {
-    const container = document.querySelector('.rooms-container');
+    const container = document.getElementById('roomsContainer');
     container.innerHTML = '';
+    
+    if (!rooms || rooms.length === 0) {
+        container.innerHTML = '<div class="no-rooms">No active rooms. Create one!</div>';
+        return;
+    }
     
     rooms.forEach(room => {
         const roomElement = createRoomElement(room);
@@ -1298,23 +1539,29 @@ function updateRoomList(rooms) {
 
 function createRoomElement(room) {
     const div = document.createElement('div');
-    div.className = `room-item ${theme}`;
+    div.className = 'room-item cute';
     div.dataset.difficulty = room.difficulty || 'beginner';
+    div.dataset.players = room.players?.length || 1;
+    
+    const playerCount = room.players?.length || 1;
+    const maxPlayers = 2;
+    const status = playerCount >= maxPlayers ? 'full' : 
+                  room.status === 'playing' ? 'playing' : 'waiting';
     
     div.innerHTML = `
         <div class="room-info">
             <div class="room-header">
-                <h4>${room.name}</h4>
-                <span class="room-status ${room.status}">
-                    ${room.status === 'waiting' ? 'Waiting...' : 
-                      room.status === 'full' ? 'Full' : 
-                      room.status === 'playing' ? 'In Progress' : room.status}
+                <h4>${room.name || 'Unnamed Room'}</h4>
+                <span class="room-status ${status}">
+                    ${status === 'waiting' ? 'Waiting...' : 
+                      status === 'full' ? 'Full' : 
+                      status === 'playing' ? 'In Progress' : status}
                 </span>
             </div>
             <div class="room-details">
                 <span class="detail">
                     <i class="fas fa-user"></i>
-                    ${room.players}/${room.maxPlayers} players
+                    ${playerCount}/${maxPlayers} players
                 </span>
                 <span class="detail">
                     <i class="fas fa-trophy"></i>
@@ -1327,28 +1574,32 @@ function createRoomElement(room) {
             </div>
             <div class="room-creator">
                 <i class="fas fa-crown"></i>
-                Creator: ${room.creator}
+                Creator: ${room.creator || 'Unknown'}
             </div>
         </div>
-        <button class="btn ${theme} small join-btn" data-room-id="${room.id}">
-            ${room.status === 'waiting' ? 'Join' : 
-              room.status === 'playing' ? 'Spectate' : 'Full'}
+        <button class="btn cute small join-btn" data-room-id="${room.id}" 
+                ${status === 'full' ? 'disabled' : ''}>
+            ${status === 'waiting' ? 'Join' : 
+              status === 'playing' ? 'Spectate' : 'Full'}
         </button>
     `;
     
-    div.querySelector('.join-btn').addEventListener('click', function() {
-        joinRoom(this.dataset.roomId);
-    });
+    const joinBtn = div.querySelector('.join-btn');
+    if (!joinBtn.disabled) {
+        joinBtn.addEventListener('click', function() {
+            joinRoom(this.dataset.roomId);
+        });
+    }
     
     return div;
 }
 
 function updateOpponentInfo(username) {
-    const opponentElement = document.querySelector('.opponent .player-info h4');
-    const opponentNameElement = document.getElementById('opponentName');
+    const opponentNameDisplay = document.getElementById('opponentNameDisplay');
+    const opponentName = document.getElementById('opponentName');
     
-    if (opponentElement) opponentElement.textContent = username || 'Waiting for opponent...';
-    if (opponentNameElement) opponentNameElement.textContent = username || 'Opponent';
+    if (opponentNameDisplay) opponentNameDisplay.textContent = username || 'Waiting for opponent...';
+    if (opponentName) opponentName.textContent = username || 'Opponent';
     
     // Update placeholder avatar
     const avatar = document.querySelector('.opponent .player-avatar i');
@@ -1358,34 +1609,54 @@ function updateOpponentInfo(username) {
 }
 
 function updateOpponentReady(isReady) {
-    const statusElement = document.querySelector('.opponent .ready-status');
-    if (statusElement) {
-        statusElement.innerHTML = isReady ? 
-            '<div class="status ready"><i class="fas fa-check-circle"></i> Ready</div>' :
-            '<div class="status not-ready"><i class="fas fa-clock"></i> Not Ready</div>';
+    const statusText = document.getElementById('opponentStatusText');
+    const statusIndicator = document.getElementById('opponentStatusIndicator');
+    
+    if (statusText) {
+        statusText.textContent = isReady ? 'Ready' : 'Not Ready';
+    }
+    
+    if (statusIndicator) {
+        if (isReady) {
+            statusIndicator.innerHTML = '<i class="fas fa-check-circle"></i><span>Ready</span>';
+            statusIndicator.className = 'status ready';
+        } else {
+            statusIndicator.innerHTML = '<i class="fas fa-clock"></i><span>Not Ready</span>';
+            statusIndicator.className = 'status not-ready';
+        }
     }
 }
 
 function updateConnectionStatus(connected) {
-    const statusIndicator = document.querySelector('.status-indicator');
+    const statusIndicator = document.getElementById('statusIndicator');
     if (statusIndicator) {
         statusIndicator.className = `status-indicator ${connected ? 'connected' : 'disconnected'}`;
-        statusIndicator.innerHTML = connected ?
-            '<i class="fas fa-wifi"></i><span>Connected to Battle Server</span>' :
-            '<i class="fas fa-wifi-slash"></i><span>Disconnected - Reconnecting...</span>';
+        document.getElementById('connectionStatus').textContent = connected ? 
+            'Connected to Battle Server' : 'Disconnected - Reconnecting...';
     }
 }
 
 function refreshRooms() {
-    socket.emit('get_rooms');
-    showNotification('Refreshing room list...', 'info');
+    if (gameState.socket.connected) {
+        gameState.socket.emit('get_rooms');
+        showNotification('Refreshing room list...', 'info');
+    } else {
+        showNotification('Not connected to server', 'error');
+    }
+}
+
+function showWaitingLobby() {
+    document.getElementById('waitingLobby').style.display = 'flex';
+    document.getElementById('battleInterface').style.display = 'none';
+    document.getElementById('resultsScreen').style.display = 'none';
 }
 
 function leaveRoom() {
     if (gameState.currentRoom) {
-        socket.emit('leave_room', {
+        gameState.socket.emit('leave_room', {
             roomId: gameState.currentRoom,
-            username: '{{ session.username|default("Player") }}'
+            username: gameState.username,
+            userId: gameState.userId
         });
         
         resetGameState();
@@ -1395,39 +1666,59 @@ function leaveRoom() {
 
 function inviteFriend() {
     const roomCode = document.getElementById('roomCodeDisplay').textContent;
-    navigator.clipboard.writeText(`Join my Python Pathfinder battle! Room: ${roomCode}`);
-    showNotification('Invite link copied to clipboard!', 'success');
+    const inviteText = `Join my Python Pathfinder battle! Room Code: ${roomCode}\nServer: ${SERVER_URL}`;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: 'Python Pathfinder Battle',
+            text: inviteText,
+            url: window.location.href
+        });
+    } else {
+        navigator.clipboard.writeText(inviteText);
+        showNotification('Invite link copied to clipboard!', 'success');
+    }
 }
 
 function copyRoomCode() {
     const roomCode = document.getElementById('roomCodeDisplay').textContent;
     navigator.clipboard.writeText(roomCode);
     showNotification('Room code copied!', 'success');
+    playSound('copy');
 }
 
 function requestRematch() {
-    socket.emit('request_rematch', {
-        roomId: gameState.currentRoom,
-        username: '{{ session.username|default("Player") }}'
-    });
-    showNotification('Rematch request sent', 'info');
+    if (gameState.currentRoom) {
+        gameState.socket.emit('request_rematch', {
+            roomId: gameState.currentRoom,
+            username: gameState.username,
+            userId: gameState.userId
+        });
+        showNotification('Rematch request sent', 'info');
+    }
 }
 
 function findNewOpponent() {
-    socket.emit('leave_room', {
-        roomId: gameState.currentRoom,
-        username: '{{ session.username|default("Player") }}'
-    });
+    if (gameState.currentRoom) {
+        gameState.socket.emit('leave_room', {
+            roomId: gameState.currentRoom,
+            username: gameState.username,
+            userId: gameState.userId
+        });
+    }
     
     resetGameState();
     findQuickMatch();
 }
 
 function returnToLobby() {
-    socket.emit('leave_room', {
-        roomId: gameState.currentRoom,
-        username: '{{ session.username|default("Player") }}'
-    });
+    if (gameState.currentRoom) {
+        gameState.socket.emit('leave_room', {
+            roomId: gameState.currentRoom,
+            username: gameState.username,
+            userId: gameState.userId
+        });
+    }
     
     resetGameState();
     showNotification('Returned to lobby', 'info');
@@ -1441,63 +1732,143 @@ function endBattleEarly() {
     
     // Return to waiting lobby
     document.getElementById('battleInterface').style.display = 'none';
-    document.getElementById('waitingLobby').style.display = 'block';
+    document.getElementById('waitingLobby').style.display = 'flex';
+}
+
+function stopTimer() {
+    clearInterval(gameState.timerInterval);
 }
 
 function resetGameState() {
-    gameState = {
-        currentRoom: null,
-        opponent: null,
-        battleActive: false,
-        timeRemaining: 300,
-        timerInterval: null,
-        playerReady: false,
-        opponentReady: false,
-        codeSubmitted: false,
-        matchResult: null
-    };
+    gameState.currentRoom = null;
+    gameState.opponent = null;
+    gameState.battleActive = false;
+    gameState.timeRemaining = 300;
+    gameState.timerInterval = null;
+    gameState.playerReady = false;
+    gameState.opponentReady = false;
+    gameState.codeSubmitted = false;
+    gameState.matchResult = null;
     
     // Reset UI
-    document.getElementById('waitingLobby').style.display = 'block';
+    document.getElementById('waitingLobby').style.display = 'none';
     document.getElementById('battleInterface').style.display = 'none';
     document.getElementById('resultsScreen').style.display = 'none';
     
     // Reset opponent info
     updateOpponentInfo(null);
     updateOpponentReady(false);
+    document.getElementById('opponentRating').textContent = '---';
+    document.getElementById('opponentStats').textContent = 'Wins: --- • Rating: ---';
     
-    // Reset code editor
-    document.getElementById('multiplayerCode').value = '# Multiplayer Challenge\n# Write your solution below\n\ndef solve_challenge():\n    # Your code here\n    pass';
-    document.getElementById('playerOutput').textContent = 'Run your code to see output...';
-    document.getElementById('submitMultiplayerBtn').disabled = false;
+    // Reset progress indicators
+    document.getElementById('opponentActivityBar').style.width = '0%';
+    document.getElementById('opponentProgress').textContent = '0% complete';
+    document.querySelectorAll('.indicator').forEach(ind => {
+        ind.style.display = 'none';
+    });
     
     // Reset chat
-    const chatMessages = document.getElementById('chatMessages');
-    chatMessages.innerHTML = `
-        <div class="message system">
-            <div class="message-content">
-                <span class="message-text">Welcome to the battle arena!</span>
-                <span class="message-time">Just now</span>
-            </div>
-        </div>
-    `;
+    clearChat();
 }
 
-function simulateCodeExecution(code) {
-    // Simple code execution simulation
-    if (code.includes('print') || code.includes('return')) {
-        return "Code executed successfully!\nOutput: Hello, World!\nAll tests passed!";
-    } else if (code.trim() === '') {
-        return "No code to execute. Please write some code first.";
+function sendChatMessage() {
+    const input = document.getElementById('chatInput');
+    const message = input.value.trim();
+    
+    if (message && gameState.currentRoom) {
+        gameState.socket.emit('chat_message', {
+            roomId: gameState.currentRoom,
+            message: message,
+            username: gameState.username,
+            userId: gameState.userId,
+            type: 'player'
+        });
+        
+        input.value = '';
+    }
+}
+
+function addChatMessage(data) {
+    const chatMessages = document.getElementById('chatMessages');
+    const messageDiv = document.createElement('div');
+    
+    messageDiv.className = `message ${data.type || 'player'}`;
+    
+    if (data.type === 'system') {
+        messageDiv.innerHTML = `
+            <div class="message-content">
+                <span class="message-text">${data.message}</span>
+                <span class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+            </div>
+        `;
     } else {
-        return "Execution completed. No output generated.";
+        const isOwnMessage = data.userId === gameState.userId;
+        messageDiv.className = `message ${isOwnMessage ? 'player' : 'opponent'}`;
+        messageDiv.innerHTML = `
+            <div class="message-sender">${data.username}</div>
+            <div class="message-content">
+                <span class="message-text">${data.message}</span>
+                <span class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+            </div>
+        `;
+    }
+    
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    
+    // Play sound for new messages (not own messages)
+    if (data.userId !== gameState.userId && gameState.soundsEnabled) {
+        playSound('message');
+    }
+}
+
+function clearChat() {
+    const chatMessages = document.getElementById('chatMessages');
+    chatMessages.innerHTML = '';
+    
+    // Add welcome message
+    addChatMessage({
+        username: 'System',
+        message: 'Welcome to the battle arena!',
+        type: 'system'
+    });
+}
+
+function toggleSounds() {
+    gameState.soundsEnabled = !gameState.soundsEnabled;
+    const icon = document.querySelector('#toggleSoundBtn i');
+    icon.className = gameState.soundsEnabled ? 'fas fa-volume-up' : 'fas fa-volume-mute';
+    showNotification(gameState.soundsEnabled ? 'Sounds enabled' : 'Sounds disabled', 'info');
+}
+
+function playSound(type) {
+    if (!gameState.soundsEnabled) return;
+    
+    const sounds = {
+        join: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-unlock-game-notification-253.mp3'),
+        leave: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-retro-game-emergency-alarm-1000.mp3'),
+        battle_start: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-game-show-intro-331.mp3'),
+        submit: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3'),
+        victory: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3'),
+        defeat: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-retro-arcade-game-over-470.mp3'),
+        warning: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-warning-alarm-buzzer-1551.mp3'),
+        tick: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-fast-clock-ticking-1050.mp3'),
+        hint: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-magic-sparkles-success-275.mp3'),
+        message: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3'),
+        copy: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.mp3')
+    };
+    
+    if (sounds[type]) {
+        sounds[type].volume = 0.3;
+        sounds[type].play().catch(e => console.log('Audio play failed:', e));
     }
 }
 
 function showNotification(message, type) {
     // Create notification element
     const notification = document.createElement('div');
-    notification.className = `multiplayer-notification ${type} ${theme}`;
+    notification.className = `multiplayer-notification ${type} cute`;
     notification.textContent = message;
     notification.style.cssText = `
         position: fixed;
@@ -1507,25 +1878,11 @@ function showNotification(message, type) {
         border-radius: 8px;
         z-index: 10000;
         animation: slideInRight 0.3s ease-out;
+        background: white;
+        border: 2px solid ${type === 'success' ? '#4CAF50' : type === 'error' ? '#F44336' : type === 'warning' ? '#FF9800' : 'var(--cute-primary)'};
+        color: #333;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     `;
-    
-    if (theme === 'cute') {
-        notification.style.background = 'white';
-        notification.style.border = '2px solid var(--cute-primary)';
-        notification.style.color = 'var(--cute-text)';
-    } else {
-        notification.style.background = 'var(--deadly-secondary)';
-        notification.style.border = '1px solid var(--deadly-accent)';
-        notification.style.color = 'var(--deadly-text)';
-    }
-    
-    if (type === 'success') {
-        notification.style.borderColor = '#4CAF50';
-    } else if (type === 'error') {
-        notification.style.borderColor = '#F44336';
-    } else if (type === 'warning') {
-        notification.style.borderColor = '#FF9800';
-    }
     
     document.body.appendChild(notification);
     
@@ -1537,86 +1894,84 @@ function showNotification(message, type) {
 }
 
 function loadPlayerStats() {
-    // This would fetch from API in real implementation
-    const stats = {
-        totalBattles: 24,
-        winRate: '67%',
-        avgTime: '3:45',
-        totalLines: '1,234',
-        rating: 1350
-    };
-    
-    document.getElementById('totalBattles').textContent = stats.totalBattles;
-    document.getElementById('winRate').textContent = stats.winRate;
-    document.getElementById('avgTime').textContent = stats.avgTime;
-    document.getElementById('totalLines').textContent = stats.totalLines;
+    // Update stats from localStorage
+    document.getElementById('totalBattles').textContent = gameState.totalBattles;
+    const winRate = gameState.totalBattles > 0 ? Math.round((gameState.wins / gameState.totalBattles) * 100) : 0;
+    document.getElementById('winRate').textContent = `${winRate}%`;
+    document.getElementById('totalLines').textContent = localStorage.getItem('pp_total_lines') || '0';
 }
 
-function updatePlayerStats(data) {
-    // Update stats based on match result
-    const totalBattles = parseInt(document.getElementById('totalBattles').textContent) + 1;
-    document.getElementById('totalBattles').textContent = totalBattles;
+function loadTournaments() {
+    const tournamentList = document.getElementById('tournamentList');
     
-    // This would be calculated from backend in real implementation
-    const newWinRate = Math.round((totalBattles * 0.67 + (data.winner === '{{ session.username|default("Player") }}' ? 1 : 0)) / (totalBattles + 1) * 100);
-    document.getElementById('winRate').textContent = `${newWinRate}%`;
-}
-
-function initializeCuteTheme() {
-    // Add cute theme animations
-    const waitingLobby = document.getElementById('waitingLobby');
-    if (waitingLobby) {
-        const hearts = document.createElement('div');
-        hearts.className = 'floating-hearts';
-        hearts.style.cssText = `
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-        `;
-        
-        for (let i = 0; i < 5; i++) {
-            const heart = document.createElement('div');
-            heart.className = 'floating-heart';
-            heart.style.cssText = `
-                position: absolute;
-                width: ${20 + Math.random() * 20}px;
-                height: ${20 + Math.random() * 20}px;
-                background: var(--cute-primary);
-                transform: rotate(45deg);
-                animation: float ${3 + Math.random() * 3}s ease-in-out infinite;
-                opacity: ${0.3 + Math.random() * 0.3};
-                left: ${Math.random() * 100}%;
-                top: ${Math.random() * 100}%;
-            `;
-            hearts.appendChild(heart);
+    // Mock tournament data
+    const tournaments = [
+        {
+            name: 'Weekly Python Cup',
+            status: 'active',
+            players: '32/64',
+            time: '2h remaining',
+            buttonText: 'Join',
+            buttonIcon: 'fa-play'
+        },
+        {
+            name: 'Beginner Battle Royale',
+            status: 'upcoming',
+            players: '0/16',
+            time: 'Starts in 30m',
+            buttonText: 'Notify',
+            buttonIcon: 'fa-bell'
         }
-        
-        waitingLobby.appendChild(hearts);
-    }
+    ];
+    
+    tournamentList.innerHTML = '';
+    
+    tournaments.forEach(tournament => {
+        const item = document.createElement('div');
+        item.className = 'tournament-item cute';
+        item.innerHTML = `
+            <div class="tournament-header">
+                <h4>${tournament.name}</h4>
+                <span class="tournament-status ${tournament.status}">${tournament.status === 'active' ? 'Live' : 'Soon'}</span>
+            </div>
+            <div class="tournament-details">
+                <span class="detail">
+                    <i class="fas fa-users"></i>
+                    ${tournament.players} players
+                </span>
+                <span class="detail">
+                    <i class="fas fa-clock"></i>
+                    ${tournament.time}
+                </span>
+            </div>
+            <button class="btn cute small">
+                <i class="fas ${tournament.buttonIcon}"></i> ${tournament.buttonText}
+            </button>
+        `;
+        tournamentList.appendChild(item);
+    });
 }
 
-function initializeDeadlyTheme() {
-    // Add deadly theme effects
-    const battleInterface = document.getElementById('battleInterface');
-    if (battleInterface) {
-        const scanLine = document.createElement('div');
-        scanLine.className = 'scan-line';
-        scanLine.style.cssText = `
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--deadly-accent), transparent);
-            animation: scan 3s linear infinite;
-            pointer-events: none;
-            z-index: 1;
-        `;
-        battleInterface.appendChild(scanLine);
+function toggleTheme() {
+    const body = document.body;
+    const themeToggle = document.getElementById('themeToggle');
+    
+    if (body.classList.contains('cute-theme')) {
+        body.classList.remove('cute-theme');
+        body.classList.add('deadly-theme');
+        themeToggle.textContent = 'Switch to Cute Mode';
+        document.querySelectorAll('.cute').forEach(el => {
+            el.classList.remove('cute');
+            el.classList.add('deadly');
+        });
+    } else {
+        body.classList.remove('deadly-theme');
+        body.classList.add('cute-theme');
+        themeToggle.textContent = 'Switch to Deadly Mode';
+        document.querySelectorAll('.deadly').forEach(el => {
+            el.classList.remove('deadly');
+            el.classList.add('cute');
+        });
     }
 }
 
@@ -1671,33 +2026,34 @@ style.textContent = `
 .pulse-dot {
     width: 10px;
     height: 10px;
-    background: var(--accent-color);
+    background: var(--cute-primary);
     border-radius: 50%;
     margin-right: 10px;
     animation: pulse 1.5s infinite;
 }
 
-.multiplayer-container.cute .pulse-dot {
-    --accent-color: var(--cute-primary);
-}
-
-.multiplayer-container.deadly .pulse-dot {
-    --accent-color: var(--deadly-accent);
-}
-
 .room-status.waiting {
     color: #FF9800;
     background: rgba(255, 152, 0, 0.1);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.7rem;
 }
 
 .room-status.full {
     color: #F44336;
     background: rgba(244, 67, 54, 0.1);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.7rem;
 }
 
 .room-status.playing {
     color: #4CAF50;
     background: rgba(76, 175, 80, 0.1);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.7rem;
 }
 
 .player-status.ready {
@@ -1710,11 +2066,12 @@ style.textContent = `
 
 .battle-timer.warning {
     color: #FF9800;
+    animation: pulse 1s infinite;
 }
 
 .battle-timer.critical {
     color: #F44336;
-    animation: pulse 1s infinite;
+    animation: pulse 0.5s infinite;
 }
 
 .status.ready {
@@ -1758,1625 +2115,33 @@ style.textContent = `
 
 .indicator-bar {
     height: 4px;
-    background: var(--indicator-color);
+    background: var(--cute-primary);
     border-radius: 2px;
     animation: pulse 2s infinite;
+    width: 100%;
 }
 
-.multiplayer-container.cute .indicator-bar {
-    --indicator-color: var(--cute-primary);
-}
-
-.multiplayer-container.deadly .indicator-bar {
-    --indicator-color: var(--deadly-accent);
-}
-
-.searching-animation {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 10px;
-    border-radius: 8px;
-    background: var(--search-bg);
-}
-
-.multiplayer-container.cute .searching-animation {
-    --search-bg: rgba(255, 158, 216, 0.1);
-}
-
-.multiplayer-container.deadly .searching-animation {
-    --search-bg: rgba(255, 70, 85, 0.1);
-}
-`;
-document.head.appendChild(style);
-</script>
-
-<style>
-/* Main Container */
-.multiplayer-container {
+.no-rooms {
+    text-align: center;
     padding: 2rem;
-    min-height: 100vh;
-    background: var(--bg-color);
+    color: #666;
+    font-style: italic;
 }
 
-.multiplayer-container.cute {
-    --bg-color: var(--cute-bg);
-    background: linear-gradient(135deg, var(--cute-bg) 0%, #ffffff 100%);
-}
-
-.multiplayer-container.deadly {
-    --bg-color: var(--deadly-bg);
-    background: linear-gradient(135deg, var(--deadly-bg) 0%, #000000 100%);
-}
-
-/* Header */
-.multiplayer-header {
-    text-align: center;
-    margin-bottom: 2rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 2px solid var(--border-color);
-}
-
-.multiplayer-container.cute .multiplayer-header {
-    --border-color: var(--cute-primary);
-}
-
-.multiplayer-container.deadly .multiplayer-header {
-    --border-color: var(--deadly-primary);
-}
-
-.multiplayer-header h1 {
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.multiplayer-container.cute .multiplayer-header h1 {
-    color: var(--cute-primary);
-}
-
-.multiplayer-container.deadly .multiplayer-header h1 {
-    color: var(--deadly-accent);
-    text-shadow: 0 0 20px rgba(31, 192, 255, 0.5);
-}
-
-.subtitle {
-    font-size: 1.1rem;
-    opacity: 0.8;
-    margin-bottom: 1.5rem;
-}
-
-.connection-status {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 2rem;
-    margin-top: 1rem;
-}
-
-.status-indicator {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-weight: 500;
-}
-
-.status-indicator.connected {
-    background: rgba(76, 175, 80, 0.1);
-    color: #4CAF50;
-    border: 1px solid #4CAF50;
-}
-
-.status-indicator.disconnected {
-    background: rgba(244, 67, 54, 0.1);
-    color: #F44336;
-    border: 1px solid #F44336;
-}
-
-.online-count {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid var(--border-color);
-}
-
-/* Main Content Layout */
-.multiplayer-content {
-    display: grid;
-    grid-template-columns: 300px 1fr 300px;
-    gap: 1.5rem;
-    max-width: 1600px;
-    margin: 0 auto;
-}
-
-/* Room Browser */
-.room-browser {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-.browser-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-}
-
-.browser-header h2 {
-    font-size: 1.3rem;
-}
-
-.browser-controls {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.room-creation {
-    padding: 1.5rem;
-    border-radius: 10px;
-    background: var(--card-bg);
-    border: 2px solid var(--border-color);
-}
-
-.multiplayer-container.cute .room-creation {
-    --card-bg: white;
-    --border-color: var(--cute-primary);
-}
-
-.multiplayer-container.deadly .room-creation {
-    --card-bg: var(--deadly-secondary);
-    --border-color: var(--deadly-primary);
-}
-
-.room-creation h3 {
-    margin-bottom: 1rem;
-    font-size: 1.1rem;
-}
-
-.form-group {
-    margin-bottom: 1rem;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-    font-size: 0.9rem;
-}
-
-.form-group input,
-.form-group select {
-    width: 100%;
-    padding: 0.5rem;
-    border-radius: 5px;
-    border: 1px solid var(--input-border);
-    background: var(--input-bg);
-    color: var(--text-color);
-}
-
-.multiplayer-container.cute .form-group input,
-.multiplayer-container.cute .form-group select {
-    --input-border: var(--cute-secondary);
-    --input-bg: white;
-    --text-color: var(--cute-text);
-}
-
-.multiplayer-container.deadly .form-group input,
-.multiplayer-container.deadly .form-group select {
-    --input-border: #444;
-    --input-bg: var(--deadly-secondary);
-    --text-color: var(--deadly-text);
-}
-
-.checkbox-label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-    font-size: 0.9rem;
-}
-
-.form-actions {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 1rem;
-}
-
-.quick-match {
-    padding: 1.5rem;
-    border-radius: 10px;
-    text-align: center;
-    background: var(--card-bg);
-    border: 2px solid var(--border-color);
-}
-
-.multiplayer-container.cute .quick-match {
-    --card-bg: white;
-    --border-color: var(--cute-accent);
-}
-
-.multiplayer-container.deadly .quick-match {
-    --card-bg: var(--deadly-secondary);
-    --border-color: var(--deadly-accent);
-}
-
-.quick-match h3 {
-    margin-bottom: 0.5rem;
-    font-size: 1.1rem;
-}
-
-.quick-match p {
-    margin-bottom: 1rem;
-    opacity: 0.8;
-    font-size: 0.9rem;
-}
-
-.matchmaking-status {
-    margin-top: 1rem;
-    padding: 1rem;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.searching-animation {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 0.5rem;
-}
-
-.room-list {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.room-filters {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
-}
-
-.filter-btn {
-    padding: 0.25rem 0.75rem;
-    border-radius: 15px;
-    border: 1px solid var(--border-color);
-    background: var(--filter-bg);
-    color: var(--text-color);
-    cursor: pointer;
-    font-size: 0.8rem;
-    transition: all 0.3s ease;
-}
-
-.multiplayer-container.cute .filter-btn {
-    --border-color: var(--cute-secondary);
-    --filter-bg: white;
-    --text-color: var(--cute-text);
-}
-
-.multiplayer-container.deadly .filter-btn {
-    --border-color: #444;
-    --filter-bg: var(--deadly-secondary);
-    --text-color: var(--deadly-text);
-}
-
-.filter-btn.active {
-    background: var(--accent-color);
-    color: white;
-    border-color: var(--accent-color);
-}
-
-.multiplayer-container.cute .filter-btn.active {
-    --accent-color: var(--cute-primary);
-}
-
-.multiplayer-container.deadly .filter-btn.active {
-    --accent-color: var(--deadly-primary);
-}
-
-.rooms-container {
-    flex: 1;
-    overflow-y: auto;
-    max-height: 400px;
-}
-
-.room-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem;
-    margin-bottom: 0.75rem;
-    border-radius: 8px;
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    transition: all 0.3s ease;
-}
-
-.multiplayer-container.cute .room-item {
-    --card-bg: white;
-    --border-color: var(--cute-secondary);
-}
-
-.multiplayer-container.deadly .room-item {
-    --card-bg: rgba(255, 255, 255, 0.05);
-    --border-color: #444;
-}
-
-.room-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-.room-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.5rem;
-}
-
-.room-header h4 {
-    margin: 0;
-    font-size: 1rem;
-}
-
-.room-status {
-    padding: 0.25rem 0.5rem;
-    border-radius: 10px;
-    font-size: 0.7rem;
-    font-weight: bold;
-}
-
-.room-details {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 0.5rem;
-    font-size: 0.8rem;
-    opacity: 0.8;
-}
-
-.room-details .detail {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-}
-
-.room-creator {
-    font-size: 0.8rem;
-    opacity: 0.7;
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-}
-
-/* Battle Arena */
-.battle-arena {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-.waiting-lobby {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
-    border-radius: 15px;
-    background: var(--card-bg);
-    border: 2px solid var(--border-color);
-}
-
-.multiplayer-container.cute .waiting-lobby {
-    --card-bg: white;
-    --border-color: var(--cute-primary);
-}
-
-.multiplayer-container.deadly .waiting-lobby {
-    --card-bg: var(--deadly-secondary);
-    --border-color: var(--deadly-primary);
-}
-
-.lobby-content {
-    text-align: center;
-    max-width: 500px;
-    width: 100%;
-}
-
-.lobby-icon {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-    opacity: 0.5;
-}
-
-.waiting-lobby h2 {
-    margin-bottom: 0.5rem;
-    font-size: 1.8rem;
-}
-
-.waiting-lobby p {
-    margin-bottom: 2rem;
-    opacity: 0.8;
-}
-
-.room-code {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    margin-bottom: 2rem;
-}
-
-.code-display {
-    font-family: monospace;
-    font-size: 1.5rem;
-    font-weight: bold;
-    letter-spacing: 0.2em;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    background: var(--code-bg);
-    border: 2px dashed var(--border-color);
-}
-
-.multiplayer-container.cute .code-display {
-    --code-bg: var(--cute-bg);
-    --border-color: var(--cute-primary);
-}
-
-.multiplayer-container.deadly .code-display {
-    --code-bg: rgba(0, 0, 0, 0.3);
-    --border-color: var(--deadly-accent);
-}
-
-.player-list {
-    display: flex;
-    justify-content: center;
-    gap: 2rem;
-    margin-bottom: 2rem;
-}
-
-.player {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    border-radius: 10px;
-    width: 200px;
-    background: var(--player-bg);
-    border: 2px solid var(--player-border);
-}
-
-.multiplayer-container.cute .player {
-    --player-bg: var(--cute-bg);
-    --player-border: var(--cute-secondary);
-}
-
-.multiplayer-container.deadly .player {
-    --player-bg: rgba(255, 255, 255, 0.05);
-    --player-border: #444;
-}
-
-.player.you {
-    --player-border: var(--accent-color);
-}
-
-.multiplayer-container.cute .player.you {
-    --accent-color: var(--cute-primary);
-}
-
-.multiplayer-container.deadly .player.you {
-    --accent-color: var(--deadly-accent);
-}
-
-.player.opponent {
-    opacity: 0.7;
-}
-
-.player-avatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    font-weight: bold;
-    position: relative;
-}
-
-.multiplayer-container.cute .player-avatar {
-    background: var(--cute-primary);
-    color: white;
-}
-
-.multiplayer-container.deadly .player-avatar {
-    background: var(--deadly-primary);
-    color: white;
-}
-
-.avatar-text {
-    font-size: 1.5rem;
-}
-
-.player-status {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    border: 2px solid white;
-}
-
-.player-status.ready {
-    background: #4CAF50;
-}
-
-.player-status.waiting {
-    background: #FF9800;
-}
-
-.player-info h4 {
-    margin-bottom: 0.25rem;
-}
-
-.player-rating {
-    font-size: 0.8rem;
-    opacity: 0.7;
-    margin-bottom: 0.5rem;
-}
-
-.ready-status .btn.ready {
-    background: #4CAF50;
-    color: white;
-}
-
-.status-text {
-    font-size: 0.8rem;
-    opacity: 0.7;
-}
-
-.lobby-actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-}
-
-/* Battle Interface */
-.battle-interface {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.battle-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem;
-    border-radius: 10px;
-    background: var(--header-bg);
-    border: 2px solid var(--border-color);
-}
-
-.multiplayer-container.cute .battle-header {
-    --header-bg: white;
-    --border-color: var(--cute-primary);
-}
-
-.multiplayer-container.deadly .battle-header {
-    --header-bg: var(--deadly-secondary);
-    --border-color: var(--deadly-primary);
-}
-
-.battle-timer {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 1.2rem;
-    font-weight: bold;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    background: rgba(0, 0, 0, 0.1);
-}
-
-.battle-info {
-    text-align: center;
-    flex: 1;
-}
-
-.battle-info h3 {
-    margin-bottom: 0.5rem;
-}
-
-.challenge-meta {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-}
-
-.difficulty-badge,
-.points-badge {
-    padding: 0.25rem 0.75rem;
-    border-radius: 15px;
-    font-size: 0.8rem;
-    font-weight: bold;
-}
-
-.multiplayer-container.cute .difficulty-badge {
-    background: var(--cute-bg);
-    color: var(--cute-primary);
-    border: 1px solid var(--cute-primary);
-}
-
-.multiplayer-container.deadly .difficulty-badge {
-    background: rgba(255, 70, 85, 0.1);
-    color: var(--deadly-primary);
-    border: 1px solid var(--deadly-primary);
-}
-
-.multiplayer-container.cute .points-badge {
-    background: var(--cute-accent);
-    color: white;
-}
-
-.multiplayer-container.deadly .points-badge {
-    background: var(--deadly-accent);
-    color: white;
-}
-
-.battle-scores {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.score-player,
-.score-opponent {
-    text-align: center;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    min-width: 100px;
-}
-
-.multiplayer-container.cute .score-player,
-.multiplayer-container.cute .score-opponent {
-    background: white;
-    border: 2px solid var(--cute-secondary);
-}
-
-.multiplayer-container.deadly .score-player,
-.multiplayer-container.deadly .score-opponent {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid #444;
-}
-
-.score-label {
-    display: block;
-    font-size: 0.8rem;
-    opacity: 0.7;
-    margin-bottom: 0.25rem;
-}
-
-.score-value {
-    display: block;
-    font-size: 1.5rem;
-    font-weight: bold;
-}
-
-.score-vs {
-    font-weight: bold;
-    color: var(--accent-color);
-}
-
-.multiplayer-container.cute .score-vs {
-    --accent-color: var(--cute-primary);
-}
-
-.multiplayer-container.deadly .score-vs {
-    --accent-color: var(--deadly-accent);
-}
-
-/* Battle Grid */
-.battle-grid {
-    flex: 1;
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    gap: 1.5rem;
-    min-height: 600px;
-}
-
-.player-side,
-.opponent-side {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    padding: 1.5rem;
-    border-radius: 15px;
-    background: var(--card-bg);
-    border: 2px solid var(--player-border);
-}
-
-.multiplayer-container.cute .player-side,
-.multiplayer-container.cute .opponent-side {
-    --card-bg: white;
-    --player-border: var(--cute-secondary);
-}
-
-.multiplayer-container.deadly .player-side,
-.multiplayer-container.deadly .opponent-side {
-    --card-bg: var(--deadly-secondary);
-    --player-border: #444;
-}
-
-.player-side {
-    --player-border: var(--player-accent);
-}
-
-.multiplayer-container.cute .player-side {
-    --player-accent: var(--cute-primary);
-}
-
-.multiplayer-container.deadly .player-side {
-    --player-accent: var(--deadly-accent);
-}
-
-.player-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.player-display {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.player-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-}
-
-.player-details h4 {
-    margin-bottom: 0.25rem;
-}
-
-.player-stats {
-    font-size: 0.8rem;
-    opacity: 0.7;
-}
-
-.player-status-indicator .status {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.9rem;
-}
-
-.code-editor-section {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.editor-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 1rem;
-    border-radius: 5px 5px 0 0;
-    background: var(--editor-header-bg);
-    color: white;
-    font-family: monospace;
-}
-
-.multiplayer-container.cute .editor-header {
-    --editor-header-bg: var(--cute-primary);
-}
-
-.multiplayer-container.deadly .editor-header {
-    --editor-header-bg: var(--deadly-primary);
-}
-
-.editor-actions {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.editor-btn {
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
-    color: white;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.editor-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
-}
-
-#multiplayerCode {
-    flex: 1;
-    width: 100%;
-    padding: 1rem;
-    border: none;
-    resize: none;
-    font-family: 'Courier New', monospace;
-    font-size: 0.9rem;
-    line-height: 1.5;
-}
-
-.multiplayer-container.cute #multiplayerCode {
-    background: white;
-    color: #333;
+/* CodeMirror overrides */
+.CodeMirror {
+    height: 200px;
     border: 2px solid var(--cute-secondary);
     border-top: none;
-}
-
-.multiplayer-container.deadly #multiplayerCode {
-    background: #1a1a1a;
-    color: #ffffff;
-    border: 1px solid #444;
-    border-top: none;
-}
-
-.player-controls {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.player-output,
-.opponent-output {
-    padding: 1rem;
-    border-radius: 8px;
-    min-height: 100px;
     font-family: 'Courier New', monospace;
-    font-size: 0.9rem;
-    line-height: 1.5;
-    white-space: pre-wrap;
-    background: var(--output-bg);
-    border: 1px solid var(--border-color);
+    font-size: 14px;
 }
 
-.multiplayer-container.cute .player-output,
-.multiplayer-container.cute .opponent-output {
-    --output-bg: white;
-    --border-color: var(--cute-secondary);
-    color: #333;
+.CodeMirror-focused {
+    border-color: var(--cute-primary);
 }
 
-.multiplayer-container.deadly .player-output,
-.multiplayer-container.deadly .opponent-output {
-    --output-bg: #1a1a1a;
-    --border-color: #444;
-    color: #ffffff;
-}
-
-.player-output h4,
-.opponent-output h4 {
-    margin-bottom: 0.5rem;
-}
-
-/* VS Divider */
-.vs-divider {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
-}
-
-.vs-icon {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-    color: var(--accent-color);
-}
-
-.vs-info {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.info-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.1);
-    font-size: 0.9rem;
-}
-
-/* Opponent Side */
-.opponent-code {
-    margin-bottom: 1rem;
-}
-
-.code-preview {
-    position: relative;
-    padding: 1rem;
-    border-radius: 0 0 5px 5px;
-    min-height: 150px;
-    background: var(--code-preview-bg);
-    border: 1px solid var(--border-color);
-    border-top: none;
-}
-
-.multiplayer-container.cute .code-preview {
-    --code-preview-bg: var(--cute-bg);
-    --border-color: var(--cute-secondary);
-}
-
-.multiplayer-container.deadly .code-preview {
-    --code-preview-bg: #1a1a1a;
-    --border-color: #444;
-}
-
-.code-mask {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(to bottom, transparent, var(--mask-color));
-    pointer-events: none;
-}
-
-.multiplayer-container.cute .code-mask {
-    --mask-color: rgba(255, 255, 255, 0.8);
-}
-
-.multiplayer-container.deadly .code-mask {
-    --mask-color: rgba(26, 26, 26, 0.8);
-}
-
-.progress-indicators {
-    position: absolute;
-    bottom: 1rem;
-    left: 1rem;
-    right: 1rem;
-}
-
-.indicator {
-    margin-bottom: 0.5rem;
-}
-
-.indicator span {
-    font-size: 0.8rem;
-    opacity: 0.8;
-}
-
-.opponent-info {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-.info-card {
-    padding: 0.75rem;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.info-card h5 {
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-}
-
-.activity-meter {
-    margin-top: 0.5rem;
-}
-
-.meter-bar {
-    height: 6px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 3px;
-    overflow: hidden;
-    margin-bottom: 0.25rem;
-}
-
-.meter-fill {
-    height: 100%;
-    border-radius: 3px;
-    background: var(--meter-fill);
-    transition: width 0.5s ease;
-}
-
-.multiplayer-container.cute .meter-fill {
-    --meter-fill: var(--cute-primary);
-}
-
-.multiplayer-container.deadly .meter-fill {
-    --meter-fill: var(--deadly-accent);
-}
-
-.status-display {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.status-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.9rem;
-}
-
-/* Results Screen */
-.results-screen {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
-}
-
-.results-content {
-    max-width: 800px;
-    width: 100%;
-    padding: 2rem;
-    border-radius: 15px;
-    background: var(--card-bg);
-    border: 3px solid var(--border-color);
-    text-align: center;
-}
-
-.multiplayer-container.cute .results-content {
-    --card-bg: white;
-    --border-color: var(--cute-primary);
-}
-
-.multiplayer-container.deadly .results-content {
-    --card-bg: var(--deadly-secondary);
-    --border-color: var(--deadly-primary);
-}
-
-.result-header {
-    margin-bottom: 2rem;
-}
-
-.result-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-}
-
-.result-subtitle {
-    font-size: 1.2rem;
-    font-weight: bold;
-}
-
-.result-comparison {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    gap: 2rem;
-    align-items: center;
-    margin-bottom: 2rem;
-}
-
-.comparison-player,
-.comparison-opponent {
-    padding: 1.5rem;
-    border-radius: 10px;
-    background: var(--comparison-bg);
-    border: 2px solid var(--comparison-border);
-}
-
-.multiplayer-container.cute .comparison-player,
-.multiplayer-container.cute .comparison-opponent {
-    --comparison-bg: var(--cute-bg);
-    --comparison-border: var(--cute-secondary);
-}
-
-.multiplayer-container.deadly .comparison-player,
-.multiplayer-container.deadly .comparison-opponent {
-    --comparison-bg: rgba(255, 255, 255, 0.05);
-    --comparison-border: #444;
-}
-
-.comparison-player {
-    --comparison-border: var(--player-accent);
-}
-
-.comparison-avatar {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    margin: 0 auto 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    font-weight: bold;
-}
-
-.multiplayer-container.cute .comparison-avatar {
-    background: var(--cute-primary);
-    color: white;
-}
-
-.multiplayer-container.deadly .comparison-avatar {
-    background: var(--deadly-primary);
-    color: white;
-}
-
-.comparison-score {
-    margin: 1rem 0;
-}
-
-.score-label {
-    display: block;
-    font-size: 0.9rem;
-    opacity: 0.7;
-    margin-bottom: 0.25rem;
-}
-
-.score-value {
-    display: block;
-    font-size: 2rem;
-    font-weight: bold;
-}
-
-.comparison-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.5rem;
-    margin-top: 1rem;
-}
-
-.comparison-stats .stat {
-    text-align: center;
-}
-
-.stat-label {
-    display: block;
-    font-size: 0.7rem;
-    opacity: 0.7;
-}
-
-.stat-value {
-    display: block;
-    font-size: 1rem;
-    font-weight: bold;
-}
-
-.comparison-vs {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-}
-
-.vs-circle {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 1.2rem;
-    background: var(--accent-color);
-    color: white;
-}
-
-.rating-change {
-    text-align: center;
-}
-
-.change-label {
-    display: block;
-    font-size: 0.8rem;
-    opacity: 0.7;
-    margin-bottom: 0.25rem;
-}
-
-.change-value {
-    display: block;
-    font-size: 1.5rem;
-    font-weight: bold;
-}
-
-.result-details {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-    margin-bottom: 2rem;
-    text-align: left;
-}
-
-.detail-section {
-    padding: 1rem;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.detail-section h5 {
-    margin-bottom: 1rem;
-    font-size: 1rem;
-}
-
-.rewards-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.reward-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem;
-    border-radius: 5px;
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.performance-metrics {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.metric {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.metric-label {
-    width: 100px;
-    font-size: 0.9rem;
-}
-
-.metric-bar {
-    flex: 1;
-    height: 8px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
-    overflow: hidden;
-}
-
-.metric-fill {
-    height: 100%;
-    border-radius: 4px;
-    background: var(--metric-fill);
-}
-
-.multiplayer-container.cute .metric-fill {
-    --metric-fill: var(--cute-primary);
-}
-
-.multiplayer-container.deadly .metric-fill {
-    --metric-fill: var(--deadly-accent);
-}
-
-.metric-value {
-    width: 40px;
-    text-align: right;
-    font-weight: bold;
-}
-
-.result-actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-}
-
-/* Battle Sidebar */
-.battle-sidebar {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-.battle-chat {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    border-radius: 10px;
-    overflow: hidden;
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-}
-
-.multiplayer-container.cute .battle-chat {
-    --card-bg: white;
-    --border-color: var(--cute-secondary);
-}
-
-.multiplayer-container.deadly .battle-chat {
-    --card-bg: var(--deadly-secondary);
-    --border-color: #444;
-}
-
-.chat-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem;
-    background: var(--header-bg);
-    border-bottom: 1px solid var(--border-color);
-}
-
-.multiplayer-container.cute .chat-header {
-    --header-bg: var(--cute-primary);
-    color: white;
-}
-
-.multiplayer-container.deadly .chat-header {
-    --header-bg: var(--deadly-primary);
-    color: white;
-}
-
-.chat-header h3 {
-    margin: 0;
-    font-size: 1.1rem;
-}
-
-.chat-controls {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.chat-btn {
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
-    color: white;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-}
-
-.chat-messages {
-    flex: 1;
-    padding: 1rem;
-    overflow-y: auto;
-    max-height: 300px;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.message {
-    padding: 0.5rem;
-    border-radius: 8px;
-    max-width: 90%;
-}
-
-.message.system {
-    align-self: center;
-    background: rgba(0, 0, 0, 0.1);
-    font-size: 0.8rem;
-    opacity: 0.7;
-}
-
-.message.player {
-    align-self: flex-end;
-    background: var(--message-player-bg);
-    color: white;
-}
-
-.message.opponent {
-    align-self: flex-start;
-    background: var(--message-opponent-bg);
-}
-
-.multiplayer-container.cute .message.player {
-    --message-player-bg: var(--cute-primary);
-}
-
-.multiplayer-container.deadly .message.player {
-    --message-player-bg: var(--deadly-primary);
-}
-
-.multiplayer-container.cute .message.opponent {
-    --message-opponent-bg: var(--cute-bg);
-}
-
-.multiplayer-container.deadly .message.opponent {
-    --message-opponent-bg: rgba(255, 255, 255, 0.1);
-}
-
-.message-sender {
-    font-size: 0.7rem;
-    font-weight: bold;
-    margin-bottom: 0.25rem;
-}
-
-.message-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 1rem;
-}
-
-.message-text {
-    flex: 1;
-    word-break: break-word;
-}
-
-.message-time {
-    font-size: 0.7rem;
-    opacity: 0.7;
-    white-space: nowrap;
-}
-
-.chat-input {
-    display: flex;
-    gap: 0.5rem;
-    padding: 1rem;
-    border-top: 1px solid var(--border-color);
-}
-
-.chat-input input {
-    flex: 1;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    border: 1px solid var(--input-border);
-    background: var(--input-bg);
-    color: var(--text-color);
-}
-
-.battle-stats h3,
-.tournaments h3 {
-    margin-bottom: 1rem;
-    font-size: 1.1rem;
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.75rem;
-}
-
-.stat-card {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem;
-    border-radius: 8px;
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-}
-
-.multiplayer-container.cute .stat-card {
-    --card-bg: white;
-    --border-color: var(--cute-secondary);
-}
-
-.multiplayer-container.deadly .stat-card {
-    --card-bg: rgba(255, 255, 255, 0.05);
-    --border-color: #444;
-}
-
-.stat-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-}
-
-.multiplayer-container.cute .stat-icon {
-    background: var(--cute-primary);
-    color: white;
-}
-
-.multiplayer-container.deadly .stat-icon {
-    background: var(--deadly-primary);
-    color: white;
-}
-
-.stat-value {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-bottom: 0.25rem;
-}
-
-.stat-label {
-    font-size: 0.8rem;
-    opacity: 0.7;
-}
-
-.tournament-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.tournament-item {
-    padding: 1rem;
-    border-radius: 8px;
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-}
-
-.tournament-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.5rem;
-}
-
-.tournament-header h4 {
-    margin: 0;
-    font-size: 0.9rem;
-}
-
-.tournament-status {
-    padding: 0.25rem 0.5rem;
-    border-radius: 10px;
-    font-size: 0.7rem;
-    font-weight: bold;
-}
-
-.tournament-status.active {
-    background: rgba(76, 175, 80, 0.1);
-    color: #4CAF50;
-}
-
-.tournament-status.upcoming {
-    background: rgba(255, 152, 0, 0.1);
-    color: #FF9800;
-}
-
-.tournament-details {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 0.5rem;
-    font-size: 0.8rem;
-    opacity: 0.8;
-}
-
-/* Spectator Notification */
-.spectator-notification {
-    position: fixed;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 1000;
-}
-
-.notification-content {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem 1.5rem;
-    border-radius: 10px;
-    background: var(--card-bg);
-    border: 2px solid var(--border-color);
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-}
-
+/* Responsive adjustments */
 @media (max-width: 1200px) {
     .multiplayer-content {
         grid-template-columns: 250px 1fr;
@@ -3420,6 +2185,11 @@ document.head.appendChild(style);
         font-size: 1.8rem;
     }
     
+    .connection-status {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
     .battle-header {
         flex-direction: column;
         gap: 1rem;
@@ -3439,6 +2209,14 @@ document.head.appendChild(style);
     .result-actions {
         flex-direction: column;
     }
+    
+    .CodeMirror {
+        height: 150px;
+    }
 }
-</style>
-{% endblock %}
+`;
+document.head.appendChild(style);
+</script>
+</main>
+</body>
+</html>
