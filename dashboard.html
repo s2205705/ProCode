@@ -4,1064 +4,2373 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard — Python Pathfinder</title>
-    <link rel="stylesheet" href="main.css">
-    <link rel="stylesheet" href="cute_mode.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>/* small safety overrides if needed */</style>
+    <style>
+        :root {
+            /* Cute Theme */
+            --cute-primary: #ff6b9d;
+            --cute-secondary: #ffc8dd;
+            --cute-accent: #a2d2ff;
+            --cute-bg: #fff9fb;
+            --cute-text: #333;
+            --cute-card: #ffffff;
+            --cute-border: #ffc8dd;
+            --cute-success: #4CAF50;
+            --cute-warning: #FF9800;
+            --cute-danger: #F44336;
+            
+            /* Deadly Theme */
+            --deadly-primary: #ff4655;
+            --deadly-secondary: #1a1a2e;
+            --deadly-accent: #00ff9d;
+            --deadly-bg: #0d0d15;
+            --deadly-text: #ffffff;
+            --deadly-card: #1a1a2e;
+            --deadly-border: #333;
+            --deadly-success: #00ff9d;
+            --deadly-warning: #ffd166;
+            --deadly-danger: #ff4655;
+            
+            /* Common */
+            --shadow: 0 4px 12px rgba(0,0,0,0.1);
+            --radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            transition: var(--transition);
+            overflow-x: hidden;
+        }
+
+        .cute-theme {
+            background: linear-gradient(135deg, var(--cute-bg) 0%, #ffeef7 100%);
+            color: var(--cute-text);
+        }
+
+        .deadly-theme {
+            background: linear-gradient(135deg, var(--deadly-bg) 0%, #1a1a1a 100%);
+            color: var(--deadly-text);
+        }
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .navbar.cute {
+            background: rgba(255, 255, 255, 0.95);
+            border-bottom: 2px solid var(--cute-primary);
+            box-shadow: 0 2px 20px rgba(255, 107, 157, 0.1);
+        }
+
+        .navbar.deadly {
+            background: rgba(26, 26, 46, 0.95);
+            border-bottom: 2px solid var(--deadly-accent);
+            box-shadow: 0 2px 20px rgba(0, 255, 157, 0.1);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: linear-gradient(135deg, var(--cute-primary), #ff8ab3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo.cute {
+            background: linear-gradient(135deg, var(--cute-primary), #ff8ab3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo.deadly {
+            background: linear-gradient(135deg, var(--deadly-accent), #1fc0ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            padding: 0.75rem 1.25rem;
+            border-radius: 50px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .nav-link.cute {
+            color: var(--cute-text);
+        }
+
+        .nav-link.cute:hover, .nav-link.cute.active {
+            background: linear-gradient(135deg, var(--cute-primary), #ff8ab3);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 107, 157, 0.3);
+        }
+
+        .nav-link.deadly {
+            color: var(--deadly-text);
+        }
+
+        .nav-link.deadly:hover, .nav-link.deadly.active {
+            background: linear-gradient(135deg, var(--deadly-accent), #1fc0ff);
+            color: var(--deadly-bg);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 255, 157, 0.3);
+        }
+
+        .btn {
+            padding: 0.75rem 1.75rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+        }
+
+        .btn.cute {
+            background: linear-gradient(135deg, var(--cute-primary), #ff8ab3);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.3);
+        }
+
+        .btn.cute:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(255, 107, 157, 0.4);
+        }
+
+        .btn.deadly {
+            background: linear-gradient(135deg, var(--deadly-accent), #1fc0ff);
+            color: var(--deadly-bg);
+            box-shadow: 0 4px 15px rgba(0, 255, 157, 0.3);
+        }
+
+        .btn.deadly:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(0, 255, 157, 0.4);
+        }
+
+        .btn.small {
+            padding: 0.5rem 1.25rem;
+            font-size: 0.85rem;
+        }
+
+        /* Dashboard Layout */
+        .dashboard {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        /* Welcome Banner */
+        .welcome-banner {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 3rem;
+            border-radius: var(--radius);
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .welcome-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400"><path fill="%23ffffff22" d="M0,200 C200,100 400,300 600,200 C800,100 1000,300 1200,200 L1200,400 L0,400 Z"/></svg>') bottom center/cover;
+            z-index: 1;
+        }
+
+        .welcome-banner.cute {
+            background: linear-gradient(135deg, rgba(255, 107, 157, 0.9), rgba(162, 210, 255, 0.9));
+            box-shadow: 0 20px 40px rgba(255, 107, 157, 0.2);
+        }
+
+        .welcome-banner.deadly {
+            background: linear-gradient(135deg, rgba(255, 70, 85, 0.9), rgba(0, 255, 157, 0.9));
+            box-shadow: 0 20px 40px rgba(255, 70, 85, 0.2);
+        }
+
+        .welcome-content {
+            flex: 1;
+            position: relative;
+            z-index: 2;
+        }
+
+        .welcome-content h1 {
+            font-size: 3rem;
+            margin-bottom: 0.75rem;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+
+        .welcome-content p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+            max-width: 600px;
+        }
+
+        .user-level {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .level-badge {
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 800;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .xp-progress {
+            flex: 1;
+            max-width: 500px;
+        }
+
+        .xp-bar {
+            height: 12px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 0.75rem;
+            position: relative;
+        }
+
+        .xp-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .xp-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.4) 50%, 
+                transparent 100%);
+            animation: shimmer 2s infinite;
+        }
+
+        .welcome-banner.cute .xp-fill {
+            background: linear-gradient(90deg, white, #ffeef7);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .welcome-banner.deadly .xp-fill {
+            background: linear-gradient(90deg, var(--deadly-accent), #00e68a);
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.5);
+        }
+
+        .xp-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.95rem;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+
+        .user-avatar {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            margin-left: 2rem;
+            z-index: 2;
+        }
+
+        .avatar-character {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .welcome-banner.cute .avatar-character {
+            background: radial-gradient(circle at 30% 30%, white, var(--cute-accent));
+            border: 6px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 
+                0 20px 40px rgba(255, 107, 157, 0.3),
+                inset 0 10px 30px rgba(255, 255, 255, 0.8);
+        }
+
+        .welcome-banner.deadly .avatar-character {
+            background: radial-gradient(circle at 30% 30%, var(--deadly-accent), #000);
+            border: 6px solid rgba(0, 255, 157, 0.8);
+            box-shadow: 
+                0 20px 40px rgba(255, 70, 85, 0.3),
+                inset 0 10px 30px rgba(0, 255, 157, 0.4);
+        }
+
+        .avatar-character::after {
+            content: '🐍';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+        }
+
+        .avatar-status {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 3px solid;
+            z-index: 3;
+            animation: pulse 2s infinite;
+        }
+
+        .welcome-banner.cute .avatar-status {
+            border-color: white;
+            background: #4CAF50;
+            box-shadow: 0 0 20px #4CAF50;
+        }
+
+        .welcome-banner.deadly .avatar-status {
+            border-color: var(--deadly-accent);
+            background: #00ff9d;
+            box-shadow: 0 0 20px #00ff9d;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            grid-column: span 6;
+        }
+
+        .quick-actions h2 {
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .dashboard.cute .quick-actions h2 {
+            color: var(--cute-primary);
+        }
+
+        .dashboard.deadly .quick-actions h2 {
+            color: var(--deadly-accent);
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .action-card {
+            padding: 1.75rem;
+            border-radius: var(--radius);
+            text-decoration: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: flex-start;
+            gap: 1.25rem;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.1) 100%);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .dashboard.cute .action-card {
+            background: white;
+            border: 2px solid var(--cute-border);
+            color: var(--cute-text);
+            box-shadow: 0 8px 25px rgba(255, 107, 157, 0.1);
+        }
+
+        .dashboard.deadly .action-card {
+            background: var(--deadly-card);
+            border: 1px solid var(--deadly-border);
+            color: var(--deadly-text);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .action-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .action-card:hover::before {
+            opacity: 1;
+        }
+
+        .dashboard.cute .action-card:hover {
+            border-color: var(--cute-primary);
+            background: linear-gradient(135deg, white, var(--cute-bg));
+        }
+
+        .dashboard.deadly .action-card:hover {
+            border-color: var(--deadly-accent);
+            background: linear-gradient(135deg, var(--deadly-card), rgba(255, 70, 85, 0.1));
+        }
+
+        .action-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 2;
+            transition: var(--transition);
+        }
+
+        .action-card:hover .action-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .dashboard.cute .action-icon.continue {
+            background: linear-gradient(135deg, var(--cute-primary), #ff8ab3);
+            color: white;
+            box-shadow: 0 8px 20px rgba(255, 107, 157, 0.3);
+        }
+
+        .dashboard.cute .action-icon.battle {
+            background: linear-gradient(135deg, #FF9800, #ffb74d);
+            color: white;
+            box-shadow: 0 8px 20px rgba(255, 152, 0, 0.3);
+        }
+
+        .dashboard.cute .action-icon.lessons {
+            background: linear-gradient(135deg, #2196F3, #64b5f6);
+            color: white;
+            box-shadow: 0 8px 20px rgba(33, 150, 243, 0.3);
+        }
+
+        .dashboard.cute .action-icon.profile {
+            background: linear-gradient(135deg, #9C27B0, #ba68c8);
+            color: white;
+            box-shadow: 0 8px 20px rgba(156, 39, 176, 0.3);
+        }
+
+        .dashboard.deadly .action-icon {
+            background: linear-gradient(135deg, var(--deadly-accent), #1fc0ff);
+            color: var(--deadly-bg);
+            box-shadow: 0 8px 20px rgba(0, 255, 157, 0.3);
+        }
+
+        .action-content {
+            flex: 1;
+            position: relative;
+            z-index: 2;
+        }
+
+        .action-content h3 {
+            margin-bottom: 0.5rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .action-content p {
+            opacity: 0.8;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* Stats Overview */
+        .stats-overview {
+            grid-column: span 6;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .stat-card {
+            padding: 1.75rem;
+            border-radius: var(--radius);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.05) 100%);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .dashboard.cute .stat-card {
+            background: white;
+            border: 2px solid var(--cute-border);
+            box-shadow: 0 8px 25px rgba(255, 107, 157, 0.1);
+        }
+
+        .dashboard.deadly .stat-card {
+            background: var(--deadly-card);
+            border: 1px solid var(--deadly-border);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .stat-header i {
+            font-size: 1.5rem;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dashboard.cute .stat-header i {
+            background: linear-gradient(135deg, var(--cute-primary), #ff8ab3);
+            color: white;
+            box-shadow: 0 8px 20px rgba(255, 107, 157, 0.2);
+        }
+
+        .dashboard.deadly .stat-header i {
+            background: linear-gradient(135deg, var(--deadly-accent), #1fc0ff);
+            color: var(--deadly-bg);
+            box-shadow: 0 8px 20px rgba(0, 255, 157, 0.2);
+        }
+
+        .stat-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+
+        .stat-value {
+            font-size: 2.75rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            line-height: 1;
+            background: linear-gradient(135deg, var(--cute-primary), #ff8ab3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .dashboard.cute .stat-value {
+            background: linear-gradient(135deg, var(--cute-primary), #ff8ab3);
+            -webkit-background-clip: text;
+        }
+
+        .dashboard.deadly .stat-value {
+            background: linear-gradient(135deg, var(--deadly-accent), #1fc0ff);
+            -webkit-background-clip: text;
+        }
+
+        .stat-trend {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .stat-trend.positive {
+            color: var(--cute-success);
+        }
+
+        .dashboard.deadly .stat-trend.positive {
+            color: var(--deadly-success);
+        }
+
+        .stat-progress {
+            margin-top: 1.25rem;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 0.75rem;
+        }
+
+        .dashboard.deadly .progress-bar {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.4) 50%, 
+                transparent 100%);
+            animation: shimmer 2s infinite;
+        }
+
+        .dashboard.cute .progress-fill {
+            background: linear-gradient(90deg, var(--cute-primary), #ff8ab3);
+        }
+
+        .dashboard.deadly .progress-fill {
+            background: linear-gradient(90deg, var(--deadly-accent), #1fc0ff);
+        }
+
+        .achievement-preview {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
+
+        .achievement-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .dashboard.cute .achievement-icon {
+            background: linear-gradient(135deg, var(--cute-bg), white);
+            border: 2px solid var(--cute-border);
+            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.1);
+        }
+
+        .dashboard.deadly .achievement-icon {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), var(--deadly-card));
+            border: 1px solid var(--deadly-border);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .achievement-icon:hover {
+            transform: translateY(-3px) scale(1.1);
+        }
+
+        .achievement-more {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            font-weight: 600;
+        }
+
+        /* Recent Activity */
+        .recent-activity {
+            grid-column: span 8;
+            margin-top: 1rem;
+        }
+
+        .activity-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .activity-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.05) 100%);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .activity-item:hover::before {
+            opacity: 1;
+        }
+
+        .dashboard.cute .activity-item {
+            background: white;
+            border-left: 5px solid var(--cute-primary);
+            box-shadow: 0 8px 25px rgba(255, 107, 157, 0.1);
+        }
+
+        .dashboard.deadly .activity-item {
+            background: var(--deadly-card);
+            border-left: 5px solid var(--deadly-accent);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .activity-item:hover {
+            transform: translateX(10px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+
+        .activity-item.success {
+            border-left-color: var(--cute-success);
+        }
+
+        .activity-item.multiplayer {
+            border-left-color: #FF9800;
+        }
+
+        .activity-item.achievement {
+            border-left-color: #9C27B0;
+        }
+
+        .activity-item.learning {
+            border-left-color: #2196F3;
+        }
+
+        .activity-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .dashboard.cute .activity-icon {
+            background: var(--cute-bg);
+            box-shadow: 0 8px 20px rgba(255, 107, 157, 0.1);
+        }
+
+        .dashboard.deadly .activity-icon {
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .activity-item.success .activity-icon {
+            color: var(--cute-success);
+        }
+
+        .activity-item.multiplayer .activity-icon {
+            color: #FF9800;
+        }
+
+        .activity-item.achievement .activity-icon {
+            color: #9C27B0;
+        }
+
+        .activity-item.learning .activity-icon {
+            color: #2196F3;
+        }
+
+        .activity-content {
+            flex: 1;
+            position: relative;
+            z-index: 2;
+        }
+
+        .activity-content h4 {
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .activity-meta {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .activity-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .activity-item.success .activity-badge {
+            background: linear-gradient(135deg, var(--cute-success), #66bb6a);
+            color: white;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .activity-item.multiplayer .activity-badge {
+            background: linear-gradient(135deg, #FF9800, #ffb74d);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
+        }
+
+        .activity-item.achievement .activity-badge {
+            background: linear-gradient(135deg, #9C27B0, #ba68c8);
+            color: white;
+            box-shadow: 0 4px 15px rgba(156, 39, 176, 0.3);
+        }
+
+        .activity-item.learning .activity-badge {
+            background: linear-gradient(135deg, #2196F3, #64b5f6);
+            color: white;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+        }
+
+        /* Learning Path */
+        .learning-path {
+            grid-column: span 4;
+            margin-top: 1rem;
+        }
+
+        .path-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .path-node {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .path-node::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.05) 100%);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .path-node:hover::before {
+            opacity: 1;
+        }
+
+        .dashboard.cute .path-node {
+            background: white;
+            border: 2px solid var(--cute-border);
+            box-shadow: 0 8px 25px rgba(255, 107, 157, 0.1);
+        }
+
+        .dashboard.deadly .path-node {
+            background: var(--deadly-card);
+            border: 1px solid var(--deadly-border);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .path-node:hover {
+            transform: translateX(10px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+
+        .path-node.completed {
+            border-color: var(--cute-success);
+        }
+
+        .path-node.current {
+            border-color: var(--cute-warning);
+            box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.1);
+        }
+
+        .node-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 2;
+            transition: var(--transition);
+        }
+
+        .dashboard.cute .node-icon {
+            background: var(--cute-bg);
+            box-shadow: 0 8px 20px rgba(255, 107, 157, 0.1);
+        }
+
+        .dashboard.deadly .node-icon {
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .path-node.completed .node-icon {
+            background: linear-gradient(135deg, var(--cute-success), #66bb6a);
+            color: white;
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.3);
+        }
+
+        .path-node.current .node-icon {
+            background: linear-gradient(135deg, var(--cute-warning), #ffca28);
+            color: white;
+            box-shadow: 0 8px 20px rgba(255, 193, 7, 0.3);
+        }
+
+        .path-node.upcoming .node-icon {
+            color: #9E9E9E;
+        }
+
+        .path-node:hover .node-icon {
+            transform: scale(1.1) rotate(10deg);
+        }
+
+        .node-content {
+            flex: 1;
+            position: relative;
+            z-index: 2;
+        }
+
+        .node-content h4 {
+            margin-bottom: 0.25rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .node-desc {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            line-height: 1.4;
+        }
+
+        .node-action {
+            flex-shrink: 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Multiplayer Stats */
+        .multiplayer-stats {
+            grid-column: span 4;
+            margin-top: 1rem;
+        }
+
+        .multiplayer-card {
+            padding: 1.75rem;
+            border-radius: var(--radius);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .multiplayer-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.05) 100%);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .multiplayer-card:hover::before {
+            opacity: 1;
+        }
+
+        .dashboard.cute .multiplayer-card {
+            background: white;
+            border: 2px solid var(--cute-border);
+            box-shadow: 0 8px 25px rgba(255, 107, 157, 0.1);
+        }
+
+        .dashboard.deadly .multiplayer-card {
+            background: var(--deadly-card);
+            border: 1px solid var(--deadly-border);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .multiplayer-card h3 {
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .vs-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .player {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .player-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            position: relative;
+            animation: pulse 2s infinite;
+        }
+
+        .dashboard.cute .player-avatar {
+            background: linear-gradient(135deg, var(--cute-primary), #ff8ab3);
+            box-shadow: 0 8px 25px rgba(255, 107, 157, 0.3);
+        }
+
+        .dashboard.deadly .player-avatar {
+            background: linear-gradient(135deg, var(--deadly-accent), #1fc0ff);
+            box-shadow: 0 8px 25px rgba(0, 255, 157, 0.3);
+        }
+
+        .player-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .vs-label {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--cute-primary), #ff8ab3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            padding: 0 1rem;
+        }
+
+        .dashboard.deadly .vs-label {
+            background: linear-gradient(135deg, var(--deadly-accent), #1fc0ff);
+            -webkit-background-clip: text;
+        }
+
+        .vs-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .vs-stat {
+            text-align: center;
+        }
+
+        .vs-stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.25rem;
+            background: linear-gradient(135deg, var(--cute-primary), #ff8ab3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .dashboard.deadly .vs-stat-value {
+            background: linear-gradient(135deg, var(--deadly-accent), #1fc0ff);
+            -webkit-background-clip: text;
+        }
+
+        .vs-stat-label {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            font-weight: 600;
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-in {
+            animation: slideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            opacity: 0;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            opacity: 0;
+        }
+
+        /* Decorative Elements */
+        .dashboard-decoration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .floating-element {
+            position: absolute;
+            border-radius: 50%;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        .cute-element {
+            background: linear-gradient(135deg, var(--cute-primary), var(--cute-accent));
+            box-shadow: 0 10px 30px rgba(255, 107, 157, 0.2);
+        }
+
+        .deadly-element {
+            background: linear-gradient(135deg, var(--deadly-accent), var(--deadly-primary));
+            box-shadow: 0 10px 30px rgba(0, 255, 157, 0.2);
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: white;
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            z-index: 10000;
+            animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            max-width: 300px;
+            border-left: 5px solid;
+        }
+
+        .dashboard.cute .notification {
+            border-left-color: var(--cute-primary);
+        }
+
+        .dashboard.deadly .notification {
+            background: var(--deadly-card);
+            border-left-color: var(--deadly-accent);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-actions,
+            .stats-overview,
+            .recent-activity,
+            .learning-path,
+            .multiplayer-stats {
+                grid-column: 1 / -1;
+            }
+            
+            .actions-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                padding: 1rem;
+            }
+            
+            .navbar {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .welcome-banner {
+                flex-direction: column;
+                text-align: center;
+                padding: 2rem;
+            }
+            
+            .user-avatar {
+                margin: 1.5rem auto 0;
+            }
+            
+            .user-level {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .xp-progress {
+                max-width: 100%;
+            }
+            
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .activity-item,
+            .path-node {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+            
+            .vs-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .welcome-content h1 {
+                font-size: 2.25rem;
+            }
+            
+            .stat-value {
+                font-size: 2.25rem;
+            }
+            
+            .btn {
+                padding: 0.6rem 1.25rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .cute-theme::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--cute-primary), #ff8ab3);
+            border-radius: 5px;
+        }
+
+        .deadly-theme::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--deadly-accent), #1fc0ff);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            opacity: 0.8;
+        }
+    </style>
 </head>
 <body class="cute-theme">
     <nav class="navbar cute">
-        <a href="dashboard.html" class="logo cute"><i class="fas fa-code"></i> Python Pathfinder</a>
+        <a href="dashboard.html" class="logo cute">
+            <i class="fas fa-code"></i> Python Pathfinder
+        </a>
         <div class="nav-links">
-            <a href="dashboard.html" class="nav-link cute"><i class="fas fa-home"></i> Dashboard</a>
-            <a href="game.html" class="nav-link cute"><i class="fas fa-gamepad"></i> Play</a>
-            <a href="multiplayer.html" class="nav-link cute"><i class="fas fa-users"></i> Multiplayer</a>
-            <a href="lessons.html" class="nav-link cute"><i class="fas fa-book"></i> Lessons</a>
-            <a href="login.html" class="nav-link cute"><i class="fas fa-sign-in-alt"></i> Login</a>
-            <a href="register.html" class="nav-link cute"><i class="fas fa-user-plus"></i> Register</a>
-            <button id="themeToggle" class="btn cute small">Switch to Deadly Mode</button>
+            <a href="dashboard.html" class="nav-link cute active">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a href="game.html" class="nav-link cute">
+                <i class="fas fa-gamepad"></i> Play
+            </a>
+            <a href="multiplayer.html" class="nav-link cute">
+                <i class="fas fa-users"></i> Multiplayer
+            </a>
+            <a href="lessons.html" class="nav-link cute">
+                <i class="fas fa-book"></i> Lessons
+            </a>
+            <button id="themeToggle" class="btn cute small">
+                <i class="fas fa-moon"></i> Deadly Mode
+            </button>
         </div>
     </nav>
 
-<main>
-<div class="dashboard cute">
-    <!-- Welcome Banner -->
-    <div class="welcome-banner cute">
-        <div class="welcome-content">
-            <h1>Welcome back, <span id="username">Player</span>! 👋</h1>
-            <p>Ready to continue your coding adventure?</p>
-            <div class="user-level">
-                <span class="level-badge" id="levelBadge">Level 1</span>
-                <span class="xp-progress">
-                    <div class="xp-bar">
-                        <div class="xp-fill" id="xpFill" style="width:0%"></div>
+    <main class="dashboard cute">
+        <!-- Welcome Banner -->
+        <div class="welcome-banner cute fade-in">
+            <div class="welcome-content">
+                <h1>Welcome back, <span id="username">Coder</span>! 🎉</h1>
+                <p>Ready to continue your coding adventure? Level up your skills and conquer new challenges!</p>
+                
+                <div class="user-level">
+                    <div class="level-badge">
+                        <i class="fas fa-trophy"></i>
+                        <span id="levelBadge">Level 1 Explorer</span>
                     </div>
-                    <span class="xp-text" id="xpText">0/10 challenges completed</span>
-                </span>
-            </div>
-        </div>
-        <div class="user-avatar cute">
-            <div class="avatar-character cute"></div>
-            <div class="avatar-status online"></div>
-        </div>
-    </div>
-
-    <!-- Quick Actions -->
-    <div class="quick-actions {{ theme }}">
-        <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
-        <div class="actions-grid">
-            <a href="#" id="continueLink" class="action-card cute">
-                <div class="action-icon continue">
-                    <i class="fas fa-play-circle"></i>
-                </div>
-                <h3>Continue Learning</h3>
-                <p id="continueText">Resume from Level 1</p>
-            </a>
-            
-            <a href="{{ url_for('multiplayer') }}" class="action-card {{ theme }}">
-                <div class="action-icon battle">
-                    <i class="fas fa-crosshairs"></i>
-                </div>
-                <h3>Multiplayer Battle</h3>
-                <p>Challenge other players in real-time</p>
-            </a>
-            
-            <a href="{{ url_for('lessons', topic='python_basics') }}" class="action-card {{ theme }}">
-                <div class="action-icon lessons">
-                    <i class="fas fa-book-open"></i>
-                </div>
-                <h3>Review Lessons</h3>
-                <p>Brush up on Python fundamentals</p>
-            </a>
-            
-            <a href="#" class="action-card {{ theme }}">
-                <div class="action-icon profile">
-                    <i class="fas fa-user-cog"></i>
-                </div>
-                <h3>Edit Profile</h3>
-                <p>Customize your settings and theme</p>
-            </a>
-        </div>
-    </div>
-
-    <!-- Stats Overview -->
-    <div class="stats-overview cute">
-        <h2><i class="fas fa-chart-line"></i> Your Progress</h2>
-        <div class="stats-grid">
-            <div class="stat-card {{ theme }}">
-                <div class="stat-header">
-                    <i class="fas fa-star"></i>
-                    <h3>Total Score</h3>
-                </div>
-                <div class="stat-value" id="totalScore">0</div>
-                <div class="stat-trend positive">
-                    <i class="fas fa-arrow-up"></i>
-                    <span>+120 this week</span>
-                </div>
-            </div>
-            
-            <div class="stat-card {{ theme }}">
-                <div class="stat-header">
-                    <i class="fas fa-flag-checkered"></i>
-                    <h3>Levels Completed</h3>
-                </div>
-                <div class="stat-value" id="levelsCompleted">0</div>
-                <div class="stat-progress">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="levelsProgress" style="width:0%"></div>
+                    <div class="xp-progress">
+                        <div class="xp-bar">
+                            <div class="xp-fill" id="xpFill" style="width: 0%"></div>
+                        </div>
+                        <div class="xp-text">
+                            <span id="currentXP">0</span> XP
+                            <span id="nextLevelXP">/ 1000 XP to Level 2</span>
+                        </div>
                     </div>
-                    <span id="levelsPercent">0%</span>
                 </div>
             </div>
-            
-            <div class="stat-card {{ theme }}">
-                <div class="stat-header">
-                    <i class="fas fa-trophy"></i>
-                    <h3>Achievements</h3>
-                </div>
-                <div class="stat-value">3/15</div>
-                <div class="achievement-preview">
-                    <span class="achievement-icon">🏆</span>
-                    <span class="achievement-icon">🐍</span>
-                    <span class="achievement-icon">⚡</span>
-                    <span class="achievement-more">+12 more</span>
-                </div>
-            </div>
-            
-            <div class="stat-card {{ theme }}">
-                <div class="stat-header">
-                    <i class="fas fa-ranking-star"></i>
-                    <h3>Global Rank</h3>
-                </div>
-                <div class="stat-value">#42</div>
-                <div class="rank-change positive">
-                    <i class="fas fa-caret-up"></i>
-                    <span>Up 3 positions</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Recent Activity -->
-    <div class="recent-activity {{ theme }}">
-        <h2><i class="fas fa-history"></i> Recent Activity</h2>
-        <div class="activity-timeline">
-            <div class="activity-item {{ theme }} success">
-                <div class="activity-icon">
-                    <i class="fas fa-check-circle"></i>
-                </div>
-                <div class="activity-content">
-                    <h4>Completed Level 3: Python Functions</h4>
-                    <p class="activity-meta">2 hours ago • Score: 95/100</p>
-                </div>
-                <span class="activity-badge">+95 points</span>
-            </div>
-            
-            <div class="activity-item {{ theme }} multiplayer">
-                <div class="activity-icon">
-                    <i class="fas fa-crosshairs"></i>
-                </div>
-                <div class="activity-content">
-                    <h4>Won against coder_pro in Multiplayer</h4>
-                    <p class="activity-meta">Yesterday • Rating: +25</p>
-                </div>
-                <span class="activity-badge victory">Victory!</span>
-            </div>
-            
-            <div class="activity-item {{ theme }} achievement">
-                <div class="activity-icon">
-                    <i class="fas fa-trophy"></i>
-                </div>
-                <div class="activity-content">
-                    <h4>Unlocked "Python Prodigy" achievement</h4>
-                    <p class="activity-meta">2 days ago • 50 points</p>
-                </div>
-                <span class="activity-badge achievement-badge">🏆 New!</span>
-            </div>
-            
-            <div class="activity-item {{ theme }} learning">
-                <div class="activity-icon">
-                    <i class="fas fa-book"></i>
-                </div>
-                <div class="activity-content">
-                    <h4>Completed HTML Basics lesson</h4>
-                    <p class="activity-meta">3 days ago • 100% score</p>
-                </div>
-                <span class="activity-badge">Perfect!</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Learning Path -->
-    <div class="learning-path {{ theme }}">
-        <h2><i class="fas fa-road"></i> Your Learning Path</h2>
-        <div class="path-container" id="pathContainer">
-            <!-- Ten static nodes; JS will mark completed/current/upcoming and set labels -->
-        </div>
-    </div>
-
-    <!-- Multiplayer Stats -->
-    <div class="multiplayer-stats {{ theme }}">
-        <h2><i class="fas fa-swords"></i> Multiplayer Stats</h2>
-        <div class="multiplayer-grid">
-            <div class="dashboard-decoration cute" id="dashboardDecoration">
-                <div class="floating-clouds"></div>
-                <div class="cute-mascot"></div>
+            <div class="user-avatar">
+                <div class="avatar-character cute"></div>
+                <div class="avatar-status online"></div>
             </div>
         </div>
 
-        <!-- Script: populate dynamic parts from a client-side stats object -->
-        <script>
-        // Example data (replace or fetch from API if available)
-        const stats = {
-            username: 'Player',
-            highest_level: 1,
-            levels_completed: 0,
-            total_score: 0
-        };
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Quick Actions -->
+            <div class="quick-actions cute fade-in" style="animation-delay: 0.1s">
+                <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
+                <div class="actions-grid">
+                    <a href="#" id="continueLink" class="action-card cute">
+                        <div class="action-icon continue">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                        <div class="action-content">
+                            <h3>Continue Learning</h3>
+                            <p id="continueText">Start your next lesson</p>
+                        </div>
+                    </a>
+                    
+                    <a href="game.html" class="action-card cute">
+                        <div class="action-icon battle">
+                            <i class="fas fa-crosshairs"></i>
+                        </div>
+                        <div class="action-content">
+                            <h3>Play Code Tetris</h3>
+                            <p>Solve coding challenges in a Tetris game</p>
+                        </div>
+                    </a>
+                    
+                    <a href="lessons.html" class="action-card cute">
+                        <div class="action-icon lessons">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        <div class="action-content">
+                            <h3>Review Lessons</h3>
+                            <p>Brush up on Python fundamentals</p>
+                        </div>
+                    </a>
+                    
+                    <a href="#" class="action-card cute" id="profileSettings">
+                        <div class="action-icon profile">
+                            <i class="fas fa-user-cog"></i>
+                        </div>
+                        <div class="action-content">
+                            <h3>Profile Settings</h3>
+                            <p>Customize your experience</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
 
-        document.addEventListener('DOMContentLoaded', () => {
-            // Apply stats to DOM
-            document.getElementById('username').textContent = stats.username;
-            document.getElementById('levelBadge').textContent = 'Level ' + (stats.highest_level || 1);
-            document.getElementById('xpText').textContent = (stats.levels_completed || 0) + '/10 challenges completed';
-            const xpPercent = ((stats.levels_completed || 0) / 10) * 100;
-            document.getElementById('xpFill').style.width = xpPercent + '%';
-            document.getElementById('totalScore').textContent = stats.total_score || 0;
-            document.getElementById('levelsCompleted').textContent = stats.levels_completed || 0;
-            document.getElementById('levelsProgress').style.width = xpPercent + '%';
-            document.getElementById('levelsPercent').textContent = Math.round(xpPercent) + '%';
-            document.getElementById('continueText').textContent = 'Resume from Level ' + (stats.highest_level || 1);
-            document.getElementById('continueLink').setAttribute('href', 'game.html?level=' + (stats.highest_level || 1));
+            <!-- Stats Overview -->
+            <div class="stats-overview cute fade-in" style="animation-delay: 0.2s">
+                <h2><i class="fas fa-chart-line"></i> Your Progress</h2>
+                <div class="stats-grid">
+                    <div class="stat-card cute">
+                        <div class="stat-header">
+                            <i class="fas fa-star"></i>
+                            <h3>Total XP</h3>
+                        </div>
+                        <div class="stat-value" id="totalXP">0</div>
+                        <div class="stat-trend positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+<span id="weeklyXP">0</span> this week</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card cute">
+                        <div class="stat-header">
+                            <i class="fas fa-check-circle"></i>
+                            <h3>Lessons Completed</h3>
+                        </div>
+                        <div class="stat-value" id="lessonsCompleted">0</div>
+                        <div class="stat-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="lessonsProgress" style="width: 0%"></div>
+                            </div>
+                            <span id="lessonsPercent">0%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card cute">
+                        <div class="stat-header">
+                            <i class="fas fa-trophy"></i>
+                            <h3>Achievements</h3>
+                        </div>
+                        <div class="stat-value" id="achievementsCount">0</div>
+                        <div class="achievement-preview" id="achievementPreview">
+                            <!-- Achievements will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card cute">
+                        <div class="stat-header">
+                            <i class="fas fa-fire"></i>
+                            <h3>Current Streak</h3>
+                        </div>
+                        <div class="stat-value" id="currentStreak">0</div>
+                        <div class="stat-trend positive">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>Keep going! 🔥</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-            // Build learning path nodes
-            const descs = [
-                'Python Variables','Basic Functions','HTML Structure','CSS Styling','JavaScript Basics',
-                'Python Lists','Flask Routes','Database CRUD','API Development','Final Project'
-            ];
-            const container = document.getElementById('pathContainer');
-            for (let i = 1; i <= 10; i++) {
-                const node = document.createElement('div');
-                node.className = 'path-node cute';
-                node.setAttribute('data-level', i);
-                const icon = document.createElement('div'); icon.className = 'node-icon';
-                const iconI = document.createElement('i'); iconI.className = 'fas fa-lock'; icon.appendChild(iconI);
-                const content = document.createElement('div'); content.className = 'node-content';
-                const h4 = document.createElement('h4'); h4.textContent = 'Level ' + i;
-                const p = document.createElement('p'); p.className = 'node-desc'; p.textContent = descs[i-1] || '';
-                content.appendChild(h4); content.appendChild(p);
-                const action = document.createElement('a'); action.className = 'node-action btn cute small';
-                // Determine state
-                if (i <= (stats.levels_completed || 0)) {
-                    node.classList.add('completed'); iconI.className = 'fas fa-check-circle'; action.textContent = 'Review';
-                    action.href = 'game.html?level=' + i;
-                } else if (i === (stats.highest_level || 1)) {
-                    node.classList.add('current'); iconI.className = 'fas fa-play-circle'; action.textContent = 'Continue';
-                    action.href = 'game.html?level=' + i;
-                } else {
-                    node.classList.add('upcoming'); iconI.className = 'fas fa-lock'; action.textContent = 'Locked'; action.href = '#';
+            <!-- Recent Activity -->
+            <div class="recent-activity cute fade-in" style="animation-delay: 0.3s">
+                <h2><i class="fas fa-history"></i> Recent Activity</h2>
+                <div class="activity-timeline" id="activityTimeline">
+                    <!-- Activity items will be populated by JavaScript -->
+                    <div class="activity-item cute success animate-in" style="animation-delay: 0.1s">
+                        <div class="activity-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="activity-content">
+                            <h4>Welcome to Python Pathfinder!</h4>
+                            <p class="activity-meta">Just now • Start your journey</p>
+                        </div>
+                        <span class="activity-badge">Begin</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Learning Path -->
+            <div class="learning-path cute fade-in" style="animation-delay: 0.4s">
+                <h2><i class="fas fa-road"></i> Learning Path</h2>
+                <div class="path-container" id="pathContainer">
+                    <!-- Path nodes will be populated by JavaScript -->
+                    <div class="path-node cute current">
+                        <div class="node-icon">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                        <div class="node-content">
+                            <h4>Lesson 1</h4>
+                            <p class="node-desc">Python Variables & Basics</p>
+                        </div>
+                        <a href="lessons.html?lesson=1" class="node-action btn cute small">
+                            Start
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Multiplayer Stats -->
+            <div class="multiplayer-stats cute fade-in" style="animation-delay: 0.5s">
+                <h2><i class="fas fa-swords"></i> Multiplayer Stats</h2>
+                <div class="multiplayer-card">
+                    <div class="vs-header">
+                        <div class="player">
+                            <div class="player-avatar" id="playerAvatar"></div>
+                            <div class="player-name" id="playerName">You</div>
+                        </div>
+                        <div class="vs-label">VS</div>
+                        <div class="player">
+                            <div class="player-avatar" style="background: linear-gradient(135deg, #666, #999);"></div>
+                            <div class="player-name">Opponent</div>
+                        </div>
+                    </div>
+                    
+                    <div class="vs-stats">
+                        <div class="vs-stat">
+                            <div class="vs-stat-value" id="winRate">0%</div>
+                            <div class="vs-stat-label">Win Rate</div>
+                        </div>
+                        <div class="vs-stat">
+                            <div class="vs-stat-value" id="totalMatches">0</div>
+                            <div class="vs-stat-label">Matches</div>
+                        </div>
+                        <div class="vs-stat">
+                            <div class="vs-stat-value" id="rating">1200</div>
+                            <div class="vs-stat-label">Rating</div>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 1.5rem; position: relative; z-index: 2;">
+                        <a href="multiplayer.html" class="btn cute">
+                            <i class="fas fa-play"></i> Play Multiplayer
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Decorative Background Elements -->
+    <div class="dashboard-decoration" id="dashboardDecoration"></div>
+
+    <script>
+        // ==================== PROGRESS TRACKING SYSTEM ====================
+        class DashboardProgress {
+            constructor() {
+                this.STORAGE_KEYS = {
+                    USER_PROFILE: 'pp_user_profile',
+                    XP: 'pp_total_xp',
+                    STREAK: 'pp_streak',
+                    LESSONS: 'pp_completed_lessons',
+                    ACHIEVEMENTS: 'pp_achievements',
+                    ACTIVITY: 'pp_recent_activity',
+                    WEEKLY_XP: 'pp_weekly_xp',
+                    LAST_ACTIVE: 'pp_last_active',
+                    GAME_STATS: 'pp_game_stats',
+                    LEVEL: 'pp_user_level'
+                };
+                
+                this.userProfile = {
+                    username: 'Coder',
+                    level: 1,
+                    avatar: 'snake',
+                    joined: new Date().toISOString()
+                };
+                
+                this.levels = [
+                    { level: 1, name: 'Explorer', xpRequired: 0 },
+                    { level: 2, name: 'Novice', xpRequired: 1000 },
+                    { level: 3, name: 'Apprentice', xpRequired: 2500 },
+                    { level: 4, name: 'Adept', xpRequired: 5000 },
+                    { level: 5, name: 'Expert', xpRequired: 10000 },
+                    { level: 6, name: 'Master', xpRequired: 20000 },
+                    { level: 7, name: 'Grandmaster', xpRequired: 40000 }
+                ];
+                
+                this.achievementsList = [
+                    { id: 'first_lesson', name: 'First Steps', icon: '👣', emoji: 'fas fa-shoe-prints', unlocked: false, xp: 100 },
+                    { id: 'level_5', name: 'Python Prodigy', icon: '🐍', emoji: 'fas fa-python', unlocked: false, xp: 500 },
+                    { id: 'streak_7', name: 'Consistency King', icon: '🔥', emoji: 'fas fa-fire', unlocked: false, xp: 300 },
+                    { id: 'lessons_10', name: 'Dedicated Learner', icon: '📚', emoji: 'fas fa-graduation-cap', unlocked: false, xp: 750 },
+                    { id: 'xp_10000', name: 'Master Coder', icon: '👑', emoji: 'fas fa-crown', unlocked: false, xp: 1000 },
+                    { id: 'game_5000', name: 'Tetris Master', icon: '🎮', emoji: 'fas fa-gamepad', unlocked: false, xp: 600 },
+                    { id: 'multiplayer_10', name: 'Battle Hardened', icon: '⚔️', emoji: 'fas fa-fist-raised', unlocked: false, xp: 400 }
+                ];
+                
+                this.loadProgress();
+                this.updateStreak();
+            }
+
+            loadProgress() {
+                // Load user profile
+                const savedProfile = localStorage.getItem(this.STORAGE_KEYS.USER_PROFILE);
+                if (savedProfile) {
+                    this.userProfile = { ...this.userProfile, ...JSON.parse(savedProfile) };
                 }
-                node.appendChild(icon); node.appendChild(content); node.appendChild(action);
-                container.appendChild(node);
+                
+                // Load progress data
+                this.totalXP = parseInt(localStorage.getItem(this.STORAGE_KEYS.XP) || '0');
+                this.streak = JSON.parse(localStorage.getItem(this.STORAGE_KEYS.STREAK) || '{"days": 0, "lastDate": ""}');
+                this.completedLessons = JSON.parse(localStorage.getItem(this.STORAGE_KEYS.LESSONS) || '[]');
+                this.achievements = JSON.parse(localStorage.getItem(this.STORAGE_KEYS.ACHIEVEMENTS) || '[]');
+                this.recentActivity = JSON.parse(localStorage.getItem(this.STORAGE_KEYS.ACTIVITY) || '[]');
+                this.weeklyXP = parseInt(localStorage.getItem(this.STORAGE_KEYS.WEEKLY_XP) || '0');
+                this.gameStats = JSON.parse(localStorage.getItem(this.STORAGE_KEYS.GAME_STATS) || '{"tetris": {"score": 0, "lines": 0, "level": 1}}');
+                this.userLevel = parseInt(localStorage.getItem(this.STORAGE_KEYS.LEVEL) || '1');
+                
+                // Initialize achievements if empty
+                if (this.achievements.length === 0) {
+                    this.achievements = this.achievementsList.map(achievement => ({...achievement}));
+                }
+                
+                // Initialize recent activity if empty
+                if (this.recentActivity.length === 0) {
+                    this.recentActivity = [
+                        {
+                            id: Date.now(),
+                            type: 'welcome',
+                            title: 'Welcome to Python Pathfinder! 🎉',
+                            details: { message: 'Start your coding journey' },
+                            timestamp: new Date().toISOString(),
+                            xp: 0,
+                            category: 'system'
+                        }
+                    ];
+                }
+                
+                this.saveProgress();
             }
 
-            // Populate leaderboard top 5
-            const lb = document.getElementById('leaderboardList');
-            for (let i = 1; i <= 5; i++) {
-                const item = document.createElement('div'); item.className = 'leaderboard-item cute';
-                const rank = document.createElement('span'); rank.className = 'rank ' + (i <= 3 ? 'top-3' : ''); rank.textContent = '#' + i;
-                const pname = document.createElement('span'); pname.className = 'player-name';
-                const avatar = document.createElement('span'); avatar.className = 'player-avatar small cute'; pname.appendChild(avatar); pname.appendChild(document.createTextNode(' Player ' + i));
-                const score = document.createElement('span'); score.className = 'player-score'; score.textContent = (1500 - (i * 50)) + ' pts';
-                item.appendChild(rank); item.appendChild(pname); item.appendChild(score);
-                lb.appendChild(item);
+            saveProgress() {
+                localStorage.setItem(this.STORAGE_KEYS.USER_PROFILE, JSON.stringify(this.userProfile));
+                localStorage.setItem(this.STORAGE_KEYS.XP, this.totalXP.toString());
+                localStorage.setItem(this.STORAGE_KEYS.STREAK, JSON.stringify(this.streak));
+                localStorage.setItem(this.STORAGE_KEYS.LESSONS, JSON.stringify(this.completedLessons));
+                localStorage.setItem(this.STORAGE_KEYS.ACHIEVEMENTS, JSON.stringify(this.achievements));
+                localStorage.setItem(this.STORAGE_KEYS.ACTIVITY, JSON.stringify(this.recentActivity));
+                localStorage.setItem(this.STORAGE_KEYS.WEEKLY_XP, this.weeklyXP.toString());
+                localStorage.setItem(this.STORAGE_KEYS.GAME_STATS, JSON.stringify(this.gameStats));
+                localStorage.setItem(this.STORAGE_KEYS.LEVEL, this.userLevel.toString());
+                localStorage.setItem(this.STORAGE_KEYS.LAST_ACTIVE, new Date().toISOString());
             }
 
-            // Setup UI interactions (animations, hover, click)
-            document.querySelectorAll('.action-card').forEach(card => {
-                card.addEventListener('mouseenter', function() { this.style.transform = 'translateY(-10px)'; this.style.boxShadow = '0 15px 30px rgba(0,0,0,0.2)'; });
-                card.addEventListener('mouseleave', function() { this.style.transform = 'translateY(0)'; this.style.boxShadow = ''; });
-                card.addEventListener('click', function(e) { if (this.getAttribute('href') === '#') { e.preventDefault(); alert('This feature is coming soon!'); } });
+            updateStreak() {
+                const today = new Date().toDateString();
+                const yesterday = new Date(Date.now() - 86400000).toDateString();
+                
+                if (this.streak.lastDate === today) return;
+                
+                if (this.streak.lastDate === yesterday) {
+                    this.streak.days++;
+                    this.addActivity('streak_continued', `🔥 Streak extended to ${this.streak.days} days!`);
+                } else if (!this.streak.lastDate) {
+                    this.streak.days = 1;
+                    this.addActivity('streak_started', '🎯 Daily streak started!');
+                } else {
+                    this.streak.days = 1;
+                    this.addActivity('streak_reset', '🔄 Streak reset - new day, new start!');
+                }
+                
+                this.streak.lastDate = today;
+                this.saveProgress();
+            }
+
+            addActivity(type, title, details = {}) {
+                const categories = {
+                    'lesson_completed': 'learning',
+                    'xp_earned': 'success',
+                    'level_up': 'achievement',
+                    'achievement_unlocked': 'achievement',
+                    'streak_continued': 'multiplayer',
+                    'streak_started': 'multiplayer',
+                    'streak_reset': 'multiplayer',
+                    'welcome': 'system',
+                    'game_completed': 'multiplayer'
+                };
+                
+                const activity = {
+                    id: Date.now(),
+                    type,
+                    title,
+                    details,
+                    timestamp: new Date().toISOString(),
+                    xp: details.xp || 0,
+                    category: categories[type] || 'system'
+                };
+                
+                this.recentActivity.unshift(activity);
+                
+                // Keep only last 10 activities
+                if (this.recentActivity.length > 10) {
+                    this.recentActivity = this.recentActivity.slice(0, 10);
+                }
+                
+                this.saveProgress();
+                return activity;
+            }
+
+            awardXP(amount, source) {
+                const oldXP = this.totalXP;
+                const oldLevel = this.getCurrentLevel();
+                
+                this.totalXP += amount;
+                this.weeklyXP += amount;
+                
+                // Add activity
+                this.addActivity('xp_earned', `🎉 +${amount} XP Earned`, {
+                    source,
+                    xp: amount,
+                    total: this.totalXP
+                });
+                
+                // Check for level up
+                const newLevel = this.getCurrentLevel();
+                if (newLevel.level > oldLevel.level) {
+                    this.addActivity('level_up', `🚀 Level Up! ${oldLevel.name} → ${newLevel.name}`, {
+                        oldLevel: oldLevel.level,
+                        newLevel: newLevel.level
+                    });
+                    
+                    // Check for achievements
+                    this.checkAchievements();
+                }
+                
+                this.saveProgress();
+                return { oldXP, newXP: this.totalXP, levelUp: newLevel.level > oldLevel.level };
+            }
+
+            completeLesson(lessonId) {
+                if (!this.completedLessons.includes(lessonId)) {
+                    this.completedLessons.push(lessonId);
+                    
+                    // Award XP for completing a lesson
+                    const xpReward = 250 * (parseInt(lessonId) || 1);
+                    this.awardXP(xpReward, `Completed lesson: ${lessonId}`);
+                    
+                    // Add activity
+                    this.addActivity('lesson_completed', '✅ Lesson Completed', {
+                        lessonId,
+                        xp: xpReward
+                    });
+                    
+                    this.saveProgress();
+                    return true;
+                }
+                return false;
+            }
+
+            updateGameStats(score, lines, level) {
+                if (score > this.gameStats.tetris.score) {
+                    this.gameStats.tetris.score = score;
+                }
+                this.gameStats.tetris.lines += lines;
+                this.gameStats.tetris.level = Math.max(this.gameStats.tetris.level, level);
+                
+                // Award XP for game performance
+                const xpReward = Math.floor(score / 100);
+                if (xpReward > 0) {
+                    this.awardXP(xpReward, 'Tetris Game');
+                    this.addActivity('game_completed', `🎮 Tetris Score: ${score.toLocaleString()}`, {
+                        score,
+                        lines,
+                        level,
+                        xp: xpReward
+                    });
+                }
+                
+                this.saveProgress();
+            }
+
+            getCurrentLevel() {
+                for (let i = this.levels.length - 1; i >= 0; i--) {
+                    if (this.totalXP >= this.levels[i].xpRequired) {
+                        return this.levels[i];
+                    }
+                }
+                return this.levels[0];
+            }
+
+            getNextLevel() {
+                const currentLevel = this.getCurrentLevel();
+                const nextLevel = this.levels.find(level => level.level === currentLevel.level + 1);
+                return nextLevel || null;
+            }
+
+            getLevelProgress() {
+                const currentLevel = this.getCurrentLevel();
+                const nextLevel = this.getNextLevel();
+                
+                if (!nextLevel) {
+                    return { percent: 100, xpToNext: 0 };
+                }
+                
+                const xpInLevel = nextLevel.xpRequired - currentLevel.xpRequired;
+                const xpProgress = this.totalXP - currentLevel.xpRequired;
+                const percent = Math.min(100, (xpProgress / xpInLevel) * 100);
+                
+                return {
+                    percent,
+                    xpToNext: nextLevel.xpRequired - this.totalXP,
+                    currentLevel,
+                    nextLevel
+                };
+            }
+
+            checkAchievements() {
+                const unlockedAchievements = [];
+                
+                this.achievements.forEach(achievement => {
+                    if (achievement.unlocked) return;
+                    
+                    let shouldUnlock = false;
+                    
+                    switch (achievement.id) {
+                        case 'first_lesson':
+                            shouldUnlock = this.completedLessons.length >= 1;
+                            break;
+                        case 'level_5':
+                            shouldUnlock = this.getCurrentLevel().level >= 5;
+                            break;
+                        case 'streak_7':
+                            shouldUnlock = this.streak.days >= 7;
+                            break;
+                        case 'lessons_10':
+                            shouldUnlock = this.completedLessons.length >= 10;
+                            break;
+                        case 'xp_10000':
+                            shouldUnlock = this.totalXP >= 10000;
+                            break;
+                        case 'game_5000':
+                            shouldUnlock = this.gameStats.tetris.score >= 5000;
+                            break;
+                        case 'multiplayer_10':
+                            shouldUnlock = false; // Will be implemented with multiplayer
+                            break;
+                    }
+                    
+                    if (shouldUnlock) {
+                        achievement.unlocked = true;
+                        unlockedAchievements.push(achievement);
+                        
+                        // Award XP for achievement
+                        this.awardXP(achievement.xp, `Achievement: ${achievement.name}`);
+                        
+                        // Add activity
+                        this.addActivity('achievement_unlocked', `🏆 Achievement: ${achievement.name}`, {
+                            achievement: achievement.id,
+                            xp: achievement.xp
+                        });
+                    }
+                });
+                
+                if (unlockedAchievements.length > 0) {
+                    this.saveProgress();
+                    return unlockedAchievements;
+                }
+                
+                return [];
+            }
+
+            getUnlockedAchievements() {
+                return this.achievements.filter(a => a.unlocked);
+            }
+
+            updateUsername(newName) {
+                this.userProfile.username = newName.trim();
+                this.saveProgress();
+            }
+        }
+
+        // ==================== DASHBOARD INITIALIZATION ====================
+        const dashboard = new DashboardProgress();
+        let currentTheme = localStorage.getItem('pp_theme') || 'cute';
+
+        function applyTheme(theme) {
+            currentTheme = theme;
+            document.body.className = theme + '-theme';
+            
+            // Update all theme-specific elements
+            document.querySelectorAll('.cute, .deadly').forEach(el => {
+                el.classList.remove('cute', 'deadly');
+                el.classList.add(theme);
             });
+            
+            // Update toggle button text
+            const toggleBtn = document.getElementById('themeToggle');
+            if (toggleBtn) {
+                toggleBtn.innerHTML = theme === 'cute' 
+                    ? '<i class="fas fa-moon"></i> Deadly Mode'
+                    : '<i class="fas fa-sun"></i> Cute Mode';
+            }
+            
+            localStorage.setItem('pp_theme', theme);
+            
+            // Update decorative elements
+            updateDecorativeElements();
+        }
 
-            // Activity items animate in
-            document.querySelectorAll('.activity-item').forEach((item, idx) => { item.style.animationDelay = `${idx * 0.1}s`; item.classList.add('animate-in'); });
+        function updateDashboardUI() {
+            // Update user profile
+            document.getElementById('username').textContent = dashboard.userProfile.username;
+            
+            // Update level and XP
+            const currentLevel = dashboard.getCurrentLevel();
+            const levelProgress = dashboard.getLevelProgress();
+            const nextLevel = dashboard.getNextLevel();
+            
+            document.getElementById('levelBadge').textContent = `Level ${currentLevel.level} ${currentLevel.name}`;
+            document.getElementById('xpFill').style.width = `${levelProgress.percent}%`;
+            document.getElementById('currentXP').textContent = dashboard.totalXP.toLocaleString();
+            
+            if (nextLevel) {
+                document.getElementById('nextLevelXP').textContent = `/ ${nextLevel.xpRequired} XP to Level ${nextLevel.level}`;
+            } else {
+                document.getElementById('nextLevelXP').textContent = 'Max Level Reached! 🎉';
+            }
+            
+            // Update stats
+            document.getElementById('totalXP').textContent = dashboard.totalXP.toLocaleString();
+            document.getElementById('weeklyXP').textContent = dashboard.weeklyXP;
+            document.getElementById('lessonsCompleted').textContent = dashboard.completedLessons.length;
+            document.getElementById('achievementsCount').textContent = dashboard.getUnlockedAchievements().length;
+            document.getElementById('currentStreak').textContent = dashboard.streak.days;
+            
+            // Update progress bars
+            const lessonPercent = Math.min(100, (dashboard.completedLessons.length / 20) * 100);
+            document.getElementById('lessonsProgress').style.width = `${lessonPercent}%`;
+            document.getElementById('lessonsPercent').textContent = `${Math.round(lessonPercent)}%`;
+            
+            // Update continue link
+            const nextLesson = dashboard.completedLessons.length > 0 ? Math.max(...dashboard.completedLessons) + 1 : 1;
+            document.getElementById('continueText').textContent = `Continue Lesson ${nextLesson}`;
+            document.getElementById('continueLink').href = `lessons.html?lesson=${nextLesson}`;
+            
+            // Update achievements preview
+            updateAchievementsPreview();
+            
+            // Update activity timeline
+            updateActivityTimeline();
+            
+            // Update learning path
+            updateLearningPath();
+            
+            // Update multiplayer stats
+            updateMultiplayerStats();
+            
+            // Trigger animations
+            setTimeout(() => {
+                document.querySelectorAll('.fade-in').forEach((el, index) => {
+                    el.style.animationDelay = `${index * 0.1}s`;
+                });
+            }, 100);
+        }
 
-            // Cute decoration hearts
-            const decor = document.getElementById('dashboardDecoration');
-            for (let i = 0; i < 6; i++) {
-                const heart = document.createElement('div'); heart.className = 'floating-heart';
-                heart.style.cssText = `position:absolute;width:${12+Math.random()*12}px;height:${12+Math.random()*12}px;background:var(--cute-primary);transform:rotate(45deg);animation:float ${3+Math.random()*3}s ease-in-out infinite;opacity:${0.15+Math.random()*0.4};left:${Math.random()*100}%;top:${Math.random()*100}%`; decor.appendChild(heart);
+        function updateAchievementsPreview() {
+            const container = document.getElementById('achievementPreview');
+            const unlocked = dashboard.getUnlockedAchievements().slice(0, 4);
+            
+            container.innerHTML = '';
+            
+            if (unlocked.length === 0) {
+                const placeholder = document.createElement('div');
+                placeholder.className = 'achievement-more';
+                placeholder.textContent = 'No achievements yet';
+                container.appendChild(placeholder);
+            } else {
+                unlocked.forEach(achievement => {
+                    const icon = document.createElement('div');
+                    icon.className = `achievement-icon ${currentTheme}`;
+                    icon.innerHTML = `<i class="${achievement.emoji}"></i>`;
+                    icon.title = achievement.name;
+                    
+                    icon.addEventListener('click', () => {
+                        showAchievementPopup(achievement);
+                    });
+                    
+                    container.appendChild(icon);
+                });
+                
+                if (dashboard.achievements.length > unlocked.length) {
+                    const more = document.createElement('span');
+                    more.className = 'achievement-more';
+                    more.textContent = `+${dashboard.achievements.length - unlocked.length} more`;
+                    more.addEventListener('click', showAllAchievements);
+                    container.appendChild(more);
+                }
+            }
+        }
+
+        function updateActivityTimeline() {
+            const container = document.getElementById('activityTimeline');
+            container.innerHTML = '';
+            
+            if (dashboard.recentActivity.length === 0) {
+                container.innerHTML = '<p style="text-align: center; padding: 2rem; opacity: 0.7;">No recent activity</p>';
+                return;
+            }
+            
+            dashboard.recentActivity.forEach((activity, index) => {
+                const activityEl = document.createElement('div');
+                activityEl.className = `activity-item ${currentTheme} ${activity.category}`;
+                activityEl.style.animationDelay = `${index * 0.1}s`;
+                
+                // Determine icon based on category
+                let icon = 'fas fa-circle';
+                switch (activity.category) {
+                    case 'learning': icon = 'fas fa-book'; break;
+                    case 'success': icon = 'fas fa-star'; break;
+                    case 'achievement': icon = 'fas fa-trophy'; break;
+                    case 'multiplayer': icon = 'fas fa-gamepad'; break;
+                    case 'system': icon = 'fas fa-info-circle'; break;
+                }
+                
+                // Format timestamp
+                const timeAgo = getTimeAgo(new Date(activity.timestamp));
+                
+                activityEl.innerHTML = `
+                    <div class="activity-icon">
+                        <i class="${icon}"></i>
+                    </div>
+                    <div class="activity-content">
+                        <h4>${activity.title}</h4>
+                        <div class="activity-meta">
+                            <span>${timeAgo}</span>
+                            ${activity.xp > 0 ? `<span>+${activity.xp} XP</span>` : ''}
+                        </div>
+                    </div>
+                    ${activity.xp > 0 ? '<span class="activity-badge">+' + activity.xp + ' XP</span>' : ''}
+                `;
+                
+                container.appendChild(activityEl);
+            });
+            
+            // Add animation class
+            setTimeout(() => {
+                container.querySelectorAll('.activity-item').forEach(item => {
+                    item.classList.add('animate-in');
+                });
+            }, 100);
+        }
+
+        function updateLearningPath() {
+            const container = document.getElementById('pathContainer');
+            container.innerHTML = '';
+            
+            const lessons = [
+                { id: 1, title: 'Python Basics', desc: 'Variables, Data Types, and Operations' },
+                { id: 2, title: 'Control Flow', desc: 'Conditionals, Loops, and Logic' },
+                { id: 3, title: 'Functions', desc: 'Creating and Using Functions' },
+                { id: 4, title: 'Data Structures', desc: 'Lists, Tuples, and Dictionaries' },
+                { id: 5, title: 'Object-Oriented Python', desc: 'Classes and Objects' },
+                { id: 6, title: 'Error Handling', desc: 'Try/Except and Debugging' },
+                { id: 7, title: 'File Operations', desc: 'Reading and Writing Files' },
+                { id: 8, title: 'Web Development', desc: 'HTML, CSS, and Flask Basics' },
+                { id: 9, title: 'Databases', desc: 'SQL and Data Storage' },
+                { id: 10, title: 'Final Project', desc: 'Build a Complete Application' }
+            ];
+            
+            lessons.forEach((lesson, index) => {
+                const isCompleted = dashboard.completedLessons.includes(lesson.id.toString());
+                const isCurrent = !isCompleted && 
+                    (index === 0 || dashboard.completedLessons.includes(lessons[index-1].id.toString()));
+                
+                const node = document.createElement('div');
+                node.className = `path-node ${currentTheme}`;
+                
+                if (isCompleted) node.classList.add('completed');
+                if (isCurrent) node.classList.add('current');
+                
+                const iconClass = isCompleted ? 'fas fa-check-circle' : 
+                                 isCurrent ? 'fas fa-play-circle' : 
+                                 'fas fa-lock';
+                
+                const buttonText = isCompleted ? 'Review' : 
+                                  isCurrent ? 'Continue' : 
+                                  'Locked';
+                
+                const buttonHref = isCompleted || isCurrent ? `lessons.html?lesson=${lesson.id}` : '#';
+                
+                node.innerHTML = `
+                    <div class="node-icon">
+                        <i class="${iconClass}"></i>
+                    </div>
+                    <div class="node-content">
+                        <h4>Lesson ${lesson.id}</h4>
+                        <p class="node-desc">${lesson.desc}</p>
+                    </div>
+                    <a href="${buttonHref}" class="node-action btn ${currentTheme} small">
+                        ${buttonText}
+                    </a>
+                `;
+                
+                container.appendChild(node);
+            });
+        }
+
+        function updateMultiplayerStats() {
+            // Simulate multiplayer stats (in a real app, this would come from backend)
+            const winRate = Math.min(100, Math.max(10, Math.floor((dashboard.totalXP / 10000) * 100)));
+            const totalMatches = Math.floor(dashboard.totalXP / 100);
+            const rating = 1200 + Math.floor(dashboard.totalXP / 10);
+            
+            document.getElementById('winRate').textContent = `${winRate}%`;
+            document.getElementById('totalMatches').textContent = totalMatches;
+            document.getElementById('rating').textContent = rating;
+            
+            // Update player avatar based on level
+            const playerAvatar = document.getElementById('playerAvatar');
+            const avatarColors = currentTheme === 'cute' 
+                ? ['#ff6b9d', '#ffc8dd', '#a2d2ff', '#ffd166']
+                : ['#ff4655', '#00ff9d', '#1fc0ff', '#ffd166'];
+            const colorIndex = Math.min(avatarColors.length - 1, Math.floor(dashboard.getCurrentLevel().level / 2));
+            
+            playerAvatar.style.background = `linear-gradient(135deg, ${avatarColors[colorIndex]}, ${avatarColors[(colorIndex + 1) % avatarColors.length]})`;
+            
+            // Update player name
+            document.getElementById('playerName').textContent = dashboard.userProfile.username;
+        }
+
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+            
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+            return date.toLocaleDateString();
+        }
+
+        function updateDecorativeElements() {
+            const container = document.getElementById('dashboardDecoration');
+            container.innerHTML = '';
+            
+            // Add floating elements
+            for (let i = 0; i < 20; i++) {
+                const element = document.createElement('div');
+                element.className = `floating-element ${currentTheme === 'cute' ? 'cute-element' : 'deadly-element'}`;
+                
+                const size = 30 + Math.random() * 70;
+                const duration = 20 + Math.random() * 40;
+                const delay = Math.random() * 20;
+                
+                element.style.cssText = `
+                    width: ${size}px;
+                    height: ${size}px;
+                    left: ${Math.random() * 100}%;
+                    top: ${Math.random() * 100}%;
+                    animation-duration: ${duration}s;
+                    animation-delay: -${delay}s;
+                    opacity: ${0.05 + Math.random() * 0.1};
+                `;
+                
+                container.appendChild(element);
+            }
+        }
+
+        function showAchievementPopup(achievement) {
+            const popup = document.createElement('div');
+            popup.className = `notification ${currentTheme}`;
+            popup.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                    <div style="width: 60px; height: 60px; border-radius: 12px; background: linear-gradient(135deg, var(--${currentTheme}-primary), var(--${currentTheme}-accent)); display: flex; align-items: center; justify-content: center; font-size: 2rem;">
+                        <i class="${achievement.emoji}"></i>
+                    </div>
+                    <div>
+                        <h3 style="margin: 0 0 0.25rem 0;">🏆 Achievement!</h3>
+                        <p style="margin: 0; opacity: 0.8;">${achievement.name}</p>
+                    </div>
+                </div>
+                <p style="margin: 0; font-size: 0.9rem;">+${achievement.xp} XP earned</p>
+            `;
+            
+            document.body.appendChild(popup);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (popup.parentElement) {
+                    popup.remove();
+                }
+            }, 5000);
+        }
+
+        function showAllAchievements() {
+            const unlocked = dashboard.getUnlockedAchievements();
+            const total = dashboard.achievements.length;
+            
+            alert(`You've unlocked ${unlocked.length} out of ${total} achievements!\n\n${unlocked.map(a => `✓ ${a.name}`).join('\n')}`);
+        }
+
+        // ==================== INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Apply theme
+            applyTheme(currentTheme);
+            
+            // Setup theme toggle
+            document.getElementById('themeToggle').addEventListener('click', () => {
+                applyTheme(currentTheme === 'cute' ? 'deadly' : 'cute');
+                updateDashboardUI();
+            });
+            
+            // Setup profile settings click
+            document.getElementById('profileSettings').addEventListener('click', (e) => {
+                e.preventDefault();
+                const newName = prompt('Enter your display name:', dashboard.userProfile.username);
+                if (newName && newName.trim()) {
+                    dashboard.updateUsername(newName.trim());
+                    updateDashboardUI();
+                    showNotification('Profile updated successfully!', 'success');
+                }
+            });
+            
+            // Setup action card animations
+            document.querySelectorAll('.action-card').forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-8px)';
+                    this.style.boxShadow = '0 20px 40px rgba(0,0,0,0.15)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = '';
+                });
+            });
+            
+            // Update UI with current progress
+            updateDashboardUI();
+            
+            // Add floating elements
+            updateDecorativeElements();
+            
+            // Check for new achievements
+            const newAchievements = dashboard.checkAchievements();
+            newAchievements.forEach(achievement => {
+                setTimeout(() => showAchievementPopup(achievement), 2000);
+            });
+            
+            // Add sample activity for new users
+            if (dashboard.completedLessons.length === 0 && dashboard.totalXP === 0) {
+                setTimeout(() => {
+                    dashboard.awardXP(100, 'Welcome bonus');
+                    showNotification('🎉 Welcome bonus! +100 XP', 'success');
+                }, 1000);
             }
         });
 
-        // Simple theme toggle compatible with other pages
-        (function() {
-            const THEME_KEY = 'pp_theme';
-            const btn = document.getElementById('themeToggle');
-            function applyTheme(theme) {
-                document.body.classList.remove('cute-theme','deadly-theme');
-                document.body.classList.add(theme + '-theme');
-                document.querySelectorAll('.cute, .deadly').forEach(el => {
-                    if (theme === 'cute') { el.classList.remove('deadly'); el.classList.add('cute'); }
-                    else { el.classList.remove('cute'); el.classList.add('deadly'); }
-                });
-                if (btn) btn.innerText = theme === 'cute' ? 'Switch to Deadly Mode' : 'Switch to Cute Mode';
-            }
-            let theme = localStorage.getItem(THEME_KEY) || 'cute';
-            applyTheme(theme);
-            if (btn) btn.addEventListener('click', () => { theme = theme === 'cute' ? 'deadly' : 'cute'; localStorage.setItem(THEME_KEY, theme); applyTheme(theme); });
-        })();
-        </script>
-
-        <style>
-        /* (Preserve the original styles from the template) */
-        /* The large style block from the original file is kept below unchanged */
-@keyframes float {
-    0%, 100% { transform: rotate(45deg) translateY(0); }
-    50% { transform: rotate(45deg) translateY(-20px); }
-}
-
-@keyframes scan {
-    0% { top: 0; }
-    100% { top: 100%; }
-}
-
-@keyframes slideIn {
-    from { opacity: 0; transform: translateX(-20px); }
-    to { opacity: 1; transform: translateX(0); }
-}
-
-.activity-item.animate-in {
-    animation: slideIn 0.5s ease-out forwards;
-    opacity: 0;
-}
-
-.floating-heart:before,
-.floating-heart:after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: inherit;
-    border-radius: 50%;
-}
-
-.floating-heart:before {
-    top: -50%;
-    left: 0;
-}
-
-.floating-heart:after {
-    top: 0;
-    left: -50%;
-}
-
-.dashboard {
-    padding: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.welcome-banner {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 2rem;
-    border-radius: 20px;
-    margin-bottom: 2rem;
-}
-
-.dashboard.cute .welcome-banner {
-    background: linear-gradient(135deg, var(--cute-primary), var(--cute-secondary));
-    color: white;
-}
-
-.dashboard.deadly .welcome-banner {
-    background: linear-gradient(135deg, var(--deadly-primary), var(--deadly-secondary));
-    color: var(--deadly-text);
-}
-
-.welcome-content h1 {
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.user-level {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-top: 1rem;
-}
-
-.level-badge {
-    padding: 0.5rem 1rem;
-    border-radius: 50px;
-    font-weight: bold;
-}
-
-.dashboard.cute .level-badge {
-    background: white;
-    color: var(--cute-primary);
-}
-
-.dashboard.deadly .level-badge {
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--deadly-accent);
-    border: 1px solid var(--deadly-accent);
-}
-
-.xp-progress {
-    flex: 1;
-    max-width: 300px;
-}
-
-.xp-bar {
-    height: 8px;
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 4px;
-    overflow: hidden;
-}
-
-.xp-fill {
-    height: 100%;
-    border-radius: 4px;
-    transition: width 0.5s ease;
-}
-
-.dashboard.cute .xp-fill {
-    background: white;
-}
-
-.dashboard.deadly .xp-fill {
-    background: var(--deadly-accent);
-}
-
-.xp-text {
-    display: block;
-    font-size: 0.9rem;
-    margin-top: 0.25rem;
-    opacity: 0.9;
-}
-
-.user-avatar {
-    position: relative;
-    width: 100px;
-    height: 100px;
-}
-
-.avatar-character {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-}
-
-.dashboard.cute .avatar-character {
-    background: linear-gradient(135deg, white, var(--cute-secondary));
-    border: 3px solid white;
-}
-
-.dashboard.deadly .avatar-character {
-    background: linear-gradient(135deg, var(--deadly-accent), #000);
-    border: 2px solid var(--deadly-primary);
-}
-
-.avatar-status {
-    position: absolute;
-    bottom: 5px;
-    right: 5px;
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-    border: 2px solid white;
-}
-
-.avatar-status.online {
-    background: #4CAF50;
-}
-
-.quick-actions {
-    margin-bottom: 2rem;
-}
-
-.quick-actions h2 {
-    margin-bottom: 1rem;
-}
-
-.dashboard.cute .quick-actions h2 {
-    color: var(--cute-text);
-}
-
-.dashboard.deadly .quick-actions h2 {
-    color: var(--deadly-accent);
-}
-
-.actions-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
-}
-
-.action-card {
-    padding: 1.5rem;
-    border-radius: 15px;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    display: block;
-}
-
-.dashboard.cute .action-card {
-    background: white;
-    border: 2px solid var(--cute-primary);
-    color: var(--cute-text);
-}
-
-.dashboard.deadly .action-card {
-    background: var(--deadly-secondary);
-    border: 1px solid var(--deadly-primary);
-    color: var(--deadly-text);
-}
-
-.action-card:hover {
-    transform: translateY(-5px);
-}
-
-.action-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-}
-
-.dashboard.cute .action-icon {
-    background: var(--cute-bg);
-    color: var(--cute-primary);
-}
-
-.dashboard.deadly .action-icon {
-    background: rgba(255, 70, 85, 0.1);
-    color: var(--deadly-primary);
-}
-
-.action-card h3 {
-    margin-bottom: 0.5rem;
-}
-
-.action-card p {
-    opacity: 0.8;
-    font-size: 0.9rem;
-}
-
-.stats-overview {
-    margin-bottom: 2rem;
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
-}
-
-.stat-card {
-    padding: 1.5rem;
-    border-radius: 15px;
-}
-
-.dashboard.cute .stat-card {
-    background: white;
-    border: 2px solid var(--cute-secondary);
-}
-
-.dashboard.deadly .stat-card {
-    background: var(--deadly-secondary);
-    border: 1px solid #444;
-}
-
-.stat-header {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-.dashboard.cute .stat-header {
-    color: var(--cute-text);
-}
-
-.dashboard.deadly .stat-header {
-    color: var(--deadly-text);
-}
-
-.stat-value {
-    font-size: 2.5rem;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-}
-
-.dashboard.cute .stat-value {
-    color: var(--cute-primary);
-}
-
-.dashboard.deadly .stat-value {
-    color: var(--deadly-accent);
-}
-
-.stat-trend, .rank-change {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    font-size: 0.9rem;
-}
-
-.stat-trend.positive, .rank-change.positive {
-    color: #4CAF50;
-}
-
-.stat-progress {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.progress-bar {
-    flex: 1;
-    height: 6px;
-    background: #eee;
-    border-radius: 3px;
-    overflow: hidden;
-}
-
-.dashboard.deadly .progress-bar {
-    background: #333;
-}
-
-.progress-fill {
-    height: 100%;
-    border-radius: 3px;
-    transition: width 0.5s ease;
-}
-
-.dashboard.cute .progress-fill {
-    background: var(--cute-primary);
-}
-
-.dashboard.deadly .progress-fill {
-    background: var(--deadly-accent);
-}
-
-.achievement-preview {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.achievement-icon {
-    font-size: 1.5rem;
-}
-
-.achievement-more {
-    font-size: 0.9rem;
-    opacity: 0.7;
-}
-
-.recent-activity {
-    margin-bottom: 2rem;
-}
-
-.activity-timeline {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.activity-item {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    border-radius: 10px;
-}
-
-.dashboard.cute .activity-item {
-    background: white;
-    border-left: 4px solid var(--cute-primary);
-}
-
-.dashboard.deadly .activity-item {
-    background: var(--deadly-secondary);
-    border-left: 4px solid var(--deadly-primary);
-}
-
-.activity-item.success {
-    border-left-color: #4CAF50;
-}
-
-.activity-item.multiplayer {
-    border-left-color: #FF9800;
-}
-
-.activity-item.achievement {
-    border-left-color: #9C27B0;
-}
-
-.activity-item.learning {
-    border-left-color: #2196F3;
-}
-
-.activity-icon {
-    font-size: 1.5rem;
-}
-
-.activity-item.success .activity-icon {
-    color: #4CAF50;
-}
-
-.activity-item.multiplayer .activity-icon {
-    color: #FF9800;
-}
-
-.activity-item.achievement .activity-icon {
-    color: #9C27B0;
-}
-
-.activity-item.learning .activity-icon {
-    color: #2196F3;
-}
-
-.activity-content {
-    flex: 1;
-}
-
-.activity-content h4 {
-    margin-bottom: 0.25rem;
-}
-
-.activity-meta {
-    font-size: 0.9rem;
-    opacity: 0.7;
-}
-
-.activity-badge {
-    padding: 0.25rem 0.75rem;
-    border-radius: 50px;
-    font-size: 0.9rem;
-    font-weight: bold;
-}
-
-.activity-item.success .activity-badge {
-    background: #4CAF50;
-    color: white;
-}
-
-.activity-item.multiplayer .activity-badge {
-    background: #FF9800;
-    color: white;
-}
-
-.activity-item.achievement .activity-badge {
-    background: #9C27B0;
-    color: white;
-}
-
-.activity-item.learning .activity-badge {
-    background: #2196F3;
-    color: white;
-}
-
-.learning-path {
-    margin-bottom: 2rem;
-}
-
-.path-container {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.path-node {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    border-radius: 10px;
-    transition: all 0.3s ease;
-}
-
-.dashboard.cute .path-node {
-    background: white;
-    border: 2px solid var(--cute-secondary);
-}
-
-.dashboard.deadly .path-node {
-    background: var(--deadly-secondary);
-    border: 1px solid #444;
-}
-
-.path-node.completed .node-icon {
-    color: #4CAF50;
-}
-
-.path-node.current .node-icon {
-    color: #FF9800;
-}
-
-.path-node.upcoming .node-icon {
-    color: #9E9E9E;
-}
-
-.node-content {
-    flex: 1;
-}
-
-.node-content h4 {
-    margin-bottom: 0.25rem;
-}
-
-.node-content p {
-    font-size: 0.9rem;
-    opacity: 0.7;
-}
-
-.node-action.btn.small {
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
-}
-
-.multiplayer-stats {
-    margin-bottom: 2rem;
-}
-
-.multiplayer-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-}
-
-.vs-card {
-    padding: 1.5rem;
-    border-radius: 15px;
-}
-
-.dashboard.cute .vs-card {
-    background: white;
-    border: 2px solid var(--cute-primary);
-}
-
-.dashboard.deadly .vs-card {
-    background: var(--deadly-secondary);
-    border: 1px solid var(--deadly-primary);
-}
-
-.vs-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1.5rem;
-}
-
-.player {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.player-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-}
-
-.dashboard.cute .player-avatar {
-    background: var(--cute-primary);
-}
-
-.dashboard.deadly .player-avatar {
-    background: var(--deadly-primary);
-}
-
-.player-avatar.opponent {
-    background: #666;
-}
-
-.vs-label {
-    font-size: 1.5rem;
-    font-weight: bold;
-    padding: 0 1rem;
-}
-
-.dashboard.cute .vs-label {
-    color: var(--cute-primary);
-}
-
-.dashboard.deadly .vs-label {
-    color: var(--deadly-accent);
-}
-
-.vs-stats {
-    display: flex;
-    justify-content: space-around;
-    margin-bottom: 1.5rem;
-}
-
-.stat-left, .stat-center, .stat-right {
-    text-align: center;
-}
-
-.stat-value {
-    font-size: 2rem;
-    font-weight: bold;
-}
-
-.dashboard.cute .stat-value {
-    color: var(--cute-primary);
-}
-
-.dashboard.deadly .stat-value {
-    color: var(--deadly-accent);
-}
-
-.stat-label {
-    font-size: 0.9rem;
-    opacity: 0.7;
-}
-
-.win-rate {
-    text-align: center;
-}
-
-.rate-bar {
-    height: 8px;
-    background: #eee;
-    border-radius: 4px;
-    overflow: hidden;
-    margin-top: 0.5rem;
-}
-
-.dashboard.deadly .rate-bar {
-    background: #333;
-}
-
-.rate-fill {
-    height: 100%;
-    border-radius: 4px;
-    transition: width 0.5s ease;
-}
-
-.dashboard.cute .rate-fill {
-    background: var(--cute-primary);
-}
-
-.dashboard.deadly .rate-fill {
-    background: var(--deadly-accent);
-}
-
-.leaderboard-preview {
-    padding: 1.5rem;
-    border-radius: 15px;
-}
-
-.dashboard.cute .leaderboard-preview {
-    background: white;
-    border: 2px solid var(--cute-secondary);
-}
-
-.dashboard.deadly .leaderboard-preview {
-    background: var(--deadly-secondary);
-    border: 1px solid #444;
-}
-
-.leaderboard-preview h3 {
-    margin-bottom: 1rem;
-}
-
-.leaderboard-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-.leaderboard-item {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.5rem;
-    border-radius: 5px;
-}
-
-.dashboard.cute .leaderboard-item {
-    background: var(--cute-bg);
-}
-
-.dashboard.deadly .leaderboard-item {
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.rank {
-    width: 30px;
-    text-align: center;
-    font-weight: bold;
-}
-
-.rank.top-3 {
-    color: #FFD700;
-}
-
-.player-avatar.small {
-    width: 25px;
-    height: 25px;
-}
-
-.player-name {
-    flex: 1;
-}
-
-.view-all {
-    display: block;
-    text-align: center;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-.dashboard-decoration {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: -1;
-}
-
-@media (max-width: 768px) {
-    .dashboard {
-        padding: 1rem;
-    }
-    
-    .welcome-banner {
-        flex-direction: column;
-        text-align: center;
-        gap: 1rem;
-    }
-    
-    .user-level {
-        flex-direction: column;
-    }
-    
-    .actions-grid,
-    .stats-grid,
-    .multiplayer-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .path-node {
-        flex-direction: column;
-        text-align: center;
-    }
-}
-</style>
-{% endblock %}
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${currentTheme}`;
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}" 
+                       style="color: ${type === 'success' ? '#4CAF50' : '#2196F3'}; font-size: 1.5rem;"></i>
+                    <div>
+                        <p style="margin: 0; font-weight: 600;">${message}</p>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 3 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 3000);
+        }
+
+        // Export dashboard for other pages to use
+        window.dashboardProgress = dashboard;
+    </script>
+</body>
+</html>
