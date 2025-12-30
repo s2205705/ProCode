@@ -3,164 +3,2012 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game — Python Pathfinder</title>
-    <link rel="stylesheet" href="main.css">
-    <link rel="stylesheet" href="cute_mode.css">
+    <title>Code Tetris — Python Pathfinder</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* Cute Theme */
+            --cute-primary: #ff6b9d;
+            --cute-secondary: #ffc8dd;
+            --cute-accent: #a2d2ff;
+            --cute-bg: #fff9fb;
+            --cute-text: #333;
+            --cute-card: #ffffff;
+            --cute-border: #ffc8dd;
+            --cute-success: #4CAF50;
+            --cute-warning: #FF9800;
+            --cute-danger: #F44336;
+            
+            /* Deadly Theme */
+            --deadly-primary: #ff4655;
+            --deadly-secondary: #1a1a2e;
+            --deadly-accent: #00ff9d;
+            --deadly-bg: #0d0d15;
+            --deadly-text: #ffffff;
+            --deadly-card: #1a1a2e;
+            --deadly-border: #333;
+            --deadly-success: #00ff9d;
+            --deadly-warning: #ffd166;
+            --deadly-danger: #ff4655;
+            
+            /* Tetris Colors */
+            --tetris-i: #00f5ff;
+            --tetris-j: #0000ff;
+            --tetris-l: #ff8800;
+            --tetris-o: #ffff00;
+            --tetris-s: #00ff00;
+            --tetris-t: #aa00ff;
+            --tetris-z: #ff0000;
+            
+            /* Common */
+            --shadow: 0 4px 12px rgba(0,0,0,0.1);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            transition: var(--transition);
+            overflow-x: hidden;
+        }
+
+        .cute-theme {
+            background-color: var(--cute-bg);
+            color: var(--cute-text);
+        }
+
+        .deadly-theme {
+            background-color: var(--deadly-bg);
+            color: var(--deadly-text);
+        }
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+
+        .navbar.cute {
+            background: white;
+            border-bottom: 3px solid var(--cute-primary);
+        }
+
+        .navbar.deadly {
+            background: var(--deadly-card);
+            border-bottom: 2px solid var(--deadly-accent);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo.cute {
+            color: var(--cute-primary);
+        }
+
+        .logo.deadly {
+            color: var(--deadly-accent);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+        .nav-link.cute {
+            color: var(--cute-text);
+        }
+
+        .nav-link.cute:hover, .nav-link.cute.active {
+            background: var(--cute-primary);
+            color: white;
+        }
+
+        .nav-link.deadly {
+            color: var(--deadly-text);
+        }
+
+        .nav-link.deadly:hover, .nav-link.deadly.active {
+            background: var(--deadly-accent);
+            color: var(--deadly-bg);
+        }
+
+        .btn {
+            padding: 0.5rem 1.5rem;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn.cute {
+            background: var(--cute-primary);
+            color: white;
+        }
+
+        .btn.cute:hover {
+            background: #ff5590;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 157, 0.3);
+        }
+
+        .btn.deadly {
+            background: var(--deadly-accent);
+            color: var(--deadly-bg);
+        }
+
+        .btn.deadly:hover {
+            background: #00e68a;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 255, 157, 0.3);
+        }
+
+        .btn.small {
+            padding: 0.25rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .btn.outline {
+            background: transparent;
+            border: 2px solid;
+        }
+
+        .btn.outline.cute {
+            border-color: var(--cute-primary);
+            color: var(--cute-primary);
+        }
+
+        .btn.outline.deadly {
+            border-color: var(--deadly-accent);
+            color: var(--deadly-accent);
+        }
+
+        /* Game Container */
+        .game-container {
+            display: grid;
+            grid-template-columns: 300px 1fr 300px;
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1600px;
+            margin: 0 auto;
+            min-height: calc(100vh - 80px);
+        }
+
+        @media (max-width: 1200px) {
+            .game-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+            }
+        }
+
+        /* Tetris Game Board */
+        .tetris-board-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tetris-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .tetris-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+        }
+
+        .cute-theme .tetris-header h1 {
+            color: var(--cute-primary);
+            text-shadow: 2px 2px 0 var(--cute-secondary);
+        }
+
+        .deadly-theme .tetris-header h1 {
+            color: var(--deadly-accent);
+            text-shadow: 2px 2px 0 var(--deadly-primary);
+        }
+
+        .tetris-subtitle {
+            opacity: 0.8;
+            font-size: 1.1rem;
+        }
+
+        .tetris-game {
+            position: relative;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .cute-theme .tetris-game {
+            border: 3px solid var(--cute-primary);
+        }
+
+        .deadly-theme .tetris-game {
+            border: 2px solid var(--deadly-accent);
+        }
+
+        #tetrisCanvas {
+            background: rgba(0, 0, 0, 0.05);
+            display: block;
+        }
+
+        .tetris-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            grid-template-rows: repeat(20, 1fr);
+            width: 300px;
+            height: 600px;
+            gap: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1px;
+            border-radius: 4px;
+        }
+
+        .tetris-cell {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 2px;
+            transition: background-color 0.2s ease;
+        }
+
+        /* Game Info Panel */
+        .game-info-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .game-stats {
+            background: var(--cute-card);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .cute-theme .game-stats {
+            border: 3px solid var(--cute-primary);
+            background: white;
+        }
+
+        .deadly-theme .game-stats {
+            border: 2px solid var(--deadly-accent);
+            background: var(--deadly-card);
+        }
+
+        .game-stats h2 {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+            border-radius: var(--radius);
+            background: var(--cute-bg);
+        }
+
+        .cute-theme .stat-item {
+            background: var(--cute-bg);
+        }
+
+        .deadly-theme .stat-item {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.25rem;
+        }
+
+        .cute-theme .stat-value {
+            color: var(--cute-primary);
+        }
+
+        .deadly-theme .stat-value {
+            color: var(--deadly-accent);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Next Piece Preview */
+        .next-piece {
+            background: var(--cute-card);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .cute-theme .next-piece {
+            border: 3px solid var(--cute-primary);
+            background: white;
+        }
+
+        .deadly-theme .next-piece {
+            border: 2px solid var(--deadly-accent);
+            background: var(--deadly-card);
+        }
+
+        .next-piece h3 {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .piece-preview {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            width: 120px;
+            height: 120px;
+            margin: 0 auto;
+            gap: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px;
+            border-radius: 4px;
+        }
+
+        .preview-cell {
+            background: transparent;
+            border-radius: 2px;
+        }
+
+        /* Coding Challenge Panel */
+        .challenge-panel {
+            background: var(--cute-card);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .cute-theme .challenge-panel {
+            border: 3px solid var(--cute-primary);
+            background: white;
+        }
+
+        .deadly-theme .challenge-panel {
+            border: 2px solid var(--deadly-accent);
+            background: var(--deadly-card);
+        }
+
+        .challenge-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .challenge-header h2 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .challenge-level {
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .cute-theme .challenge-level {
+            background: var(--cute-primary);
+            color: white;
+        }
+
+        .deadly-theme .challenge-level {
+            background: var(--deadly-accent);
+            color: var(--deadly-bg);
+        }
+
+        .challenge-description {
+            background: var(--cute-bg);
+            padding: 1rem;
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+        }
+
+        .cute-theme .challenge-description {
+            background: var(--cute-bg);
+        }
+
+        .deadly-theme .challenge-description {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .challenge-description p {
+            margin-bottom: 0.5rem;
+        }
+
+        .code-editor-container {
+            background: #1e1e1e;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .editor-header {
+            background: #2d2d2d;
+            padding: 0.75rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            font-family: monospace;
+        }
+
+        .editor-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .editor-btn {
+            background: #3d3d3d;
+            border: none;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .editor-btn:hover {
+            background: #4d4d4d;
+            transform: scale(1.1);
+        }
+
+        #codeInput {
+            width: 100%;
+            height: 200px;
+            padding: 1rem;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            border: none;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            resize: vertical;
+            outline: none;
+        }
+
+        .challenge-controls {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .challenge-controls .btn {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        /* Game Controls */
+        .game-controls {
+            background: var(--cute-card);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .cute-theme .game-controls {
+            border: 3px solid var(--cute-primary);
+            background: white;
+        }
+
+        .deadly-theme .game-controls {
+            border: 2px solid var(--deadly-accent);
+            background: var(--deadly-card);
+        }
+
+        .game-controls h3 {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .control-keys {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .key {
+            padding: 0.5rem;
+            background: var(--cute-bg);
+            border-radius: 4px;
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .cute-theme .key {
+            background: var(--cute-bg);
+            border: 2px solid var(--cute-secondary);
+        }
+
+        .deadly-theme .key {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--deadly-border);
+        }
+
+        .key-label {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-top: 0.25rem;
+        }
+
+        /* Game Over Modal */
+        .game-over-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .game-over-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 3rem;
+            border-radius: var(--radius);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            transform: translateY(-50px);
+            transition: transform 0.3s ease;
+        }
+
+        .game-over-modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .cute-theme .modal-content {
+            background: white;
+            border: 3px solid var(--cute-primary);
+        }
+
+        .deadly-theme .modal-content {
+            background: var(--deadly-card);
+            border: 2px solid var(--deadly-accent);
+            color: var(--deadly-text);
+        }
+
+        .modal-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-stats {
+            margin: 2rem 0;
+            background: var(--cute-bg);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+        }
+
+        .deadly-theme .modal-stats {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .modal-stat {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-stat:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 5px currentColor; }
+            50% { box-shadow: 0 0 20px currentColor; }
+        }
+
+        @keyframes lineClear {
+            0% { background: white; }
+            50% { background: var(--tetris-i); }
+            100% { background: transparent; }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        .float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .glow {
+            animation: glow 2s infinite;
+        }
+
+        /* Tetris Piece Colors */
+        .piece-i { background: var(--tetris-i); }
+        .piece-j { background: var(--tetris-j); }
+        .piece-l { background: var(--tetris-l); }
+        .piece-o { background: var(--tetris-o); }
+        .piece-s { background: var(--tetris-s); }
+        .piece-t { background: var(--tetris-t); }
+        .piece-z { background: var(--tetris-z); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .game-container {
+                padding: 1rem;
+                gap: 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .control-keys {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .navbar {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .tetris-header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+        }
+    </style>
 </head>
 <body class="cute-theme">
     <nav class="navbar cute">
-        <a href="dashboard.html" class="logo cute"><i class="fas fa-code"></i> Python Pathfinder</a>
+        <a href="dashboard.html" class="logo cute">
+            <i class="fas fa-code"></i> Python Pathfinder
+        </a>
         <div class="nav-links">
-            <a href="dashboard.html" class="nav-link cute"><i class="fas fa-home"></i> Dashboard</a>
-            <a href="multiplayer.html" class="nav-link cute"><i class="fas fa-users"></i> Multiplayer</a>
-            <button id="themeToggle" class="btn cute small">Switch to Deadly Mode</button>
+            <a href="dashboard.html" class="nav-link cute">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a href="multiplayer.html" class="nav-link cute">
+                <i class="fas fa-users"></i> Multiplayer
+            </a>
+            <a href="lessons.html" class="nav-link cute">
+                <i class="fas fa-book"></i> Lessons
+            </a>
+            <button id="themeToggle" class="btn cute small">
+                <i class="fas fa-moon"></i> Deadly Mode
+            </button>
         </div>
     </nav>
 
-<main>
-<div class="game-container cute">
-    <div class="game-sidebar">
-        <div class="level-info cute">
-            <h2 class="level-title">Level <span id="levelNumber">1</span></h2>
-            <h3 id="levelTitle">Python Basics</h3>
-            
-            <div class="progress-container cute">
-                <div id="progressBar" class="progress-bar cute" style="width:0%"></div>
-            </div>
-            
-            <div class="stats cute">
-                <div class="stat">
-                    <i class="fas fa-star"></i>
-                    <span>Score: <span id="scoreValue">0</span></span>
+    <!-- Particles Background -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Game Container -->
+    <div class="game-container">
+        <!-- Left Panel: Game Info & Controls -->
+        <div class="game-info-panel">
+            <div class="game-stats">
+                <h2><i class="fas fa-chart-line"></i> Game Stats</h2>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="score">0</div>
+                        <div class="stat-label">Score</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="level">1</div>
+                        <div class="stat-label">Level</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="lines">0</div>
+                        <div class="stat-label">Lines</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="time">00:00</div>
+                        <div class="stat-label">Time</div>
+                    </div>
                 </div>
-                <div class="stat">
-                    <i class="fas fa-trophy"></i>
-                    <span>Level: <span id="levelDisplay">1</span>/10</span>
+            </div>
+
+            <div class="next-piece">
+                <h3><i class="fas fa-shapes"></i> Next Piece</h3>
+                <div class="piece-preview" id="nextPiecePreview">
+                    <!-- Next piece preview will be generated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="game-controls">
+                <h3><i class="fas fa-gamepad"></i> Controls</h3>
+                <div class="control-keys">
+                    <div class="key">
+                        ← →
+                        <div class="key-label">Move</div>
+                    </div>
+                    <div class="key">
+                        ↑
+                        <div class="key-label">Rotate</div>
+                    </div>
+                    <div class="key">
+                        ↓
+                        <div class="key-label">Soft Drop</div>
+                    </div>
+                    <div class="key">
+                        Space
+                        <div class="key-label">Hard Drop</div>
+                    </div>
+                    <div class="key">
+                        P
+                        <div class="key-label">Pause</div>
+                    </div>
+                    <div class="key">
+                        R
+                        <div class="key-label">Restart</div>
+                    </div>
+                </div>
+                <div style="margin-top: 1.5rem;">
+                    <button id="startGame" class="btn cute">
+                        <i class="fas fa-play"></i> Start Game
+                    </button>
+                    <button id="pauseGame" class="btn outline cute" style="margin-top: 0.5rem;">
+                        <i class="fas fa-pause"></i> Pause
+                    </button>
                 </div>
             </div>
         </div>
-        
-        <div class="challenge-description cute">
-            <h3><i class="fas fa-question-circle"></i> Challenge</h3>
-            <p id="challengeText">Complete the coding challenge</p>
+
+        <!-- Center Panel: Tetris Game -->
+        <div class="tetris-board-container">
+            <div class="tetris-header">
+                <h1>CODE TETRIS</h1>
+                <p class="tetris-subtitle">Clear lines by solving Python challenges!</p>
+            </div>
             
-            <div class="hint-box cute">
+            <div class="tetris-game">
+                <canvas id="tetrisCanvas" width="300" height="600"></canvas>
+            </div>
+            
+            <div style="margin-top: 1.5rem; text-align: center;">
+                <div class="stat-item" style="display: inline-block; padding: 0.75rem 1.5rem;">
+                    <div class="stat-label">High Score</div>
+                    <div class="stat-value" id="highScore">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Coding Challenge -->
+        <div class="challenge-panel">
+            <div class="challenge-header">
+                <h2><i class="fas fa-puzzle-piece"></i> Coding Challenge</h2>
+                <span class="challenge-level" id="challengeLevel">Level 1</span>
+            </div>
+            
+            <div class="challenge-description">
+                <h3 id="challengeTitle">Sum Two Numbers</h3>
+                <p id="challengeText">Write a function that takes two numbers and returns their sum.</p>
+                <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(0,0,0,0.05); border-radius: 4px;">
+                    <strong>Reward:</strong> <span id="challengeReward">Clear 1 line</span>
+                </div>
+            </div>
+            
+            <div class="code-editor-container">
+                <div class="editor-header">
+                    <span>solution.py</span>
+                    <div class="editor-actions">
+                        <button class="editor-btn" title="Format code" id="formatCode">
+                            <i class="fas fa-align-left"></i>
+                        </button>
+                        <button class="editor-btn" title="Reset code" id="resetCode">
+                            <i class="fas fa-redo"></i>
+                        </button>
+                    </div>
+                </div>
+                <textarea id="codeInput" spellcheck="false">def sum_two_numbers(a, b):
+    # Return the sum of a and b
+    return a + b
+
+# Test your function
+print(sum_two_numbers(5, 3))  # Should print 8
+print(sum_two_numbers(10, 20))  # Should print 30</textarea>
+            </div>
+            
+            <div id="testOutput" style="background: #1e1e1e; color: #d4d4d4; padding: 1rem; border-radius: 4px; font-family: monospace; min-height: 60px; white-space: pre-wrap;">
+                Run your code to see output...
+            </div>
+            
+            <div class="challenge-controls">
+                <button id="runCode" class="btn outline cute">
+                    <i class="fas fa-play"></i> Run Code
+                </button>
+                <button id="submitSolution" class="btn cute">
+                    <i class="fas fa-check"></i> Submit Solution
+                </button>
+                <button id="showHint" class="btn outline cute" style="flex: none;">
+                    <i class="fas fa-lightbulb"></i> Hint
+                </button>
+            </div>
+            
+            <div id="hintBox" style="display: none; margin-top: 1rem; padding: 1rem; background: var(--cute-bg); border-radius: var(--radius);">
                 <h4><i class="fas fa-lightbulb"></i> Hint</h4>
-                <p id="challengeHint">Read the instructions carefully and test your code before submitting.</p>
+                <p id="hintText">Use the + operator to add two numbers together.</p>
             </div>
         </div>
-        
-        <div class="controls">
-            <button id="runCode" class="btn cute">
-                <i class="fas fa-play"></i> Run Code
-            </button>
-            <button id="submitCode" class="btn cute">
-                <i class="fas fa-check"></i> Submit Solution
-            </button>
-            <button id="nextLevel" class="btn cute" disabled>
-                <i class="fas fa-arrow-right"></i> Next Level
-            </button>
-        </div>
     </div>
-    
-    <div class="game-main">
-        <div class="code-editor">
-            <div class="editor-header cute">
-                <span><i class="fas fa-code"></i> editor.py</span>
-                <div class="editor-actions">
-                    <button class="editor-btn" title="Format code">
-                        <i class="fas fa-align-left"></i>
-                    </button>
-                    <button class="editor-btn" title="Reset code" id="resetCodeBtn">
-                        <i class="fas fa-redo"></i>
-                    </button>
+
+    <!-- Game Over Modal -->
+    <div class="game-over-modal" id="gameOverModal">
+        <div class="modal-content">
+            <div class="modal-icon">🎮</div>
+            <h2>Game Over!</h2>
+            <p>Great job! Keep practicing your Python skills.</p>
+            
+            <div class="modal-stats">
+                <div class="modal-stat">
+                    <span>Final Score:</span>
+                    <strong id="finalScore">0</strong>
+                </div>
+                <div class="modal-stat">
+                    <span>Lines Cleared:</span>
+                    <strong id="finalLines">0</strong>
+                </div>
+                <div class="modal-stat">
+                    <span>Level Reached:</span>
+                    <strong id="finalLevel">1</strong>
+                </div>
+                <div class="modal-stat">
+                    <span>Challenges Solved:</span>
+                    <strong id="finalChallenges">0</strong>
                 </div>
             </div>
-            <textarea id="codeInput" class="cute" spellcheck="false"># Python Challenge
-# Write your solution here
-
-# Your code goes below this line
-
-            </textarea>
-        </div>
-        
-        <div class="game-output cute">
-            <h3><i class="fas fa-terminal"></i> Output</h3>
-            <pre id="output">Run your code to see output here...</pre>
-        </div>
-        
-        <div class="cute-characters" id="cuteChars">
-            <div class="character float"></div>
-            <div class="cloud"></div>
-            <div class="cloud"></div>
-        </div>
-        <div class="deadly-effects" id="deadlyEffects" style="display:none;">
-            <div class="cyber-character"></div>
-            <div class="hex-grid"></div>
+            
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                <button id="playAgain" class="btn cute">
+                    <i class="fas fa-redo"></i> Play Again
+                </button>
+                <button id="backToMenu" class="btn outline cute">
+                    <i class="fas fa-home"></i> Dashboard
+                </button>
+            </div>
         </div>
     </div>
-</div>
 
-<script src="game.js"></script>
-<script>
-// Basic page JS for the static game page
-document.addEventListener('DOMContentLoaded', () => {
-    // Example challenge data; replace with fetch if needed
-    const challenge = {
-        level: 1,
-        title: 'Python Basics',
-        description: 'Write a function that returns the sum of two numbers.',
-        hint: 'Use the + operator.'
-    };
+    <script>
+        // ==================== GAME CONSTANTS ====================
+        const TETRIS = {
+            COLS: 10,
+            ROWS: 20,
+            BLOCK_SIZE: 30,
+            EMPTY: 0,
+            
+            PIECES: [
+                { // I
+                    shape: [
+                        [0,0,0,0],
+                        [1,1,1,1],
+                        [0,0,0,0],
+                        [0,0,0,0]
+                    ],
+                    color: 'var(--tetris-i)',
+                    name: 'I'
+                },
+                { // J
+                    shape: [
+                        [1,0,0],
+                        [1,1,1],
+                        [0,0,0]
+                    ],
+                    color: 'var(--tetris-j)',
+                    name: 'J'
+                },
+                { // L
+                    shape: [
+                        [0,0,1],
+                        [1,1,1],
+                        [0,0,0]
+                    ],
+                    color: 'var(--tetris-l)',
+                    name: 'L'
+                },
+                { // O
+                    shape: [
+                        [1,1],
+                        [1,1]
+                    ],
+                    color: 'var(--tetris-o)',
+                    name: 'O'
+                },
+                { // S
+                    shape: [
+                        [0,1,1],
+                        [1,1,0],
+                        [0,0,0]
+                    ],
+                    color: 'var(--tetris-s)',
+                    name: 'S'
+                },
+                { // T
+                    shape: [
+                        [0,1,0],
+                        [1,1,1],
+                        [0,0,0]
+                    ],
+                    color: 'var(--tetris-t)',
+                    name: 'T'
+                },
+                { // Z
+                    shape: [
+                        [1,1,0],
+                        [0,1,1],
+                        [0,0,0]
+                    ],
+                    color: 'var(--tetris-z)',
+                    name: 'Z'
+                }
+            ],
+            
+            SCORING: {
+                SINGLE: 100,
+                DOUBLE: 300,
+                TRIPLE: 500,
+                TETRIS: 800,
+                SOFT_DROP: 1,
+                HARD_DROP: 2
+            },
+            
+            LEVEL_SPEEDS: [
+                1000,  // Level 1
+                900,   // Level 2
+                800,   // Level 3
+                700,   // Level 4
+                600,   // Level 5
+                500,   // Level 6
+                400,   // Level 7
+                350,   // Level 8
+                300,   // Level 9
+                250,   // Level 10
+                200,   // Level 11
+                150,   // Level 12
+                100    // Level 13+
+            ]
+        };
 
-    document.getElementById('levelNumber').textContent = challenge.level;
-    document.getElementById('levelDisplay').textContent = challenge.level;
-    document.getElementById('levelTitle').textContent = challenge.title;
-    document.getElementById('challengeText').textContent = challenge.description;
-    document.getElementById('challengeHint').textContent = challenge.hint;
+        // ==================== CODING CHALLENGES ====================
+        const CHALLENGES = [
+            {
+                level: 1,
+                title: "Sum Two Numbers",
+                description: "Write a function that takes two numbers and returns their sum.",
+                starterCode: `def sum_two_numbers(a, b):
+    # Return the sum of a and b
+    return a + b
 
-    // Run code (demo): evaluate simple print statements only
-    const runBtn = document.getElementById('runCode');
-    const output = document.getElementById('output');
-    if (runBtn) runBtn.addEventListener('click', () => {
-        const code = document.getElementById('codeInput').value;
-        // Very small sandbox: capture console.log calls
-        try {
-            // eslint-disable-next-line no-eval
-            const consoleLog = [];
-            const consoleObj = { log: (...args) => consoleLog.push(args.join(' ')) };
-            const func = new Function('console', code + '\nreturn null;');
-            func(consoleObj);
-            output.textContent = consoleLog.join('\n') || 'No output';
-        } catch (err) {
-            output.textContent = 'Error: ' + err.message;
+# Test your function
+print(sum_two_numbers(5, 3))  # Should print 8
+print(sum_two_numbers(10, 20))  # Should print 30`,
+                tests: [
+                    { args: [5, 3], expected: 8 },
+                    { args: [10, 20], expected: 30 },
+                    { args: [-5, 10], expected: 5 },
+                    { args: [0, 0], expected: 0 }
+                ],
+                hint: "Use the + operator to add two numbers together.",
+                reward: "Clear 1 line"
+            },
+            {
+                level: 2,
+                title: "Check Even Number",
+                description: "Write a function that returns True if a number is even, False otherwise.",
+                starterCode: `def is_even(number):
+    # Return True if number is even, False otherwise
+    return number % 2 == 0
+
+# Test your function
+print(is_even(4))   # Should print True
+print(is_even(7))   # Should print False
+print(is_even(0))   # Should print True`,
+                tests: [
+                    { args: [4], expected: true },
+                    { args: [7], expected: false },
+                    { args: [0], expected: true },
+                    { args: [15], expected: false }
+                ],
+                hint: "Use the modulus operator % to check if the remainder is 0 when divided by 2.",
+                reward: "Clear 2 lines"
+            },
+            {
+                level: 3,
+                title: "Find Maximum",
+                description: "Write a function that returns the largest of three numbers.",
+                starterCode: `def find_maximum(a, b, c):
+    # Return the largest of the three numbers
+    max_val = a
+    if b > max_val:
+        max_val = b
+    if c > max_val:
+        max_val = c
+    return max_val
+
+# Test your function
+print(find_maximum(1, 2, 3))    # Should print 3
+print(find_maximum(10, 5, 8))   # Should print 10
+print(find_maximum(-1, -5, -3)) # Should print -1`,
+                tests: [
+                    { args: [1, 2, 3], expected: 3 },
+                    { args: [10, 5, 8], expected: 10 },
+                    { args: [-1, -5, -3], expected: -1 },
+                    { args: [0, 0, 0], expected: 0 }
+                ],
+                hint: "You can use multiple if statements to compare the numbers.",
+                reward: "Clear 3 lines"
+            },
+            {
+                level: 4,
+                title: "Reverse String",
+                description: "Write a function that returns a reversed version of a string.",
+                starterCode: `def reverse_string(text):
+    # Return the reversed string
+    return text[::-1]
+
+# Test your function
+print(reverse_string("hello"))    # Should print "olleh"
+print(reverse_string("Python"))   # Should print "nohtyP"
+print(reverse_string("a"))        # Should print "a"`,
+                tests: [
+                    { args: ["hello"], expected: "olleh" },
+                    { args: ["Python"], expected: "nohtyP" },
+                    { args: ["a"], expected: "a" },
+                    { args: ["racecar"], expected: "racecar" }
+                ],
+                hint: "Python strings support slicing with a negative step.",
+                reward: "Clear 4 lines"
+            },
+            {
+                level: 5,
+                title: "Count Vowels",
+                description: "Write a function that counts the number of vowels in a string.",
+                starterCode: `def count_vowels(text):
+    # Count and return the number of vowels (a, e, i, o, u)
+    vowels = "aeiouAEIOU"
+    count = 0
+    for char in text:
+        if char in vowels:
+            count += 1
+    return count
+
+# Test your function
+print(count_vowels("hello"))     # Should print 2
+print(count_vowels("Python"))    # Should print 1
+print(count_vowels("AEIOU"))     # Should print 5`,
+                tests: [
+                    { args: ["hello"], expected: 2 },
+                    { args: ["Python"], expected: 1 },
+                    { args: ["AEIOU"], expected: 5 },
+                    { args: ["xyz"], expected: 0 }
+                ],
+                hint: "Create a string containing all vowels and check if each character is in that string.",
+                reward: "Clear 5 lines"
+            }
+        ];
+
+        // ==================== GAME STATE ====================
+        class TetrisGame {
+            constructor() {
+                this.canvas = document.getElementById('tetrisCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.grid = this.createEmptyGrid();
+                this.score = 0;
+                this.level = 1;
+                this.lines = 0;
+                this.gameOver = false;
+                this.paused = false;
+                this.currentPiece = null;
+                this.nextPiece = null;
+                this.dropInterval = TETRIS.LEVEL_SPEEDS[0];
+                this.dropCounter = 0;
+                this.lastTime = 0;
+                this.currentChallenge = 0;
+                this.challengesSolved = 0;
+                this.gameStartTime = null;
+                this.gameTime = 0;
+                this.highScore = parseInt(localStorage.getItem('tetris_high_score') || '0');
+                
+                this.initializeGame();
+                this.setupControls();
+                this.setupUI();
+                this.startGameLoop();
+            }
+
+            createEmptyGrid() {
+                return Array(TETRIS.ROWS).fill().map(() => Array(TETRIS.COLS).fill(TETRIS.EMPTY));
+            }
+
+            initializeGame() {
+                this.grid = this.createEmptyGrid();
+                this.score = 0;
+                this.level = 1;
+                this.lines = 0;
+                this.gameOver = false;
+                this.paused = false;
+                this.challengesSolved = 0;
+                this.gameStartTime = Date.now();
+                this.gameTime = 0;
+                this.dropInterval = TETRIS.LEVEL_SPEEDS[0];
+                this.currentChallenge = 0;
+                
+                this.nextPiece = this.createRandomPiece();
+                this.spawnNewPiece();
+                
+                this.updateUI();
+                this.loadChallenge(this.currentChallenge);
+            }
+
+            createRandomPiece() {
+                const pieceIndex = Math.floor(Math.random() * TETRIS.PIECES.length);
+                const piece = TETRIS.PIECES[pieceIndex];
+                
+                return {
+                    shape: piece.shape,
+                    color: piece.color,
+                    name: piece.name,
+                    x: Math.floor(TETRIS.COLS / 2) - Math.floor(piece.shape[0].length / 2),
+                    y: 0
+                };
+            }
+
+            spawnNewPiece() {
+                this.currentPiece = this.nextPiece;
+                this.nextPiece = this.createRandomPiece();
+                
+                // Update next piece preview
+                this.updateNextPiecePreview();
+                
+                // Check if game over
+                if (this.checkCollision(this.currentPiece.x, this.currentPiece.y, this.currentPiece.shape)) {
+                    this.gameOver = true;
+                    this.showGameOver();
+                }
+            }
+
+            updateNextPiecePreview() {
+                const preview = document.getElementById('nextPiecePreview');
+                preview.innerHTML = '';
+                
+                const piece = this.nextPiece;
+                const size = 4;
+                
+                // Create preview grid
+                for (let y = 0; y < size; y++) {
+                    for (let x = 0; x < size; x++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'preview-cell';
+                        
+                        if (piece.shape[y] && piece.shape[y][x]) {
+                            cell.style.background = piece.color;
+                            cell.style.borderRadius = '4px';
+                            cell.style.boxShadow = 'inset 0 0 5px rgba(255,255,255,0.5)';
+                        }
+                        
+                        preview.appendChild(cell);
+                    }
+                }
+            }
+
+            draw() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // Draw background
+                this.ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // Draw grid lines
+                this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+                this.ctx.lineWidth = 0.5;
+                
+                for (let x = 0; x <= TETRIS.COLS; x++) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(x * TETRIS.BLOCK_SIZE, 0);
+                    this.ctx.lineTo(x * TETRIS.BLOCK_SIZE, TETRIS.ROWS * TETRIS.BLOCK_SIZE);
+                    this.ctx.stroke();
+                }
+                
+                for (let y = 0; y <= TETRIS.ROWS; y++) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(0, y * TETRIS.BLOCK_SIZE);
+                    this.ctx.lineTo(TETRIS.COLS * TETRIS.BLOCK_SIZE, y * TETRIS.BLOCK_SIZE);
+                    this.ctx.stroke();
+                }
+                
+                // Draw placed blocks
+                for (let y = 0; y < TETRIS.ROWS; y++) {
+                    for (let x = 0; x < TETRIS.COLS; x++) {
+                        if (this.grid[y][x]) {
+                            this.drawBlock(x, y, this.grid[y][x]);
+                        }
+                    }
+                }
+                
+                // Draw current piece
+                if (this.currentPiece) {
+                    for (let y = 0; y < this.currentPiece.shape.length; y++) {
+                        for (let x = 0; x < this.currentPiece.shape[y].length; x++) {
+                            if (this.currentPiece.shape[y][x]) {
+                                this.drawBlock(
+                                    this.currentPiece.x + x,
+                                    this.currentPiece.y + y,
+                                    this.currentPiece.color
+                                );
+                            }
+                        }
+                    }
+                    
+                    // Draw ghost piece
+                    const ghostY = this.getDropPosition();
+                    for (let y = 0; y < this.currentPiece.shape.length; y++) {
+                        for (let x = 0; x < this.currentPiece.shape[y].length; x++) {
+                            if (this.currentPiece.shape[y][x]) {
+                                this.drawGhostBlock(
+                                    this.currentPiece.x + x,
+                                    ghostY + y,
+                                    this.currentPiece.color
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+
+            drawBlock(x, y, color) {
+                this.ctx.fillStyle = color;
+                this.ctx.fillRect(
+                    x * TETRIS.BLOCK_SIZE,
+                    y * TETRIS.BLOCK_SIZE,
+                    TETRIS.BLOCK_SIZE - 1,
+                    TETRIS.BLOCK_SIZE - 1
+                );
+                
+                // Add 3D effect
+                this.ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+                this.ctx.fillRect(
+                    x * TETRIS.BLOCK_SIZE,
+                    y * TETRIS.BLOCK_SIZE,
+                    TETRIS.BLOCK_SIZE - 1,
+                    2
+                );
+                this.ctx.fillRect(
+                    x * TETRIS.BLOCK_SIZE,
+                    y * TETRIS.BLOCK_SIZE,
+                    2,
+                    TETRIS.BLOCK_SIZE - 1
+                );
+                
+                this.ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+                this.ctx.fillRect(
+                    x * TETRIS.BLOCK_SIZE + TETRIS.BLOCK_SIZE - 3,
+                    y * TETRIS.BLOCK_SIZE,
+                    2,
+                    TETRIS.BLOCK_SIZE - 1
+                );
+                this.ctx.fillRect(
+                    x * TETRIS.BLOCK_SIZE,
+                    y * TETRIS.BLOCK_SIZE + TETRIS.BLOCK_SIZE - 3,
+                    TETRIS.BLOCK_SIZE - 1,
+                    2
+                );
+            }
+
+            drawGhostBlock(x, y, color) {
+                this.ctx.fillStyle = color;
+                this.ctx.globalAlpha = 0.3;
+                this.ctx.fillRect(
+                    x * TETRIS.BLOCK_SIZE,
+                    y * TETRIS.BLOCK_SIZE,
+                    TETRIS.BLOCK_SIZE - 1,
+                    TETRIS.BLOCK_SIZE - 1
+                );
+                this.ctx.globalAlpha = 1.0;
+            }
+
+            checkCollision(x, y, shape) {
+                for (let row = 0; row < shape.length; row++) {
+                    for (let col = 0; col < shape[row].length; col++) {
+                        if (shape[row][col]) {
+                            const newX = x + col;
+                            const newY = y + row;
+                            
+                            if (
+                                newX < 0 ||
+                                newX >= TETRIS.COLS ||
+                                newY >= TETRIS.ROWS ||
+                                (newY >= 0 && this.grid[newY] && this.grid[newY][newX])
+                            ) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+                return false;
+            }
+
+            mergePiece() {
+                for (let y = 0; y < this.currentPiece.shape.length; y++) {
+                    for (let x = 0; x < this.currentPiece.shape[y].length; x++) {
+                        if (this.currentPiece.shape[y][x]) {
+                            const gridY = this.currentPiece.y + y;
+                            const gridX = this.currentPiece.x + x;
+                            
+                            if (gridY >= 0) {
+                                this.grid[gridY][gridX] = this.currentPiece.color;
+                            }
+                        }
+                    }
+                }
+            }
+
+            clearLines() {
+                let linesCleared = 0;
+                
+                for (let y = TETRIS.ROWS - 1; y >= 0; y--) {
+                    if (this.grid[y].every(cell => cell !== TETRIS.EMPTY)) {
+                        // Remove the line
+                        this.grid.splice(y, 1);
+                        // Add new empty line at top
+                        this.grid.unshift(Array(TETRIS.COLS).fill(TETRIS.EMPTY));
+                        linesCleared++;
+                        y++; // Check same line again since everything moved down
+                    }
+                }
+                
+                if (linesCleared > 0) {
+                    this.updateScore(linesCleared);
+                    this.lines += linesCleared;
+                    this.updateLevel();
+                    
+                    // Animate line clearing
+                    this.animateLineClear(linesCleared);
+                    
+                    // If a challenge is active, check if lines cleared match reward
+                    const currentChallenge = CHALLENGES[this.currentChallenge];
+                    if (currentChallenge && linesCleared === this.getLinesFromReward(currentChallenge.reward)) {
+                        this.challengesSolved++;
+                        this.completeChallenge();
+                    }
+                }
+            }
+
+            getLinesFromReward(reward) {
+                const match = reward.match(/Clear (\d+) line/);
+                return match ? parseInt(match[1]) : 1;
+            }
+
+            animateLineClear(linesCleared) {
+                // Visual effect for line clearing
+                const lines = [];
+                for (let y = 0; y < TETRIS.ROWS; y++) {
+                    if (this.grid[y].every(cell => cell !== TETRIS.EMPTY)) {
+                        lines.push(y);
+                    }
+                }
+                
+                // Flash animation
+                let flashCount = 0;
+                const flashInterval = setInterval(() => {
+                    this.ctx.fillStyle = flashCount % 2 === 0 ? 'white' : 'rgba(255,255,255,0.1)';
+                    lines.forEach(y => {
+                        this.ctx.fillRect(0, y * TETRIS.BLOCK_SIZE, this.canvas.width, TETRIS.BLOCK_SIZE);
+                    });
+                    flashCount++;
+                    
+                    if (flashCount > 6) {
+                        clearInterval(flashInterval);
+                        this.draw();
+                    }
+                }, 50);
+            }
+
+            updateScore(linesCleared) {
+                let points = 0;
+                switch (linesCleared) {
+                    case 1: points = TETRIS.SCORING.SINGLE; break;
+                    case 2: points = TETRIS.SCORING.DOUBLE; break;
+                    case 3: points = TETRIS.SCORING.TRIPLE; break;
+                    case 4: points = TETRIS.SCORING.TETRIS; break;
+                }
+                
+                // Level multiplier
+                points *= this.level;
+                this.score += points;
+                
+                if (this.score > this.highScore) {
+                    this.highScore = this.score;
+                    localStorage.setItem('tetris_high_score', this.highScore.toString());
+                }
+            }
+
+            updateLevel() {
+                const newLevel = Math.floor(this.lines / 10) + 1;
+                if (newLevel > this.level) {
+                    this.level = newLevel;
+                    this.dropInterval = TETRIS.LEVEL_SPEEDS[Math.min(this.level - 1, TETRIS.LEVEL_SPEEDS.length - 1)];
+                }
+            }
+
+            rotatePiece() {
+                const originalShape = this.currentPiece.shape;
+                const rotated = [];
+                
+                // Transpose the matrix
+                for (let i = 0; i < originalShape[0].length; i++) {
+                    rotated[i] = [];
+                    for (let j = 0; j < originalShape.length; j++) {
+                        rotated[i][j] = originalShape[originalShape.length - 1 - j][i];
+                    }
+                }
+                
+                if (!this.checkCollision(this.currentPiece.x, this.currentPiece.y, rotated)) {
+                    this.currentPiece.shape = rotated;
+                }
+            }
+
+            movePiece(dx, dy) {
+                if (!this.checkCollision(this.currentPiece.x + dx, this.currentPiece.y + dy, this.currentPiece.shape)) {
+                    this.currentPiece.x += dx;
+                    this.currentPiece.y += dy;
+                    return true;
+                }
+                return false;
+            }
+
+            getDropPosition() {
+                let y = this.currentPiece.y;
+                while (!this.checkCollision(this.currentPiece.x, y + 1, this.currentPiece.shape)) {
+                    y++;
+                }
+                return y;
+            }
+
+            dropPiece() {
+                this.currentPiece.y = this.getDropPosition();
+                this.lockPiece();
+            }
+
+            lockPiece() {
+                this.mergePiece();
+                this.clearLines();
+                this.spawnNewPiece();
+            }
+
+            update(time = 0) {
+                if (this.gameOver || this.paused) return;
+                
+                const deltaTime = time - this.lastTime;
+                this.lastTime = time;
+                
+                // Update game time
+                if (this.gameStartTime) {
+                    this.gameTime = Math.floor((Date.now() - this.gameStartTime) / 1000);
+                    this.updateTimer();
+                }
+                
+                // Auto drop
+                this.dropCounter += deltaTime;
+                if (this.dropCounter > this.dropInterval) {
+                    if (!this.movePiece(0, 1)) {
+                        this.lockPiece();
+                    }
+                    this.dropCounter = 0;
+                }
+                
+                this.draw();
+                requestAnimationFrame(this.update.bind(this));
+            }
+
+            startGameLoop() {
+                this.lastTime = 0;
+                requestAnimationFrame(this.update.bind(this));
+            }
+
+            setupControls() {
+                const keys = {
+                    ArrowLeft: () => this.movePiece(-1, 0),
+                    ArrowRight: () => this.movePiece(1, 0),
+                    ArrowDown: () => {
+                        if (this.movePiece(0, 1)) {
+                            this.score += TETRIS.SCORING.SOFT_DROP;
+                        }
+                    },
+                    ArrowUp: () => this.rotatePiece(),
+                    ' ': () => {
+                        const lines = this.getDropPosition() - this.currentPiece.y;
+                        this.score += lines * TETRIS.SCORING.HARD_DROP;
+                        this.dropPiece();
+                    },
+                    'p': () => this.togglePause(),
+                    'r': () => this.initializeGame()
+                };
+
+                document.addEventListener('keydown', (e) => {
+                    if (keys[e.key] && !this.gameOver) {
+                        keys[e.key]();
+                        e.preventDefault();
+                    }
+                });
+            }
+
+            togglePause() {
+                this.paused = !this.paused;
+                document.getElementById('pauseGame').innerHTML = 
+                    this.paused ? '<i class="fas fa-play"></i> Resume' : '<i class="fas fa-pause"></i> Pause';
+            }
+
+            updateUI() {
+                document.getElementById('score').textContent = this.score.toLocaleString();
+                document.getElementById('level').textContent = this.level;
+                document.getElementById('lines').textContent = this.lines;
+                document.getElementById('highScore').textContent = this.highScore.toLocaleString();
+                document.getElementById('challengeLevel').textContent = `Level ${this.currentChallenge + 1}`;
+            }
+
+            updateTimer() {
+                const minutes = Math.floor(this.gameTime / 60);
+                const seconds = this.gameTime % 60;
+                document.getElementById('time').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+
+            setupUI() {
+                // Start Game button
+                document.getElementById('startGame').addEventListener('click', () => {
+                    if (this.gameOver) {
+                        this.initializeGame();
+                    }
+                });
+
+                // Pause button
+                document.getElementById('pauseGame').addEventListener('click', () => {
+                    this.togglePause();
+                });
+
+                // Theme toggle
+                const themeToggle = document.getElementById('themeToggle');
+                let currentTheme = localStorage.getItem('pp_theme') || 'cute';
+                
+                themeToggle.addEventListener('click', () => {
+                    currentTheme = currentTheme === 'cute' ? 'deadly' : 'cute';
+                    localStorage.setItem('pp_theme', currentTheme);
+                    applyTheme(currentTheme);
+                });
+
+                // Run code button
+                document.getElementById('runCode').addEventListener('click', () => {
+                    this.runCode();
+                });
+
+                // Submit solution button
+                document.getElementById('submitSolution').addEventListener('click', () => {
+                    this.submitSolution();
+                });
+
+                // Show hint button
+                document.getElementById('showHint').addEventListener('click', () => {
+                    const hintBox = document.getElementById('hintBox');
+                    hintBox.style.display = hintBox.style.display === 'none' ? 'block' : 'none';
+                });
+
+                // Format code button
+                document.getElementById('formatCode').addEventListener('click', () => {
+                    this.formatCode();
+                });
+
+                // Reset code button
+                document.getElementById('resetCode').addEventListener('click', () => {
+                    this.resetCode();
+                });
+
+                // Game over buttons
+                document.getElementById('playAgain').addEventListener('click', () => {
+                    this.initializeGame();
+                    document.getElementById('gameOverModal').classList.remove('active');
+                });
+
+                document.getElementById('backToMenu').addEventListener('click', () => {
+                    window.location.href = 'dashboard.html';
+                });
+            }
+
+            loadChallenge(index) {
+                if (index >= CHALLENGES.length) {
+                    index = CHALLENGES.length - 1;
+                }
+                
+                this.currentChallenge = index;
+                const challenge = CHALLENGES[index];
+                
+                document.getElementById('challengeTitle').textContent = challenge.title;
+                document.getElementById('challengeText').textContent = challenge.description;
+                document.getElementById('challengeReward').textContent = challenge.reward;
+                document.getElementById('challengeLevel').textContent = `Level ${index + 1}`;
+                document.getElementById('hintText').textContent = challenge.hint;
+                
+                document.getElementById('codeInput').value = challenge.starterCode;
+                document.getElementById('testOutput').textContent = 'Run your code to see output...';
+                document.getElementById('hintBox').style.display = 'none';
+                
+                this.updateUI();
+            }
+
+            runCode() {
+                const code = document.getElementById('codeInput').value;
+                const output = document.getElementById('testOutput');
+                
+                try {
+                    // Create a sandbox for code execution
+                    const logs = [];
+                    const consoleMock = {
+                        log: (...args) => logs.push(args.map(arg => 
+                            typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
+                        ).join(' '))
+                    };
+                    
+                    // Wrap the code in a function to capture return values
+                    const wrappedCode = `
+                        ${code}
+                        return {
+                            sum_two_numbers: typeof sum_two_numbers === 'function' ? sum_two_numbers : undefined,
+                            is_even: typeof is_even === 'function' ? is_even : undefined,
+                            find_maximum: typeof find_maximum === 'function' ? find_maximum : undefined,
+                            reverse_string: typeof reverse_string === 'function' ? reverse_string : undefined,
+                            count_vowels: typeof count_vowels === 'function' ? count_vowels : undefined
+                        };
+                    `;
+                    
+                    const result = new Function('console', wrappedCode)(consoleMock);
+                    const outputText = logs.join('\n');
+                    
+                    if (outputText) {
+                        output.textContent = outputText;
+                        output.style.color = '#d4d4d4';
+                    } else {
+                        output.textContent = 'Code executed successfully. No output.';
+                        output.style.color = '#4CAF50';
+                    }
+                    
+                    return result;
+                    
+                } catch (error) {
+                    output.textContent = `Error: ${error.message}`;
+                    output.style.color = '#F44336';
+                    return null;
+                }
+            }
+
+            submitSolution() {
+                const codeResult = this.runCode();
+                if (!codeResult) return;
+                
+                const challenge = CHALLENGES[this.currentChallenge];
+                const tests = challenge.tests;
+                let passed = 0;
+                const results = [];
+                
+                // Run tests based on function name
+                let testFunction;
+                if (challenge.title.includes('Sum')) testFunction = codeResult.sum_two_numbers;
+                else if (challenge.title.includes('Even')) testFunction = codeResult.is_even;
+                else if (challenge.title.includes('Maximum')) testFunction = codeResult.find_maximum;
+                else if (challenge.title.includes('Reverse')) testFunction = codeResult.reverse_string;
+                else if (challenge.title.includes('Vowels')) testFunction = codeResult.count_vowels;
+                
+                if (!testFunction) {
+                    document.getElementById('testOutput').textContent = 'Error: Required function not found. Make sure to define the function with the correct name.';
+                    document.getElementById('testOutput').style.color = '#F44336';
+                    return;
+                }
+                
+                // Run all tests
+                tests.forEach((test, i) => {
+                    try {
+                        const result = testFunction(...test.args);
+                        const success = JSON.stringify(result) === JSON.stringify(test.expected);
+                        
+                        if (success) {
+                            passed++;
+                            results.push(`✓ Test ${i + 1}: Passed`);
+                        } else {
+                            results.push(`✗ Test ${i + 1}: Failed - Expected ${JSON.stringify(test.expected)}, got ${JSON.stringify(result)}`);
+                        }
+                    } catch (error) {
+                        results.push(`✗ Test ${i + 1}: Error - ${error.message}`);
+                    }
+                });
+                
+                // Display results
+                const output = document.getElementById('testOutput');
+                output.textContent = results.join('\n');
+                
+                if (passed === tests.length) {
+                    output.style.color = '#4CAF50';
+                    output.textContent += '\n\n🎉 All tests passed! Challenge completed!';
+                    
+                    // Award XP and show celebration
+                    this.awardChallengeCompletion();
+                    
+                } else {
+                    output.style.color = '#FF9800';
+                    output.textContent += `\n\n${passed}/${tests.length} tests passed. Keep trying!`;
+                }
+            }
+
+            awardChallengeCompletion() {
+                // Award points
+                const challengePoints = 500 * (this.currentChallenge + 1);
+                this.score += challengePoints;
+                
+                // Show celebration
+                this.showCelebration(`Challenge Complete! +${challengePoints} points`);
+                
+                // Load next challenge
+                setTimeout(() => {
+                    if (this.currentChallenge < CHALLENGES.length - 1) {
+                        this.currentChallenge++;
+                        this.loadChallenge(this.currentChallenge);
+                    }
+                }, 2000);
+            }
+
+            completeChallenge() {
+                // Award bonus for completing challenge through gameplay
+                const bonusPoints = 1000;
+                this.score += bonusPoints;
+                this.showCelebration(`Challenge Bonus! +${bonusPoints} points`);
+            }
+
+            showCelebration(message) {
+                // Create celebration element
+                const celebration = document.createElement('div');
+                celebration.textContent = message;
+                celebration.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: rgba(0,0,0,0.8);
+                    color: white;
+                    padding: 1rem 2rem;
+                    border-radius: ${document.body.classList.contains('cute-theme') ? 'var(--cute-primary)' : 'var(--deadly-accent)'};
+                    font-size: 1.5rem;
+                    font-weight: bold;
+                    z-index: 1000;
+                    animation: fadeInOut 2s ease;
+                `;
+                
+                document.body.appendChild(celebration);
+                
+                // Remove after animation
+                setTimeout(() => {
+                    celebration.remove();
+                }, 2000);
+            }
+
+            showGameOver() {
+                document.getElementById('finalScore').textContent = this.score.toLocaleString();
+                document.getElementById('finalLines').textContent = this.lines;
+                document.getElementById('finalLevel').textContent = this.level;
+                document.getElementById('finalChallenges').textContent = this.challengesSolved;
+                
+                setTimeout(() => {
+                    document.getElementById('gameOverModal').classList.add('active');
+                }, 1000);
+            }
+
+            formatCode() {
+                // Simple code formatting (just indentation)
+                const textarea = document.getElementById('codeInput');
+                const lines = textarea.value.split('\n');
+                const formatted = lines.map(line => {
+                    // Count leading spaces
+                    const match = line.match(/^(\s*)/);
+                    const indent = match[1].length;
+                    return ' '.repeat(Math.floor(indent / 4) * 4) + line.trimStart();
+                }).join('\n');
+                
+                textarea.value = formatted;
+            }
+
+            resetCode() {
+                const challenge = CHALLENGES[this.currentChallenge];
+                document.getElementById('codeInput').value = challenge.starterCode;
+                document.getElementById('testOutput').textContent = 'Code reset to starting template.';
+                document.getElementById('testOutput').style.color = '#d4d4d4';
+            }
         }
-    });
 
-    const resetBtn = document.getElementById('resetCodeBtn');
-    if (resetBtn) resetBtn.addEventListener('click', () => { document.getElementById('codeInput').value = '# Python Challenge\n# Write your solution here\n'; });
-
-    // Theme toggle compatibility
-    (function() {
-        const THEME_KEY = 'pp_theme';
-        const btn = document.getElementById('themeToggle');
+        // ==================== THEME MANAGEMENT ====================
         function applyTheme(theme) {
-            document.body.classList.remove('cute-theme','deadly-theme');
-            document.body.classList.add(theme + '-theme');
+            document.body.className = theme + '-theme';
+            
+            // Update all theme-specific elements
             document.querySelectorAll('.cute, .deadly').forEach(el => {
-                if (theme === 'cute') { el.classList.remove('deadly'); el.classList.add('cute'); }
-                else { el.classList.remove('cute'); el.classList.add('deadly'); }
+                el.classList.remove('cute', 'deadly');
+                el.classList.add(theme);
             });
-            document.getElementById('cuteChars').style.display = theme === 'cute' ? '' : 'none';
-            document.getElementById('deadlyEffects').style.display = theme === 'deadly' ? '' : 'none';
-            if (btn) btn.innerText = theme === 'cute' ? 'Switch to Deadly Mode' : 'Switch to Cute Mode';
+            
+            // Update toggle button text
+            const toggleBtn = document.getElementById('themeToggle');
+            if (toggleBtn) {
+                toggleBtn.innerHTML = theme === 'cute' 
+                    ? '<i class="fas fa-moon"></i> Deadly Mode'
+                    : '<i class="fas fa-sun"></i> Cute Mode';
+            }
+            
+            localStorage.setItem('pp_theme', theme);
+            
+            // Update particles
+            createParticles();
         }
-        let theme = localStorage.getItem(THEME_KEY) || 'cute';
-        applyTheme(theme);
-        if (btn) btn.addEventListener('click', () => { theme = theme === 'cute' ? 'deadly' : 'cute'; localStorage.setItem(THEME_KEY, theme); applyTheme(theme); });
-    })();
-});
-</script>
 
-<style>
+        // ==================== PARTICLE SYSTEM ====================
+        function createParticles() {
+            const container = document.getElementById('particles');
+            container.innerHTML = '';
+            
+            const isCute = document.body.classList.contains('cute-theme');
+            const colors = isCute 
+                ? ['#ff6b9d', '#ffc8dd', '#a2d2ff', '#ffd166']
+                : ['#ff4655', '#00ff9d', '#1fc0ff', '#ffd166'];
+            
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                const size = 2 + Math.random() * 8;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const duration = 15 + Math.random() * 30;
+                const delay = Math.random() * 20;
+                
+                particle.style.cssText = `
+                    width: ${size}px;
+                    height: ${size}px;
+                    background: ${color};
+                    left: ${Math.random() * 100}%;
+                    top: ${Math.random() * 100}%;
+                    animation-duration: ${duration}s;
+                    animation-delay: -${delay}s;
+                    opacity: ${0.1 + Math.random() * 0.2};
+                `;
+                
+                container.appendChild(particle);
+            }
+        }
+
+        // ==================== INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Apply theme
+            const savedTheme = localStorage.getItem('pp_theme') || 'cute';
+            applyTheme(savedTheme);
+            
+            // Initialize game
+            const game = new TetrisGame();
+            window.tetrisGame = game; // Make accessible for debugging
+            
+            // Create particles
+            createParticles();
+            
+            // Add CSS for fadeInOut animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fadeInOut {
+                    0%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+                    50% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+</body>
+</html>
