@@ -1,1776 +1,2527 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard — Python Pathfinder</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* Cute Theme */
+            --cute-primary: #ff6b9d;
+            --cute-secondary: #ffc8dd;
+            --cute-accent: #a2d2ff;
+            --cute-bg: #fff9fb;
+            --cute-text: #333;
+            --cute-card: #ffffff;
+            --cute-border: #ffc8dd;
+            --cute-success: #4CAF50;
+            --cute-warning: #FF9800;
+            --cute-danger: #F44336;
+            --cute-1st: #FFD700;
+            --cute-2nd: #C0C0C0;
+            --cute-3rd: #CD7F32;
+            
+            /* Deadly Theme */
+            --deadly-primary: #ff4655;
+            --deadly-secondary: #1a1a2e;
+            --deadly-accent: #00ff9d;
+            --deadly-bg: #0d0d15;
+            --deadly-text: #ffffff;
+            --deadly-card: #1a1a2e;
+            --deadly-border: #333;
+            --deadly-success: #00ff9d;
+            --deadly-warning: #ffd166;
+            --deadly-danger: #ff4655;
+            --deadly-1st: #FFD700;
+            --deadly-2nd: #C0C0C0;
+            --deadly-3rd: #CD7F32;
+            
+            /* Common */
+            --shadow: 0 4px 12px rgba(0,0,0,0.1);
+            --radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-{% block content %}
-<div class="leaderboard-container {{ theme }}">
-    <div class="leaderboard-header {{ theme }}">
-        <h1><i class="fas fa-crown"></i> Global Leaderboard</h1>
-        <p class="subtitle {{ theme }}">Top players in Python Pathfinder</p>
-        
-        <div class="leaderboard-tabs {{ theme }}">
-            <button class="tab-btn {{ theme }} active" data-tab="overall">
-                <i class="fas fa-trophy"></i> Overall
-            </button>
-            <button class="tab-btn {{ theme }}" data-tab="weekly">
-                <i class="fas fa-calendar-week"></i> Weekly
-            </button>
-            <button class="tab-btn {{ theme }}" data-tab="multiplayer">
-                <i class="fas fa-crosshairs"></i> Multiplayer
-            </button>
-            <button class="tab-btn {{ theme }}" data-tab="friends">
-                <i class="fas fa-users"></i> Friends
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            transition: var(--transition);
+            overflow-x: hidden;
+        }
+
+        .cute-theme {
+            background: linear-gradient(135deg, var(--cute-bg) 0%, #ffeef7 100%);
+            color: var(--cute-text);
+        }
+
+        .deadly-theme {
+            background: linear-gradient(135deg, var(--deadly-bg) 0%, #1a1a1a 100%);
+            color: var(--deadly-text);
+        }
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .navbar.cute {
+            background: rgba(255, 255, 255, 0.95);
+            border-bottom: 2px solid var(--cute-primary);
+            box-shadow: 0 2px 20px rgba(255, 107, 157, 0.1);
+        }
+
+        .navbar.deadly {
+            background: rgba(26, 26, 46, 0.95);
+            border-bottom: 2px solid var(--deadly-accent);
+            box-shadow: 0 2px 20px rgba(0, 255, 157, 0.1);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo.cute {
+            background: linear-gradient(135deg, var(--cute-primary), #ff8ab3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo.deadly {
+            background: linear-gradient(135deg, var(--deadly-accent), #1fc0ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            padding: 0.75rem 1.25rem;
+            border-radius: 50px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .nav-link.cute {
+            color: var(--cute-text);
+        }
+
+        .nav-link.cute:hover, .nav-link.cute.active {
+            background: linear-gradient(135deg, var(--cute-primary), #ff8ab3);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 107, 157, 0.3);
+        }
+
+        .nav-link.deadly {
+            color: var(--deadly-text);
+        }
+
+        .nav-link.deadly:hover, .nav-link.deadly.active {
+            background: linear-gradient(135deg, var(--deadly-accent), #1fc0ff);
+            color: var(--deadly-bg);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 255, 157, 0.3);
+        }
+
+        .btn {
+            padding: 0.75rem 1.75rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+        }
+
+        .btn.cute {
+            background: linear-gradient(135deg, var(--cute-primary), #ff8ab3);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.3);
+        }
+
+        .btn.cute:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(255, 107, 157, 0.4);
+        }
+
+        .btn.deadly {
+            background: linear-gradient(135deg, var(--deadly-accent), #1fc0ff);
+            color: var(--deadly-bg);
+            box-shadow: 0 4px 15px rgba(0, 255, 157, 0.3);
+        }
+
+        .btn.deadly:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(0, 255, 157, 0.4);
+        }
+
+        .btn.small {
+            padding: 0.5rem 1.25rem;
+            font-size: 0.85rem;
+        }
+
+        /* Leaderboard Container */
+        .leaderboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .leaderboard-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .leaderboard-header h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--cute-primary), #ff8ab3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .deadly-theme .leaderboard-header h1 {
+            background: linear-gradient(135deg, var(--deadly-accent), #1fc0ff);
+            -webkit-background-clip: text;
+        }
+
+        .leaderboard-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 2rem;
+        }
+
+        .leaderboard-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: transparent;
+        }
+
+        .tab-btn.cute {
+            color: var(--cute-text);
+            border: 2px solid var(--cute-border);
+        }
+
+        .tab-btn.deadly {
+            color: var(--deadly-text);
+            border: 1px solid var(--deadly-border);
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .tab-btn.active {
+            transform: translateY(-2px);
+        }
+
+        .tab-btn.cute.active {
+            background: linear-gradient(135deg, var(--cute-primary), #ff8ab3);
+            color: white;
+            border-color: var(--cute-primary);
+            box-shadow: 0 8px 25px rgba(255, 107, 157, 0.3);
+        }
+
+        .tab-btn.deadly.active {
+            background: linear-gradient(135deg, var(--deadly-accent), #1fc0ff);
+            color: var(--deadly-bg);
+            border-color: var(--deadly-accent);
+            box-shadow: 0 8px 25px rgba(0, 255, 157, 0.3);
+        }
+
+        .leaderboard-content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        @media (max-width: 1200px) {
+            .leaderboard-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Top 3 Podium */
+        .podium-section {
+            margin-bottom: 3rem;
+        }
+
+        .podium {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            align-items: end;
+        }
+
+        @media (max-width: 768px) {
+            .podium {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+
+        .podium-player {
+            text-align: center;
+            padding: 2rem;
+            border-radius: var(--radius);
+            position: relative;
+            transition: var(--transition);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .podium-player:hover {
+            transform: translateY(-10px);
+        }
+
+        .podium-player.cute {
+            background: white;
+            border: 2px solid var(--cute-border);
+            box-shadow: 0 10px 30px rgba(255, 107, 157, 0.15);
+        }
+
+        .podium-player.deadly {
+            background: var(--deadly-card);
+            border: 1px solid var(--deadly-border);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .podium-player.rank-1 {
+            grid-row: 1;
+            grid-column: 2;
+            height: 350px;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), white);
+            border: 3px solid var(--cute-1st);
+        }
+
+        .deadly-theme .podium-player.rank-1 {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), var(--deadly-card));
+            border-color: var(--deadly-1st);
+        }
+
+        .podium-player.rank-2 {
+            grid-row: 2;
+            grid-column: 1;
+            height: 280px;
+            background: linear-gradient(135deg, rgba(192, 192, 192, 0.1), white);
+            border: 3px solid var(--cute-2nd);
+        }
+
+        .deadly-theme .podium-player.rank-2 {
+            background: linear-gradient(135deg, rgba(192, 192, 192, 0.1), var(--deadly-card));
+            border-color: var(--deadly-2nd);
+        }
+
+        .podium-player.rank-3 {
+            grid-row: 2;
+            grid-column: 3;
+            height: 250px;
+            background: linear-gradient(135deg, rgba(205, 127, 50, 0.1), white);
+            border: 3px solid var(--cute-3rd);
+        }
+
+        .deadly-theme .podium-player.rank-3 {
+            background: linear-gradient(135deg, rgba(205, 127, 50, 0.1), var(--deadly-card));
+            border-color: var(--deadly-3rd);
+        }
+
+        .rank-badge {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: white;
+            z-index: 2;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .rank-1 .rank-badge {
+            background: linear-gradient(135deg, var(--cute-1st), #FFA500);
+        }
+
+        .rank-2 .rank-badge {
+            background: linear-gradient(135deg, var(--cute-2nd), #999);
+        }
+
+        .rank-3 .rank-badge {
+            background: linear-gradient(135deg, var(--cute-3rd), #8B4513);
+        }
+
+        .deadly-theme .rank-1 .rank-badge {
+            background: linear-gradient(135deg, var(--deadly-1st), #FFA500);
+        }
+
+        .deadly-theme .rank-2 .rank-badge {
+            background: linear-gradient(135deg, var(--deadly-2nd), #999);
+        }
+
+        .deadly-theme .rank-3 .rank-badge {
+            background: linear-gradient(135deg, var(--deadly-3rd), #8B4513);
+        }
+
+        .rank-badge i {
+            font-size: 1.2rem;
+        }
+
+        .player-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: 2rem auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            position: relative;
+            overflow: hidden;
+            border: 4px solid white;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .cute-theme .player-avatar {
+            background: linear-gradient(135deg, var(--cute-primary), var(--cute-accent));
+        }
+
+        .deadly-theme .player-avatar {
+            background: linear-gradient(135deg, var(--deadly-accent), var(--deadly-primary));
+        }
+
+        .podium-player.rank-1 .player-avatar {
+            width: 120px;
+            height: 120px;
+            border: 5px solid var(--cute-1st);
+            box-shadow: 0 15px 30px rgba(255, 215, 0, 0.3);
+        }
+
+        .player-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .player-title {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .podium-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .podium-stat {
+            text-align: center;
+        }
+
+        .podium-stat-value {
+            display: block;
+            font-size: 1.3rem;
+            font-weight: 800;
+            margin-bottom: 0.25rem;
+        }
+
+        .cute-theme .podium-stat-value {
+            color: var(--cute-primary);
+        }
+
+        .deadly-theme .podium-stat-value {
+            color: var(--deadly-accent);
+        }
+
+        .podium-stat-label {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            font-weight: 600;
+        }
+
+        /* Leaderboard Table */
+        .leaderboard-table-section {
+            background: var(--cute-card);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+        }
+
+        .deadly-theme .leaderboard-table-section {
+            background: var(--deadly-card);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .table-header {
+            display: grid;
+            grid-template-columns: 80px 3fr 1fr 1fr 1fr 1fr;
+            padding: 1.5rem 2rem;
+            font-weight: 700;
+            background: var(--cute-bg);
+            border-bottom: 2px solid var(--cute-border);
+            color: var(--cute-text);
+        }
+
+        .deadly-theme .table-header {
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 2px solid var(--deadly-border);
+            color: var(--deadly-text);
+        }
+
+        .table-body {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .table-row {
+            display: grid;
+            grid-template-columns: 80px 3fr 1fr 1fr 1fr 1fr;
+            padding: 1.25rem 2rem;
+            align-items: center;
+            transition: var(--transition);
+            border-bottom: 1px solid var(--cute-border);
+            animation: slideIn 0.5s ease-out forwards;
+            opacity: 0;
+        }
+
+        .deadly-theme .table-row {
+            border-bottom: 1px solid var(--deadly-border);
+        }
+
+        .table-row:hover {
+            transform: translateX(10px);
+            background: var(--cute-bg);
+        }
+
+        .deadly-theme .table-row:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .table-row.current-user {
+            background: linear-gradient(90deg, rgba(255, 107, 157, 0.1), transparent);
+            border-left: 4px solid var(--cute-primary);
+        }
+
+        .deadly-theme .table-row.current-user {
+            background: linear-gradient(90deg, rgba(0, 255, 157, 0.1), transparent);
+            border-left: 4px solid var(--deadly-accent);
+        }
+
+        .rank-cell {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .rank-number {
+            font-size: 1.3rem;
+            font-weight: 800;
+            width: 30px;
+        }
+
+        .rank-change {
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .rank-change.up {
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--cute-success);
+        }
+
+        .deadly-theme .rank-change.up {
+            background: rgba(0, 255, 157, 0.1);
+            color: var(--deadly-success);
+        }
+
+        .rank-change.down {
+            background: rgba(244, 67, 54, 0.1);
+            color: var(--cute-danger);
+        }
+
+        .deadly-theme .rank-change.down {
+            background: rgba(255, 70, 85, 0.1);
+            color: var(--deadly-danger);
+        }
+
+        .player-cell {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .player-avatar-small {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .cute-theme .player-avatar-small {
+            background: linear-gradient(135deg, var(--cute-primary), var(--cute-accent));
+        }
+
+        .deadly-theme .player-avatar-small {
+            background: linear-gradient(135deg, var(--deadly-accent), var(--deadly-primary));
+        }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .player-name-small {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .player-status {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--cute-success);
+            animation: pulse 2s infinite;
+        }
+
+        .deadly-theme .player-status {
+            background: var(--deadly-success);
+        }
+
+        .player-status.offline {
+            background: #9E9E9E;
+            animation: none;
+        }
+
+        .score-cell, .wins-cell, .rating-cell {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .cute-theme .score-cell,
+        .cute-theme .wins-cell,
+        .cute-theme .rating-cell {
+            color: var(--cute-primary);
+        }
+
+        .deadly-theme .score-cell,
+        .deadly-theme .wins-cell,
+        .deadly-theme .rating-cell {
+            color: var(--deadly-accent);
+        }
+
+        .level-cell {
+            font-size: 0.9rem;
+        }
+
+        .level-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: 700;
+            display: inline-block;
+            background: var(--cute-bg);
+            color: var(--cute-primary);
+        }
+
+        .deadly-theme .level-badge {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--deadly-accent);
+        }
+
+        /* Your Stats Sidebar */
+        .your-stats-sidebar {
+            position: sticky;
+            top: 2rem;
+            height: fit-content;
+        }
+
+        @media (max-width: 1200px) {
+            .your-stats-sidebar {
+                position: static;
+                margin-top: 2rem;
+            }
+        }
+
+        .stats-card {
+            background: var(--cute-card);
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 2px solid var(--cute-border);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .deadly-theme .stats-card {
+            background: var(--deadly-card);
+            border: 1px solid var(--deadly-border);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .stats-card h3 {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .cute-theme .stats-card h3 {
+            color: var(--cute-primary);
+        }
+
+        .deadly-theme .stats-card h3 {
+            color: var(--deadly-accent);
+        }
+
+        .your-ranking {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .your-rank {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--cute-primary), #ff8ab3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .deadly-theme .your-rank {
+            background: linear-gradient(135deg, var(--deadly-accent), #1fc0ff);
+            -webkit-background-clip: text;
+        }
+
+        .rank-change-large {
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .rank-change-large.up {
+            color: var(--cute-success);
+        }
+
+        .deadly-theme .rank-change-large.up {
+            color: var(--deadly-success);
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--cute-border);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 1.5rem 0;
+        }
+
+        .deadly-theme .progress-bar {
+            background: var(--deadly-border);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--cute-primary), #ff8ab3);
+            border-radius: 4px;
+            transition: width 1s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.4) 50%, 
+                transparent 100%);
+            animation: shimmer 2s infinite;
+        }
+
+        .deadly-theme .progress-fill {
+            background: linear-gradient(90deg, var(--deadly-accent), #1fc0ff);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-item {
+            padding: 1rem;
+            border-radius: 12px;
+            background: var(--cute-bg);
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .deadly-theme .stat-item {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 0.25rem;
+            color: var(--cute-primary);
+        }
+
+        .deadly-theme .stat-value {
+            color: var(--deadly-accent);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            font-weight: 600;
+        }
+
+        .achievements-preview {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .achievement-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: var(--cute-bg);
+            color: var(--cute-primary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .deadly-theme .achievement-icon {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--deadly-accent);
+        }
+
+        .achievement-icon:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        /* Time Filters */
+        .time-filters {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .time-filter-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 50px;
+            background: transparent;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .time-filter-btn.cute {
+            color: var(--cute-text);
+            border: 2px solid var(--cute-border);
+        }
+
+        .time-filter-btn.deadly {
+            color: var(--deadly-text);
+            border: 1px solid var(--deadly-border);
+        }
+
+        .time-filter-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .time-filter-btn.active {
+            transform: translateY(-2px);
+        }
+
+        .time-filter-btn.cute.active {
+            background: linear-gradient(135deg, var(--cute-primary), #ff8ab3);
+            color: white;
+            border-color: var(--cute-primary);
+            box-shadow: 0 8px 25px rgba(255, 107, 157, 0.2);
+        }
+
+        .time-filter-btn.deadly.active {
+            background: linear-gradient(135deg, var(--deadly-accent), #1fc0ff);
+            color: var(--deadly-bg);
+            border-color: var(--deadly-accent);
+            box-shadow: 0 8px 25px rgba(0, 255, 157, 0.2);
+        }
+
+        /* Decorative Elements */
+        .leaderboard-decoration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .floating-element {
+            position: absolute;
+            border-radius: 50%;
+            animation: float 20s infinite ease-in-out;
+            opacity: 0.1;
+        }
+
+        .cute-element {
+            background: linear-gradient(135deg, var(--cute-primary), var(--cute-accent));
+        }
+
+        .deadly-element {
+            background: linear-gradient(135deg, var(--deadly-accent), var(--deadly-primary));
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .animate-in {
+            animation: slideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            opacity: 0;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            opacity: 0;
+        }
+
+        .bounce {
+            animation: bounce 2s infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .leaderboard-container {
+                padding: 1rem;
+            }
+            
+            .leaderboard-header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .podium {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .podium-player.rank-1,
+            .podium-player.rank-2,
+            .podium-player.rank-3 {
+                grid-row: auto;
+                grid-column: auto;
+                height: auto;
+            }
+            
+            .table-header,
+            .table-row {
+                grid-template-columns: 60px 2fr 1fr;
+                font-size: 0.9rem;
+                padding: 1rem;
+            }
+            
+            .table-header .header-level,
+            .table-header .header-wins,
+            .table-header .header-rating,
+            .table-row .level-cell,
+            .table-row .wins-cell,
+            .table-row .rating-cell {
+                display: none;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .achievements-preview {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .time-filters {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .time-filter-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .leaderboard-header h1 {
+                font-size: 2rem;
+            }
+            
+            .tab-btn {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .achievements-preview {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .cute-theme::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--cute-primary), #ff8ab3);
+            border-radius: 5px;
+        }
+
+        .deadly-theme::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--deadly-accent), #1fc0ff);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body class="cute-theme">
+    <!-- Navigation -->
+    <nav class="navbar cute">
+        <a href="dashboard.html" class="logo cute">
+            <i class="fas fa-code"></i> Python Pathfinder
+        </a>
+        <div class="nav-links">
+            <a href="dashboard.html" class="nav-link cute">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a href="game.html" class="nav-link cute">
+                <i class="fas fa-gamepad"></i> Play
+            </a>
+            <a href="leaderboard.html" class="nav-link cute active">
+                <i class="fas fa-trophy"></i> Leaderboard
+            </a>
+            <a href="multiplayer.html" class="nav-link cute">
+                <i class="fas fa-users"></i> Multiplayer
+            </a>
+            <button id="themeToggle" class="btn cute small">
+                <i class="fas fa-moon"></i> Deadly Mode
             </button>
         </div>
-    </div>
+    </nav>
 
-    <div class="leaderboard-content {{ theme }}">
-        <!-- Overall Leaderboard -->
-        <div class="tab-content active" id="overall-tab">
-            <div class="leaderboard-top3 {{ theme }}">
-                {% for i in range(1, 4) %}
-                <div class="top-player rank-{{ i }} {{ theme }}">
-                    <div class="rank-badge {{ theme }}">
-                        <div class="rank-number">{{ i }}</div>
-                        <div class="rank-crown">
-                            {% if i == 1 %}<i class="fas fa-crown"></i>{% endif %}
-                            {% if i == 2 %}<i class="fas fa-medal"></i>{% endif %}
-                            {% if i == 3 %}<i class="fas fa-award"></i>{% endif %}
-                        </div>
-                    </div>
-                    <div class="player-info {{ theme }}">
-                        <div class="player-avatar {{ theme }}">
-                            {% if i == 1 %}<i class="fas fa-fire"></i>{% endif %}
-                            {% if i == 2 %}<i class="fas fa-bolt"></i>{% endif %}
-                            {% if i == 3 %}<i class="fas fa-star"></i>{% endif %}
-                        </div>
-                        <div class="player-details">
-                            <h3 class="player-name">TopPlayer{{ i }}</h3>
-                            <p class="player-title">
-                                {% if i == 1 %}Grand Master{% endif %}
-                                {% if i == 2 %}Master Coder{% endif %}
-                                {% if i == 3 %}Expert Developer{% endif %}
-                            </p>
-                        </div>
-                    </div>
-                    <div class="player-stats {{ theme }}">
-                        <div class="stat {{ theme }}">
-                            <span class="stat-value">{{ 5000 - (i * 500) }}</span>
-                            <span class="stat-label">Score</span>
-                        </div>
-                        <div class="stat {{ theme }}">
-                            <span class="stat-value">10</span>
-                            <span class="stat-label">Levels</span>
-                        </div>
-                        <div class="stat {{ theme }}">
-                            <span class="stat-value">{{ 95 - (i * 5) }}%</span>
-                            <span class="stat-label">Win Rate</span>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
+    <!-- Leaderboard Container -->
+    <main class="leaderboard-container">
+        <!-- Header -->
+        <div class="leaderboard-header fade-in">
+            <h1><i class="fas fa-crown"></i> Global Leaderboard</h1>
+            <p class="leaderboard-subtitle">Compete with coders worldwide and climb the ranks!</p>
+            
+            <!-- Tabs -->
+            <div class="leaderboard-tabs">
+                <button class="tab-btn cute active" data-tab="overall">
+                    <i class="fas fa-trophy"></i> Overall
+                </button>
+                <button class="tab-btn cute" data-tab="weekly">
+                    <i class="fas fa-calendar-week"></i> Weekly
+                </button>
+                <button class="tab-btn cute" data-tab="multiplayer">
+                    <i class="fas fa-crosshairs"></i> Multiplayer
+                </button>
+                <button class="tab-btn cute" data-tab="friends">
+                    <i class="fas fa-users"></i> Friends
+                </button>
             </div>
-
-            <div class="leaderboard-list {{ theme }}">
-                <div class="list-header {{ theme }}">
-                    <div class="header-rank">Rank</div>
-                    <div class="header-player">Player</div>
-                    <div class="header-score">Score</div>
-                    <div class="header-level">Level</div>
-                    <div class="header-wins">Wins</div>
-                    <div class="header-rating">Rating</div>
-                </div>
-                
-                <div class="list-body">
-                    {% for i in range(4, 51) %}
-                    <div class="leaderboard-row {{ theme }} {{ 'current-user' if i == 25 else '' }}">
-                        <div class="row-rank">
-                            <span class="rank-number">{{ i }}</span>
-                            {% if i <= 10 %}
-                            <span class="rank-icon">
-                                <i class="fas fa-star"></i>
-                            </span>
-                            {% endif %}
-                        </div>
-                        <div class="row-player">
-                            <div class="player-avatar small {{ theme }}">
-                                <span class="avatar-text">
-                                    {% if i == 25 %}ME{% else %}P{{ i }}{% endif %}
-                                </span>
-                            </div>
-                            <div class="player-info">
-                                <span class="player-name">
-                                    {% if i == 25 %}{{ session.username|default('You') }}{% else %}Player{{ i }}{% endif %}
-                                </span>
-                                <span class="player-status online"></span>
-                            </div>
-                        </div>
-                        <div class="row-score">{{ 4000 - (i * 70) }}</div>
-                        <div class="row-level">
-                            <span class="level-badge {{ theme }}">{{ 10 - ((i-1)//5) }}</span>
-                        </div>
-                        <div class="row-wins">{{ 50 - i }}</div>
-                        <div class="row-rating">
-                            <span class="rating-value {{ theme }}">{{ 1500 - (i * 25) }}</span>
-                            <span class="rating-change {{ 'positive' if i % 3 == 0 else 'negative' if i % 5 == 0 else 'neutral' }}">
-                                {% if i % 3 == 0 %}+{% elif i % 5 == 0 %}-{% endif %}{{ i % 10 }}
-                            </span>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
+            
+            <!-- Time Filters -->
+            <div class="time-filters">
+                <button class="time-filter-btn cute active" data-time="all">All Time</button>
+                <button class="time-filter-btn cute" data-time="month">This Month</button>
+                <button class="time-filter-btn cute" data-time="week">This Week</button>
+                <button class="time-filter-btn cute" data-time="today">Today</button>
             </div>
         </div>
 
-        <!-- Weekly Leaderboard -->
-        <div class="tab-content" id="weekly-tab">
-            <div class="weekly-stats {{ theme }}">
-                <h2><i class="fas fa-chart-line"></i> This Week's Top Performers</h2>
-                <p class="week-range">Nov 20 - Nov 26, 2024</p>
-                
-                <div class="weekly-leaderboard">
-                    {% for i in range(1, 21) %}
-                    <div class="weekly-row {{ theme }}">
-                        <div class="weekly-rank">{{ i }}</div>
-                        <div class="weekly-player">
-                            <span class="player-name">WeeklyPlayer{{ i }}</span>
-                            <span class="player-progress {{ 'positive' if i % 2 == 0 else 'neutral' }}">
-                                {% if i % 2 == 0 %}+{{ i * 2 }} positions{% else %}—{% endif %}
-                            </span>
-                        </div>
-                        <div class="weekly-points">
-                            <span class="points-value">{{ 1000 - (i * 45) }}</span>
-                            <span class="points-label">points</span>
-                        </div>
-                        <div class="weekly-activity">
-                            <div class="activity-bar">
-                                {% for day in range(7) %}
-                                <div class="activity-day {{ 'active' if day < 7-i//3 else '' }}"></div>
-                                {% endfor %}
+        <!-- Main Content -->
+        <div class="leaderboard-content">
+            <!-- Leaderboard Tables -->
+            <div class="leaderboard-main">
+                <!-- Podium - Top 3 -->
+                <div class="podium-section" id="overall-content">
+                    <div class="podium">
+                        <!-- 2nd Place -->
+                        <div class="podium-player cute rank-2 fade-in" style="animation-delay: 0.1s">
+                            <div class="rank-badge">
+                                <span>2</span>
+                                <i class="fas fa-medal"></i>
                             </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-
-        <!-- Multiplayer Leaderboard -->
-        <div class="tab-content" id="multiplayer-tab">
-            <div class="multiplayer-leaderboard {{ theme }}">
-                <h2><i class="fas fa-swords"></i> Battle Rankings</h2>
-                
-                <div class="battle-stats {{ theme }}">
-                    <div class="battle-stat {{ theme }}">
-                        <div class="stat-value">1,234</div>
-                        <div class="stat-label">Total Matches</div>
-                    </div>
-                    <div class="battle-stat {{ theme }}">
-                        <div class="stat-value">892</div>
-                        <div class="stat-label">Players Online</div>
-                    </div>
-                    <div class="battle-stat {{ theme }}">
-                        <div class="stat-value">45</div>
-                        <div class="stat-label">Active Tournaments</div>
-                    </div>
-                </div>
-                
-                <div class="elo-ratings {{ theme }}">
-                    <h3><i class="fas fa-chess-queen"></i> Elo Rating Top 20</h3>
-                    <div class="elo-list">
-                        {% for i in range(1, 21) %}
-                        <div class="elo-player {{ theme }}">
-                            <div class="elo-rank">{{ i }}</div>
-                            <div class="elo-info">
-                                <span class="player-name">BattleMaster{{ i }}</span>
-                                <div class="player-record">
-                                    <span class="wins">{{ 50 - i }}W</span>
-                                    <span class="losses">{{ i }}L</span>
-                                    <span class="win-rate">{{ (100 - i*3) }}%</span>
+                            <div class="player-avatar">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <h3 class="player-name" id="player2-name">CodeNinja</h3>
+                            <p class="player-title">Master Coder</p>
+                            <div class="podium-stats">
+                                <div class="podium-stat">
+                                    <span class="podium-stat-value" id="player2-score">8,450</span>
+                                    <span class="podium-stat-label">Score</span>
+                                </div>
+                                <div class="podium-stat">
+                                    <span class="podium-stat-value" id="player2-wins">92%</span>
+                                    <span class="podium-stat-label">Win Rate</span>
+                                </div>
+                                <div class="podium-stat">
+                                    <span class="podium-stat-value" id="player2-level">9</span>
+                                    <span class="podium-stat-label">Level</span>
                                 </div>
                             </div>
-                            <div class="elo-rating">
-                                <span class="rating {{ 'grandmaster' if i == 1 else 'master' if i <= 5 else 'expert' if i <= 10 else 'advanced' }}">
-                                    {{ 2200 - (i * 50) }}
-                                </span>
-                                <span class="rating-change {{ 'positive' if i % 4 == 0 else 'negative' if i % 3 == 0 else 'neutral' }}">
-                                    {% if i % 4 == 0 %}+{{ i }}{% elif i % 3 == 0 %}-{{ i }}{% endif %}
-                                </span>
+                        </div>
+                        
+                        <!-- 1st Place -->
+                        <div class="podium-player cute rank-1 fade-in" style="animation-delay: 0.2s">
+                            <div class="rank-badge bounce">
+                                <span>1</span>
+                                <i class="fas fa-crown"></i>
+                            </div>
+                            <div class="player-avatar">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                            <h3 class="player-name" id="player1-name">PythonMaster</h3>
+                            <p class="player-title">Grand Champion</p>
+                            <div class="podium-stats">
+                                <div class="podium-stat">
+                                    <span class="podium-stat-value" id="player1-score">9,850</span>
+                                    <span class="podium-stat-label">Score</span>
+                                </div>
+                                <div class="podium-stat">
+                                    <span class="podium-stat-value" id="player1-wins">98%</span>
+                                    <span class="podium-stat-label">Win Rate</span>
+                                </div>
+                                <div class="podium-stat">
+                                    <span class="podium-stat-value" id="player1-level">10</span>
+                                    <span class="podium-stat-label">Level</span>
+                                </div>
                             </div>
                         </div>
-                        {% endfor %}
+                        
+                        <!-- 3rd Place -->
+                        <div class="podium-player cute rank-3 fade-in" style="animation-delay: 0.3s">
+                            <div class="rank-badge">
+                                <span>3</span>
+                                <i class="fas fa-award"></i>
+                            </div>
+                            <div class="player-avatar">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <h3 class="player-name" id="player3-name">DevWizard</h3>
+                            <p class="player-title">Expert Developer</p>
+                            <div class="podium-stats">
+                                <div class="podium-stat">
+                                    <span class="podium-stat-value" id="player3-score">7,920</span>
+                                    <span class="podium-stat-label">Score</span>
+                                </div>
+                                <div class="podium-stat">
+                                    <span class="podium-stat-value" id="player3-wins">89%</span>
+                                    <span class="podium-stat-label">Win Rate</span>
+                                </div>
+                                <div class="podium-stat">
+                                    <span class="podium-stat-value" id="player3-level">8</span>
+                                    <span class="podium-stat-label">Level</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Leaderboard Table -->
+                <div class="leaderboard-table-section fade-in" style="animation-delay: 0.4s">
+                    <div class="table-header">
+                        <div class="header-rank">Rank</div>
+                        <div class="header-player">Player</div>
+                        <div class="header-score">Score</div>
+                        <div class="header-level">Level</div>
+                        <div class="header-wins">Wins</div>
+                        <div class="header-rating">Rating</div>
+                    </div>
+                    <div class="table-body" id="leaderboard-body">
+                        <!-- Rows will be populated by JavaScript -->
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Friends Leaderboard -->
-        <div class="tab-content" id="friends-tab">
-            <div class="friends-leaderboard {{ theme }}">
-                <h2><i class="fas fa-user-friends"></i> Your Friends</h2>
-                
-                <div class="friends-stats {{ theme }}">
-                    <div class="friend-count {{ theme }}">
-                        <div class="count-value">12</div>
-                        <div class="count-label">Friends</div>
+            <!-- Your Stats Sidebar -->
+            <div class="your-stats-sidebar">
+                <!-- Your Ranking -->
+                <div class="stats-card cute fade-in" style="animation-delay: 0.5s">
+                    <h3><i class="fas fa-user"></i> Your Ranking</h3>
+                    
+                    <div class="your-ranking">
+                        <div class="your-rank" id="your-rank">#25</div>
+                        <div class="rank-change-large up">
+                            <i class="fas fa-arrow-up"></i>
+                            <span id="rank-change">Up 3 spots this week</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="rank-progress" style="width: 60%"></div>
+                        </div>
+                        <div style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 1.5rem;">
+                            <span id="next-rank">150 points to reach Top 20</span>
+                        </div>
                     </div>
-                    <div class="friend-search {{ theme }}">
-                        <input type="text" placeholder="Add friends by username..." class="{{ theme }}">
-                        <button class="btn {{ theme }} small">
-                            <i class="fas fa-user-plus"></i> Add
+                    
+                    <div class="stats-grid">
+                        <div class="stat-item cute">
+                            <div class="stat-value" id="your-score">2,850</div>
+                            <div class="stat-label">Total Score</div>
+                        </div>
+                        <div class="stat-item cute">
+                            <div class="stat-value" id="your-level">7</div>
+                            <div class="stat-label">Level</div>
+                        </div>
+                        <div class="stat-item cute">
+                            <div class="stat-value" id="your-wins">42</div>
+                            <div class="stat-label">Wins</div>
+                        </div>
+                        <div class="stat-item cute">
+                            <div class="stat-value" id="your-rating">1,350</div>
+                            <div class="stat-label">Rating</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Achievements -->
+                <div class="stats-card cute fade-in" style="animation-delay: 0.6s">
+                    <h3><i class="fas fa-trophy"></i> Recent Achievements</h3>
+                    <div class="achievements-preview" id="achievements-preview">
+                        <!-- Achievements will be populated by JavaScript -->
+                    </div>
+                    <div style="text-align: center; margin-top: 1rem;">
+                        <button id="view-all-achievements" class="btn cute small">
+                            <i class="fas fa-award"></i> View All
                         </button>
                     </div>
                 </div>
-                
-                <div class="friends-list">
-                    {% for i in range(1, 13) %}
-                    <div class="friend-row {{ theme }} {{ 'online' if i % 3 != 0 else 'offline' }}">
-                        <div class="friend-info">
-                            <div class="friend-avatar {{ theme }}">
-                                <span class="avatar-text">F{{ i }}</span>
-                                <div class="friend-status {{ 'online' if i % 3 != 0 else 'offline' }}"></div>
-                            </div>
-                            <div class="friend-details">
-                                <h4>Friend{{ i }}</h4>
-                                <p class="friend-status-text">
-                                    {% if i % 3 != 0 %}Online • Playing Level {{ i }}{% else %}Offline • 2h ago{% endif %}
-                                </p>
-                            </div>
-                        </div>
-                        <div class="friend-rank">
-                            <span class="rank">{{ i * 4 }}</span>
-                            <span class="rank-change {{ 'positive' if i % 2 == 0 else 'negative' }}">
-                                {% if i % 2 == 0 %}+{% else %}-{% endif %}{{ i }}
-                            </span>
-                        </div>
-                        <div class="friend-actions">
-                            <button class="action-btn {{ theme }}" title="Challenge to duel">
-                                <i class="fas fa-crosshairs"></i>
-                            </button>
-                            <button class="action-btn {{ theme }}" title="Send message">
-                                <i class="fas fa-comment"></i>
-                            </button>
-                        </div>
+
+                <!-- Quick Actions -->
+                <div class="stats-card cute fade-in" style="animation-delay: 0.7s">
+                    <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <button id="play-now-btn" class="btn cute">
+                            <i class="fas fa-play"></i> Play Now
+                        </button>
+                        <button id="challenge-friend-btn" class="btn cute">
+                            <i class="fas fa-crosshairs"></i> Challenge Friend
+                        </button>
+                        <button id="share-profile-btn" class="btn cute">
+                            <i class="fas fa-share-alt"></i> Share Profile
+                        </button>
                     </div>
-                    {% endfor %}
                 </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Decorative Background Elements -->
+    <div class="leaderboard-decoration" id="leaderboard-decoration"></div>
+
+    <!-- Achievement Modal -->
+    <div id="achievement-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-trophy"></i> Achievement Unlocked!</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="achievement-modal-body">
+                <!-- Content will be populated by JavaScript -->
             </div>
         </div>
     </div>
 
-    <!-- Your Stats Sidebar -->
-    <div class="your-stats {{ theme }}">
-        <div class="stats-card {{ theme }}">
-            <h3><i class="fas fa-user"></i> Your Ranking</h3>
-            
-            <div class="your-ranking {{ theme }}">
-                <div class="rank-display {{ theme }}">
-                    <div class="rank-number">#25</div>
-                    <div class="rank-progress {{ theme }}">
-                        <div class="progress-text">Up 3 positions this week</div>
-                        <div class="progress-bar {{ theme }}">
-                            <div class="progress-fill" style="width: 60%"></div>
-                        </div>
-                    </div>
-                </div>
+    <script>
+        // ==================== LEADERBOARD DATA SYSTEM ====================
+        class LeaderboardSystem {
+            constructor() {
+                this.STORAGE_KEYS = {
+                    LEADERBOARD: 'pp_leaderboard_data',
+                    USER_STATS: 'pp_user_stats',
+                    MULTIPLAYER_STATS: 'pp_multiplayer_stats',
+                    FRIENDS: 'pp_friends_list',
+                    WEEKLY_RANKING: 'pp_weekly_ranking'
+                };
                 
-                <div class="stats-grid {{ theme }}">
-                    <div class="stat-item {{ theme }}">
-                        <div class="stat-icon">
-                            <i class="fas fa-star"></i>
+                this.currentTab = 'overall';
+                this.currentTimeFilter = 'all';
+                this.leaderboardData = this.generateLeaderboardData();
+                this.userStats = this.loadUserStats();
+                this.friends = this.loadFriendsList();
+                this.multiplayerStats = this.loadMultiplayerStats();
+                
+                // Load from localStorage if available
+                this.loadFromStorage();
+            }
+
+            generateLeaderboardData() {
+                const players = [];
+                const names = [
+                    'PythonMaster', 'CodeNinja', 'DevWizard', 'ScriptSorcerer', 'ByteBender',
+                    'LoopLegend', 'SyntaxSavior', 'AlgorithmAce', 'DebugDynamo', 'FunctionFury',
+                    'VariableVirtuoso', 'ClassChampion', 'ModuleMaestro', 'PackagePro', 'ImportExpert',
+                    'ListLegend', 'DictDuke', 'TupleTitan', 'SetSultan', 'IteratorIcon',
+                    'GeneratorGuru', 'DecoratorDynamo', 'ContextCzar', 'AsyncAce', 'ThreadThunder',
+                    'ProcessPro', 'MemoryMaestro', 'GarbageGuru', 'ProfilePro', 'OptimizationOracle'
+                ];
+                
+                const titles = [
+                    'Grand Champion', 'Master Coder', 'Expert Developer', 'Senior Programmer',
+                    'Code Wizard', 'Script Sorcerer', 'Algorithm Artist', 'Debugging Dynamo',
+                    'Function Freak', 'Class Champion'
+                ];
+
+                for (let i = 0; i < 50; i++) {
+                    const rank = i + 1;
+                    const isUser = rank === 25; // User is at rank 25
+                    
+                    players.push({
+                        id: i + 1,
+                        rank: rank,
+                        name: isUser ? 'You' : names[i % names.length],
+                        title: titles[i % titles.length],
+                        score: 10000 - (rank * 180) + Math.floor(Math.random() * 200),
+                        level: Math.max(1, 10 - Math.floor(rank / 5)),
+                        wins: Math.max(1, 100 - rank),
+                        rating: 2000 - (rank * 35) + Math.floor(Math.random() * 100),
+                        isOnline: Math.random() > 0.3,
+                        isUser: isUser,
+                        rankChange: this.generateRankChange(rank),
+                        avatarColor: this.generateAvatarColor(i),
+                        weeklyScore: Math.floor(Math.random() * 500) + 200,
+                        multiplayerWins: Math.floor(Math.random() * 50),
+                        friendStatus: i < 12 ? 'friend' : 'not_friend'
+                    });
+                }
+                
+                return players;
+            }
+
+            generateRankChange(rank) {
+                if (rank <= 3) return 0;
+                const change = Math.floor(Math.random() * 10) - 2;
+                return change;
+            }
+
+            generateAvatarColor(index) {
+                const colors = [
+                    '#ff6b9d', '#a2d2ff', '#ffd166', '#06d6a0', '#118ab2',
+                    '#ef476f', '#ff9e6d', '#9d4edd', '#00bbf9', '#f15bb5'
+                ];
+                return colors[index % colors.length];
+            }
+
+            loadUserStats() {
+                const saved = localStorage.getItem(this.STORAGE_KEYS.USER_STATS);
+                if (saved) {
+                    return JSON.parse(saved);
+                }
+                
+                // Default user stats
+                return {
+                    rank: 25,
+                    score: 2850,
+                    level: 7,
+                    wins: 42,
+                    rating: 1350,
+                    rankChange: 3,
+                    weeklyProgress: 60,
+                    achievements: ['first_lesson', 'streak_7', 'multiplayer_10'],
+                    weeklyScore: 420
+                };
+            }
+
+            loadMultiplayerStats() {
+                const saved = localStorage.getItem(this.STORAGE_KEYS.MULTIPLAYER_STATS);
+                if (saved) {
+                    return JSON.parse(saved);
+                }
+                
+                return {
+                    matches: 128,
+                    wins: 72,
+                    losses: 56,
+                    winRate: 56.3,
+                    rating: 1450,
+                    rank: 'Gold II',
+                    streak: 3
+                };
+            }
+
+            loadFriendsList() {
+                const saved = localStorage.getItem(this.STORAGE_KEYS.FRIENDS);
+                if (saved) {
+                    return JSON.parse(saved);
+                }
+                
+                // Generate friends list
+                const friends = [];
+                const friendNames = ['AlexCoder', 'SamScript', 'TaylorDev', 'JamiePython', 'CaseyCode'];
+                
+                for (let i = 0; i < 5; i++) {
+                    friends.push({
+                        id: i + 1,
+                        name: friendNames[i],
+                        rank: 10 + (i * 5),
+                        score: 5000 + (i * 500),
+                        isOnline: Math.random() > 0.4,
+                        status: i % 2 === 0 ? 'Playing' : 'Online',
+                        avatarColor: this.generateAvatarColor(i)
+                    });
+                }
+                
+                return friends;
+            }
+
+            loadFromStorage() {
+                const savedLeaderboard = localStorage.getItem(this.STORAGE_KEYS.LEADERBOARD);
+                if (savedLeaderboard) {
+                    this.leaderboardData = JSON.parse(savedLeaderboard);
+                }
+                
+                const savedWeekly = localStorage.getItem(this.STORAGE_KEYS.WEEKLY_RANKING);
+                if (savedWeekly) {
+                    this.weeklyRanking = JSON.parse(savedWeekly);
+                }
+            }
+
+            saveToStorage() {
+                localStorage.setItem(this.STORAGE_KEYS.LEADERBOARD, JSON.stringify(this.leaderboardData));
+                localStorage.setItem(this.STORAGE_KEYS.USER_STATS, JSON.stringify(this.userStats));
+                localStorage.setItem(this.STORAGE_KEYS.MULTIPLAYER_STATS, JSON.stringify(this.multiplayerStats));
+                localStorage.setItem(this.STORAGE_KEYS.FRIENDS, JSON.stringify(this.friends));
+            }
+
+            getLeaderboardData(filter = 'all') {
+                let data = [...this.leaderboardData];
+                
+                // Apply time filter
+                if (filter !== 'all') {
+                    data = data.map(player => ({
+                        ...player,
+                        score: this.applyTimeFilter(player.score, filter)
+                    })).sort((a, b) => b.score - a.score);
+                    
+                    // Re-rank
+                    data.forEach((player, index) => {
+                        player.rank = index + 1;
+                    });
+                }
+                
+                return data;
+            }
+
+            applyTimeFilter(score, filter) {
+                const multipliers = {
+                    'today': 0.1,
+                    'week': 0.3,
+                    'month': 0.6,
+                    'all': 1
+                };
+                return Math.floor(score * multipliers[filter]);
+            }
+
+            getWeeklyRanking() {
+                return [...this.leaderboardData]
+                    .map(player => ({
+                        ...player,
+                        weeklyScore: Math.floor(Math.random() * 1000) + 200,
+                        weeklyChange: Math.floor(Math.random() * 20) - 10
+                    }))
+                    .sort((a, b) => b.weeklyScore - a.weeklyScore)
+                    .slice(0, 20);
+            }
+
+            getMultiplayerRanking() {
+                return [...this.leaderboardData]
+                    .map(player => ({
+                        ...player,
+                        multiplayerWins: Math.floor(Math.random() * 100),
+                        multiplayerLosses: Math.floor(Math.random() * 50),
+                        winRate: Math.floor(Math.random() * 30) + 60
+                    }))
+                    .sort((a, b) => b.multiplayerWins - a.multiplayerWins)
+                    .slice(0, 15);
+            }
+
+            getFriendsRanking() {
+                return this.friends.map(friend => {
+                    const leaderboardPlayer = this.leaderboardData.find(p => p.name === friend.name);
+                    return {
+                        ...friend,
+                        rank: leaderboardPlayer ? leaderboardPlayer.rank : friend.rank,
+                        score: leaderboardPlayer ? leaderboardPlayer.score : friend.score,
+                        weeklyChange: Math.floor(Math.random() * 10) - 5
+                    };
+                }).sort((a, b) => a.rank - b.rank);
+            }
+
+            getUserStats() {
+                return this.userStats;
+            }
+
+            updateUserScore(scoreDelta) {
+                this.userStats.score += scoreDelta;
+                
+                // Update rank if needed
+                const currentRankIndex = this.leaderboardData.findIndex(p => p.isUser);
+                if (currentRankIndex !== -1) {
+                    this.leaderboardData[currentRankIndex].score = this.userStats.score;
+                    
+                    // Re-sort and update ranks
+                    this.leaderboardData.sort((a, b) => b.score - a.score);
+                    this.leaderboardData.forEach((player, index) => {
+                        player.rank = index + 1;
+                    });
+                    
+                    // Find new user rank
+                    const newRankIndex = this.leaderboardData.findIndex(p => p.isUser);
+                    const oldRank = this.userStats.rank;
+                    const newRank = newRankIndex + 1;
+                    
+                    this.userStats.rank = newRank;
+                    this.userStats.rankChange = oldRank - newRank; // Positive if improved
+                    
+                    this.saveToStorage();
+                    return { oldRank, newRank, rankChange: this.userStats.rankChange };
+                }
+                
+                return null;
+            }
+
+            addFriend(name) {
+                if (this.friends.find(f => f.name === name)) {
+                    return { success: false, message: 'Already friends' };
+                }
+                
+                const newFriend = {
+                    id: this.friends.length + 1,
+                    name: name,
+                    rank: 50 + Math.floor(Math.random() * 50),
+                    score: 2000 + Math.floor(Math.random() * 3000),
+                    isOnline: true,
+                    status: 'Online',
+                    avatarColor: this.generateAvatarColor(this.friends.length)
+                };
+                
+                this.friends.push(newFriend);
+                this.saveToStorage();
+                
+                return { success: true, friend: newFriend };
+            }
+
+            removeFriend(friendId) {
+                this.friends = this.friends.filter(f => f.id !== friendId);
+                this.saveToStorage();
+            }
+
+            challengeFriend(friendName) {
+                // Simulate challenge
+                return {
+                    success: true,
+                    message: `Challenge sent to ${friendName}!`,
+                    matchId: 'CHL_' + Date.now()
+                };
+            }
+        }
+
+        // ==================== UI MANAGEMENT ====================
+        class LeaderboardUI {
+            constructor(leaderboardSystem) {
+                this.system = leaderboardSystem;
+                this.currentTheme = localStorage.getItem('pp_theme') || 'cute';
+                this.modal = null;
+            }
+
+            init() {
+                this.applyTheme(this.currentTheme);
+                this.setupEventListeners();
+                this.renderLeaderboard();
+                this.updateDecorativeElements();
+                this.showWelcomeNotification();
+            }
+
+            applyTheme(theme) {
+                this.currentTheme = theme;
+                document.body.className = theme + '-theme';
+                
+                // Update all theme-specific elements
+                document.querySelectorAll('.cute, .deadly').forEach(el => {
+                    el.classList.remove('cute', 'deadly');
+                    el.classList.add(theme);
+                });
+                
+                // Update toggle button
+                const toggleBtn = document.getElementById('themeToggle');
+                if (toggleBtn) {
+                    toggleBtn.innerHTML = theme === 'cute' 
+                        ? '<i class="fas fa-moon"></i> Deadly Mode'
+                        : '<i class="fas fa-sun"></i> Cute Mode';
+                }
+                
+                localStorage.setItem('pp_theme', theme);
+                this.updateDecorativeElements();
+            }
+
+            setupEventListeners() {
+                // Theme toggle
+                document.getElementById('themeToggle').addEventListener('click', () => {
+                    this.applyTheme(this.currentTheme === 'cute' ? 'deadly' : 'cute');
+                    this.renderLeaderboard();
+                });
+                
+                // Tab switching
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const tab = e.target.dataset.tab;
+                        this.switchTab(tab);
+                    });
+                });
+                
+                // Time filters
+                document.querySelectorAll('.time-filter-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const timeFilter = e.target.dataset.time;
+                        this.applyTimeFilter(timeFilter);
+                    });
+                });
+                
+                // Quick action buttons
+                document.getElementById('play-now-btn').addEventListener('click', () => {
+                    this.showNotification('🎮 Starting a new game...', 'info');
+                    setTimeout(() => {
+                        window.location.href = 'game.html';
+                    }, 1000);
+                });
+                
+                document.getElementById('challenge-friend-btn').addEventListener('click', () => {
+                    this.showFriendChallengeDialog();
+                });
+                
+                document.getElementById('share-profile-btn').addEventListener('click', () => {
+                    this.shareProfile();
+                });
+                
+                document.getElementById('view-all-achievements').addEventListener('click', () => {
+                    this.showAllAchievements();
+                });
+                
+                // Initialize modal
+                this.initModal();
+                
+                // Simulate real-time updates
+                this.startRealTimeUpdates();
+            }
+
+            switchTab(tab) {
+                this.system.currentTab = tab;
+                
+                // Update active tab button
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.tab === tab) {
+                        btn.classList.add('active');
+                    }
+                });
+                
+                // Render appropriate content
+                this.renderLeaderboard();
+                
+                // Update URL hash
+                window.location.hash = tab;
+            }
+
+            applyTimeFilter(timeFilter) {
+                this.system.currentTimeFilter = timeFilter;
+                
+                // Update active time filter button
+                document.querySelectorAll('.time-filter-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.time === timeFilter) {
+                        btn.classList.add('active');
+                    }
+                });
+                
+                // Re-render leaderboard
+                this.renderLeaderboard();
+            }
+
+            renderLeaderboard() {
+                const container = document.getElementById('leaderboard-body');
+                container.innerHTML = '';
+                
+                let data = [];
+                let columns = ['rank', 'player', 'score', 'level', 'wins', 'rating'];
+                
+                switch (this.system.currentTab) {
+                    case 'overall':
+                        data = this.system.getLeaderboardData(this.system.currentTimeFilter);
+                        break;
+                    case 'weekly':
+                        data = this.system.getWeeklyRanking();
+                        columns = ['rank', 'player', 'weeklyScore', 'weeklyChange'];
+                        break;
+                    case 'multiplayer':
+                        data = this.system.getMultiplayerRanking();
+                        columns = ['rank', 'player', 'multiplayerWins', 'winRate'];
+                        break;
+                    case 'friends':
+                        data = this.system.getFriendsRanking();
+                        columns = ['rank', 'player', 'score', 'status'];
+                        break;
+                }
+                
+                // Update table header based on current tab
+                this.updateTableHeader(columns);
+                
+                // Render rows
+                data.forEach((player, index) => {
+                    const row = this.createTableRow(player, index);
+                    container.appendChild(row);
+                });
+                
+                // Update podium for overall tab
+                if (this.system.currentTab === 'overall') {
+                    this.updatePodium(data.slice(0, 3));
+                } else {
+                    this.hidePodium();
+                }
+                
+                // Update user stats
+                this.updateUserStats();
+                
+                // Trigger animations
+                setTimeout(() => {
+                    container.querySelectorAll('.table-row').forEach((row, index) => {
+                        row.style.animationDelay = `${index * 0.05}s`;
+                        row.classList.add('animate-in');
+                    });
+                }, 100);
+            }
+
+            updateTableHeader(columns) {
+                const header = document.querySelector('.table-header');
+                if (!header) return;
+                
+                // Define column configurations
+                const columnConfigs = {
+                    'rank': { label: 'Rank', class: 'header-rank' },
+                    'player': { label: 'Player', class: 'header-player' },
+                    'score': { label: 'Score', class: 'header-score' },
+                    'level': { label: 'Level', class: 'header-level' },
+                    'wins': { label: 'Wins', class: 'header-wins' },
+                    'rating': { label: 'Rating', class: 'header-rating' },
+                    'weeklyScore': { label: 'Weekly Score', class: 'header-score' },
+                    'weeklyChange': { label: 'Change', class: 'header-rating' },
+                    'multiplayerWins': { label: 'Wins', class: 'header-wins' },
+                    'winRate': { label: 'Win Rate', class: 'header-rating' },
+                    'status': { label: 'Status', class: 'header-level' }
+                };
+                
+                header.innerHTML = '';
+                columns.forEach(col => {
+                    const config = columnConfigs[col];
+                    if (config) {
+                        const div = document.createElement('div');
+                        div.className = config.class;
+                        div.textContent = config.label;
+                        header.appendChild(div);
+                    }
+                });
+            }
+
+            createTableRow(player, index) {
+                const row = document.createElement('div');
+                row.className = `table-row ${this.currentTheme}`;
+                if (player.isUser) row.classList.add('current-user');
+                
+                let html = '';
+                
+                switch (this.system.currentTab) {
+                    case 'overall':
+                        html = this.createOverallRow(player);
+                        break;
+                    case 'weekly':
+                        html = this.createWeeklyRow(player);
+                        break;
+                    case 'multiplayer':
+                        html = this.createMultiplayerRow(player);
+                        break;
+                    case 'friends':
+                        html = this.createFriendsRow(player);
+                        break;
+                }
+                
+                row.innerHTML = html;
+                
+                // Add click event for friend actions
+                if (this.system.currentTab === 'friends') {
+                    const challengeBtn = row.querySelector('.challenge-btn');
+                    if (challengeBtn) {
+                        challengeBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            this.challengeFriend(player.name);
+                        });
+                    }
+                    
+                    const removeBtn = row.querySelector('.remove-btn');
+                    if (removeBtn) {
+                        removeBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            this.removeFriend(player.id);
+                        });
+                    }
+                }
+                
+                // Add row click event
+                row.addEventListener('click', () => {
+                    this.showPlayerProfile(player);
+                });
+                
+                return row;
+            }
+
+            createOverallRow(player) {
+                const rankChange = player.rankChange;
+                const rankChangeHtml = rankChange > 0 ? 
+                    `<span class="rank-change up">+${rankChange}</span>` :
+                    rankChange < 0 ? 
+                    `<span class="rank-change down">${rankChange}</span>` :
+                    '';
+                
+                return `
+                    <div class="rank-cell">
+                        <span class="rank-number">${player.rank}</span>
+                        ${rankChangeHtml}
+                    </div>
+                    <div class="player-cell">
+                        <div class="player-avatar-small" style="background: linear-gradient(135deg, ${player.avatarColor}, ${this.getAvatarColor2(player.avatarColor)})">
+                            ${player.name.charAt(0)}
                         </div>
-                        <div class="stat-content">
-                            <div class="stat-value">2,850</div>
-                            <div class="stat-label">Total Score</div>
+                        <div class="player-info">
+                            <span class="player-name-small">${player.name}</span>
+                            ${player.isOnline ? '<span class="player-status"></span>' : '<span class="player-status offline"></span>'}
                         </div>
                     </div>
-                    
-                    <div class="stat-item {{ theme }}">
-                        <div class="stat-icon">
-                            <i class="fas fa-flag-checkered"></i>
+                    <div class="score-cell">${player.score.toLocaleString()}</div>
+                    <div class="level-cell">
+                        <span class="level-badge">Level ${player.level}</span>
+                    </div>
+                    <div class="wins-cell">${player.wins}</div>
+                    <div class="rating-cell">${player.rating}</div>
+                `;
+            }
+
+            createWeeklyRow(player) {
+                const changeIcon = player.weeklyChange > 0 ? 'fa-arrow-up' : 
+                                 player.weeklyChange < 0 ? 'fa-arrow-down' : 'fa-minus';
+                const changeClass = player.weeklyChange > 0 ? 'up' : 
+                                   player.weeklyChange < 0 ? 'down' : '';
+                
+                return `
+                    <div class="rank-cell">
+                        <span class="rank-number">${player.rank}</span>
+                        <span class="rank-change ${changeClass}">
+                            <i class="fas ${changeIcon}"></i> ${Math.abs(player.weeklyChange)}
+                        </span>
+                    </div>
+                    <div class="player-cell">
+                        <div class="player-avatar-small" style="background: linear-gradient(135deg, ${player.avatarColor}, ${this.getAvatarColor2(player.avatarColor)})">
+                            ${player.name.charAt(0)}
                         </div>
-                        <div class="stat-content">
-                            <div class="stat-value">7/10</div>
-                            <div class="stat-label">Levels Completed</div>
+                        <div class="player-info">
+                            <span class="player-name-small">${player.name}</span>
                         </div>
                     </div>
-                    
-                    <div class="stat-item {{ theme }}">
-                        <div class="stat-icon">
-                            <i class="fas fa-trophy"></i>
+                    <div class="score-cell">${player.weeklyScore.toLocaleString()}</div>
+                    <div class="rating-cell ${changeClass}">
+                        <i class="fas ${changeIcon}"></i> ${Math.abs(player.weeklyChange)}
+                    </div>
+                `;
+            }
+
+            createMultiplayerRow(player) {
+                return `
+                    <div class="rank-cell">
+                        <span class="rank-number">${player.rank}</span>
+                    </div>
+                    <div class="player-cell">
+                        <div class="player-avatar-small" style="background: linear-gradient(135deg, ${player.avatarColor}, ${this.getAvatarColor2(player.avatarColor)})">
+                            ${player.name.charAt(0)}
                         </div>
-                        <div class="stat-content">
-                            <div class="stat-value">5</div>
-                            <div class="stat-label">Achievements</div>
+                        <div class="player-info">
+                            <span class="player-name-small">${player.name}</span>
+                            <span class="player-status"></span>
                         </div>
                     </div>
-                    
-                    <div class="stat-item {{ theme }}">
-                        <div class="stat-icon">
+                    <div class="wins-cell">${player.multiplayerWins}</div>
+                    <div class="rating-cell">${player.winRate}%</div>
+                `;
+            }
+
+            createFriendsRow(player) {
+                const statusText = player.isOnline ? player.status : 'Offline';
+                const statusClass = player.isOnline ? '' : 'offline';
+                
+                return `
+                    <div class="rank-cell">
+                        <span class="rank-number">${player.rank}</span>
+                    </div>
+                    <div class="player-cell">
+                        <div class="player-avatar-small" style="background: linear-gradient(135deg, ${player.avatarColor}, ${this.getAvatarColor2(player.avatarColor)})">
+                            ${player.name.charAt(0)}
+                        </div>
+                        <div class="player-info">
+                            <span class="player-name-small">${player.name}</span>
+                            <span class="player-status ${statusClass}"></span>
+                        </div>
+                    </div>
+                    <div class="score-cell">${player.score.toLocaleString()}</div>
+                    <div class="level-cell">
+                        <span class="level-badge">${statusText}</span>
+                    </div>
+                    <div class="rating-cell">
+                        <button class="challenge-btn btn ${this.currentTheme} small" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">
                             <i class="fas fa-crosshairs"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-value">1,350</div>
-                            <div class="stat-label">Battle Rating</div>
+                        </button>
+                        <button class="remove-btn btn ${this.currentTheme} small" style="padding: 0.25rem 0.5rem; font-size: 0.8rem; margin-left: 0.5rem;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+            }
+
+            updatePodium(top3) {
+                if (top3.length < 3) return;
+                
+                // Update player 1
+                document.getElementById('player1-name').textContent = top3[0].name;
+                document.getElementById('player1-score').textContent = top3[0].score.toLocaleString();
+                document.getElementById('player1-wins').textContent = `${Math.floor((top3[0].wins / 100) * 100)}%`;
+                document.getElementById('player1-level').textContent = top3[0].level;
+                
+                // Update player 2
+                document.getElementById('player2-name').textContent = top3[1].name;
+                document.getElementById('player2-score').textContent = top3[1].score.toLocaleString();
+                document.getElementById('player2-wins').textContent = `${Math.floor((top3[1].wins / 100) * 100)}%`;
+                document.getElementById('player2-level').textContent = top3[1].level;
+                
+                // Update player 3
+                document.getElementById('player3-name').textContent = top3[2].name;
+                document.getElementById('player3-score').textContent = top3[2].score.toLocaleString();
+                document.getElementById('player3-wins').textContent = `${Math.floor((top3[2].wins / 100) * 100)}%`;
+                document.getElementById('player3-level').textContent = top3[2].level;
+                
+                // Show podium section
+                document.querySelector('.podium-section').style.display = 'block';
+            }
+
+            hidePodium() {
+                document.querySelector('.podium-section').style.display = 'none';
+            }
+
+            updateUserStats() {
+                const userStats = this.system.getUserStats();
+                
+                // Update rank
+                document.getElementById('your-rank').textContent = `#${userStats.rank}`;
+                
+                // Update rank change
+                const rankChangeElement = document.getElementById('rank-change');
+                if (userStats.rankChange > 0) {
+                    rankChangeElement.innerHTML = `<i class="fas fa-arrow-up"></i> Up ${userStats.rankChange} spots this week`;
+                    rankChangeElement.className = 'rank-change-large up';
+                } else if (userStats.rankChange < 0) {
+                    rankChangeElement.innerHTML = `<i class="fas fa-arrow-down"></i> Down ${Math.abs(userStats.rankChange)} spots`;
+                    rankChangeElement.className = 'rank-change-large down';
+                } else {
+                    rankChangeElement.innerHTML = `No change this week`;
+                    rankChangeElement.className = 'rank-change-large';
+                }
+                
+                // Update progress bar
+                const progressPercent = userStats.weeklyProgress || 60;
+                document.getElementById('rank-progress').style.width = `${progressPercent}%`;
+                
+                // Update next rank text
+                const nextRank = Math.max(1, userStats.rank - 5);
+                const pointsNeeded = Math.max(0, (userStats.rank - nextRank) * 100);
+                document.getElementById('next-rank').textContent = 
+                    pointsNeeded > 0 ? `${pointsNeeded} points to reach #${nextRank}` : 'You are #1! 🎉';
+                
+                // Update stats
+                document.getElementById('your-score').textContent = userStats.score.toLocaleString();
+                document.getElementById('your-level').textContent = userStats.level;
+                document.getElementById('your-wins').textContent = userStats.wins;
+                document.getElementById('your-rating').textContent = userStats.rating;
+                
+                // Update achievements preview
+                this.updateAchievementsPreview(userStats.achievements || []);
+            }
+
+            updateAchievementsPreview(achievements) {
+                const container = document.getElementById('achievements-preview');
+                container.innerHTML = '';
+                
+                const achievementIcons = {
+                    'first_lesson': 'fas fa-graduation-cap',
+                    'streak_7': 'fas fa-fire',
+                    'multiplayer_10': 'fas fa-crosshairs',
+                    'level_5': 'fas fa-python',
+                    'xp_10000': 'fas fa-crown',
+                    'game_5000': 'fas fa-gamepad',
+                    'lessons_10': 'fas fa-book-open'
+                };
+                
+                const achievementColors = [
+                    '#ff6b9d', '#a2d2ff', '#ffd166', '#06d6a0', '#118ab2', '#ef476f', '#9d4edd'
+                ];
+                
+                achievements.slice(0, 8).forEach((achievement, index) => {
+                    const icon = document.createElement('div');
+                    icon.className = `achievement-icon ${this.currentTheme}`;
+                    icon.style.background = `linear-gradient(135deg, ${achievementColors[index % achievementColors.length]}, ${this.lightenColor(achievementColors[index % achievementColors.length], 20)})`;
+                    icon.innerHTML = `<i class="${achievementIcons[achievement] || 'fas fa-trophy'}"></i>`;
+                    icon.title = this.getAchievementName(achievement);
+                    icon.addEventListener('click', () => this.showAchievementPopup(achievement));
+                    container.appendChild(icon);
+                });
+            }
+
+            getAchievementName(key) {
+                const names = {
+                    'first_lesson': 'First Lesson',
+                    'streak_7': '7-Day Streak',
+                    'multiplayer_10': '10 Multiplayer Wins',
+                    'level_5': 'Level 5 Reached',
+                    'xp_10000': '10,000 XP',
+                    'game_5000': '5,000 Game Score',
+                    'lessons_10': '10 Lessons Completed'
+                };
+                return names[key] || key;
+            }
+
+            getAvatarColor2(color1) {
+                // Convert hex to RGB
+                const r = parseInt(color1.slice(1, 3), 16);
+                const g = parseInt(color1.slice(3, 5), 16);
+                const b = parseInt(color1.slice(5, 7), 16);
+                
+                // Lighten color
+                const lighten = (value) => Math.min(255, value + 60);
+                
+                return `rgb(${lighten(r)}, ${lighten(g)}, ${lighten(b)})`;
+            }
+
+            lightenColor(color, percent) {
+                const num = parseInt(color.slice(1), 16);
+                const amt = Math.round(2.55 * percent);
+                const R = (num >> 16) + amt;
+                const G = (num >> 8 & 0x00FF) + amt;
+                const B = (num & 0x0000FF) + amt;
+                
+                return `rgb(${R}, ${G}, ${B})`;
+            }
+
+            updateDecorativeElements() {
+                const container = document.getElementById('leaderboard-decoration');
+                container.innerHTML = '';
+                
+                for (let i = 0; i < 15; i++) {
+                    const element = document.createElement('div');
+                    element.className = `floating-element ${this.currentTheme === 'cute' ? 'cute-element' : 'deadly-element'}`;
+                    
+                    const size = 40 + Math.random() * 80;
+                    const duration = 25 + Math.random() * 35;
+                    const delay = Math.random() * 20;
+                    
+                    element.style.cssText = `
+                        width: ${size}px;
+                        height: ${size}px;
+                        left: ${Math.random() * 100}%;
+                        top: ${Math.random() * 100}%;
+                        animation-duration: ${duration}s;
+                        animation-delay: -${delay}s;
+                        opacity: ${0.05 + Math.random() * 0.1};
+                    `;
+                    
+                    container.appendChild(element);
+                }
+            }
+
+            showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                notification.className = `notification ${this.currentTheme}`;
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 100px;
+                    right: 20px;
+                    background: ${this.currentTheme === 'cute' ? 'white' : 'var(--deadly-card)'};
+                    border-radius: var(--radius);
+                    padding: 1.5rem;
+                    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+                    z-index: 10000;
+                    animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    max-width: 300px;
+                    border-left: 5px solid ${type === 'success' ? '#4CAF50' : type === 'error' ? '#F44336' : '#2196F3'};
+                `;
+                
+                const icon = type === 'success' ? 'check-circle' : 
+                            type === 'error' ? 'exclamation-circle' : 'info-circle';
+                
+                notification.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <i class="fas fa-${icon}" 
+                           style="color: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#F44336' : '#2196F3'}; 
+                                  font-size: 1.5rem;"></i>
+                        <div>
+                            <p style="margin: 0; font-weight: 600;">${message}</p>
                         </div>
                     </div>
-                </div>
-            </div>
-            
-            <div class="achievements-preview {{ theme }}">
-                <h4><i class="fas fa-award"></i> Recent Achievements</h4>
-                <div class="achievements-list">
-                    {% for i in range(1, 4) %}
-                    <div class="achievement {{ theme }}">
-                        <div class="achievement-icon">{{ ['🏆', '🐍', '⚡'][i-1] }}</div>
-                        <div class="achievement-info">
-                            <div class="achievement-name">
-                                {% if i == 1 %}Python Prodigy{% endif %}
-                                {% if i == 2 %}Speed Coder{% endif %}
-                                {% if i == 3 %}Multiplayer Champion{% endif %}
+                `;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    if (notification.parentElement) {
+                        notification.remove();
+                    }
+                }, 3000);
+            }
+
+            showWelcomeNotification() {
+                setTimeout(() => {
+                    this.showNotification('🏆 Welcome to the Global Leaderboard! Compete and climb!', 'info');
+                }, 1000);
+            }
+
+            showFriendChallengeDialog() {
+                const friendName = prompt('Enter friend\'s username to challenge:');
+                if (friendName && friendName.trim()) {
+                    const result = this.system.challengeFriend(friendName.trim());
+                    this.showNotification(result.message, 'success');
+                }
+            }
+
+            shareProfile() {
+                const userStats = this.system.getUserStats();
+                const shareText = `Check out my Python Pathfinder ranking! 🐍\nRank: #${userStats.rank}\nScore: ${userStats.score}\nLevel: ${userStats.level}\n\nCan you beat me?`;
+                
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'My Python Pathfinder Profile',
+                        text: shareText,
+                        url: window.location.href
+                    });
+                } else {
+                    navigator.clipboard.writeText(shareText).then(() => {
+                        this.showNotification('📋 Profile copied to clipboard!', 'success');
+                    });
+                }
+            }
+
+            showAllAchievements() {
+                const userStats = this.system.getUserStats();
+                const achievements = userStats.achievements || [];
+                
+                if (achievements.length === 0) {
+                    this.showNotification('No achievements yet. Keep playing to earn some!', 'info');
+                    return;
+                }
+                
+                let message = 'Your Achievements:\n\n';
+                achievements.forEach(achievement => {
+                    message += `🏆 ${this.getAchievementName(achievement)}\n`;
+                });
+                
+                alert(message);
+            }
+
+            showAchievementPopup(achievementKey) {
+                const achievementName = this.getAchievementName(achievementKey);
+                const descriptions = {
+                    'first_lesson': 'Completed your first Python lesson!',
+                    'streak_7': 'Maintained a 7-day learning streak!',
+                    'multiplayer_10': 'Won 10 multiplayer matches!',
+                    'level_5': 'Reached Level 5 in your coding journey!',
+                    'xp_10000': 'Earned 10,000 experience points!',
+                    'game_5000': 'Scored 5,000 points in Code Tetris!',
+                    'lessons_10': 'Completed 10 lessons!'
+                };
+                
+                this.showNotification(`🏆 ${achievementName}\n${descriptions[achievementKey] || 'Great job!'}`, 'success');
+            }
+
+            challengeFriend(friendName) {
+                const result = this.system.challengeFriend(friendName);
+                this.showNotification(result.message, 'success');
+            }
+
+            removeFriend(friendId) {
+                if (confirm('Remove this friend from your list?')) {
+                    this.system.removeFriend(friendId);
+                    this.showNotification('Friend removed', 'info');
+                    this.renderLeaderboard(); // Re-render friends tab
+                }
+            }
+
+            showPlayerProfile(player) {
+                const profileHtml = `
+                    <div style="text-align: center; padding: 2rem;">
+                        <div style="width: 100px; height: 100px; border-radius: 50%; 
+                                    background: linear-gradient(135deg, ${player.avatarColor}, ${this.getAvatarColor2(player.avatarColor)});
+                                    margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; 
+                                    font-size: 2.5rem; color: white; font-weight: bold;">
+                            ${player.name.charAt(0)}
+                        </div>
+                        <h3 style="margin: 0 0 0.5rem 0;">${player.name}</h3>
+                        <p style="opacity: 0.8; margin: 0 0 1.5rem 0;">${player.title}</p>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+                            <div>
+                                <div style="font-size: 1.2rem; font-weight: bold; color: ${this.currentTheme === 'cute' ? 'var(--cute-primary)' : 'var(--deadly-accent)'}">
+                                    ${player.score.toLocaleString()}
+                                </div>
+                                <div style="font-size: 0.9rem; opacity: 0.7;">Score</div>
                             </div>
-                            <div class="achievement-date">2 days ago</div>
+                            <div>
+                                <div style="font-size: 1.2rem; font-weight: bold; color: ${this.currentTheme === 'cute' ? 'var(--cute-primary)' : 'var(--deadly-accent)'}">
+                                    ${player.level}
+                                </div>
+                                <div style="font-size: 0.9rem; opacity: 0.7;">Level</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 1.2rem; font-weight: bold; color: ${this.currentTheme === 'cute' ? 'var(--cute-primary)' : 'var(--deadly-accent)'}">
+                                    ${player.wins}
+                                </div>
+                                <div style="font-size: 0.9rem; opacity: 0.7;">Wins</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 1.2rem; font-weight: bold; color: ${this.currentTheme === 'cute' ? 'var(--cute-primary)' : 'var(--deadly-accent)'}">
+                                    ${player.rating}
+                                </div>
+                                <div style="font-size: 0.9rem; opacity: 0.7;">Rating</div>
+                            </div>
                         </div>
+                        
+                        ${!player.isUser ? `
+                            <div style="display: flex; gap: 0.5rem; justify-content: center;">
+                                <button class="btn ${this.currentTheme} small challenge-profile-btn">
+                                    <i class="fas fa-crosshairs"></i> Challenge
+                                </button>
+                                <button class="btn ${this.currentTheme} small add-friend-btn">
+                                    <i class="fas fa-user-plus"></i> Add Friend
+                                </button>
+                            </div>
+                        ` : ''}
                     </div>
-                    {% endfor %}
-                </div>
-            </div>
-            
-            <div class="next-milestone {{ theme }}">
-                <h4><i class="fas fa-bullseye"></i> Next Milestone</h4>
-                <div class="milestone-content">
-                    <div class="milestone-title">Reach Top 20</div>
-                    <div class="milestone-progress">
-                        <div class="progress-text">150 points to go</div>
-                        <div class="progress-bar {{ theme }}">
-                            <div class="progress-fill" style="width: 75%"></div>
-                        </div>
-                    </div>
-                    <button class="btn {{ theme }} small">
-                        <i class="fas fa-play"></i> Play Now
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+                `;
+                
+                const modal = this.createModal('Player Profile', profileHtml);
+                
+                // Add event listeners for buttons
+                setTimeout(() => {
+                    const challengeBtn = modal.querySelector('.challenge-profile-btn');
+                    if (challengeBtn) {
+                        challengeBtn.addEventListener('click', () => {
+                            this.challengeFriend(player.name);
+                            this.closeModal();
+                        });
+                    }
+                    
+                    const addFriendBtn = modal.querySelector('.add-friend-btn');
+                    if (addFriendBtn) {
+                        addFriendBtn.addEventListener('click', () => {
+                            const result = this.system.addFriend(player.name);
+                            if (result.success) {
+                                this.showNotification(`Added ${player.name} as friend!`, 'success');
+                            } else {
+                                this.showNotification(result.message, 'info');
+                            }
+                            this.closeModal();
+                        });
+                    }
+                }, 100);
+            }
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Tab switching
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
-    
-    tabBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const tabId = this.dataset.tab;
-            
-            // Update active tab button
-            tabBtns.forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            
-            // Show corresponding content
-            tabContents.forEach(content => {
-                content.classList.remove('active');
-                if (content.id === `${tabId}-tab`) {
-                    content.classList.add('active');
+            initModal() {
+                this.modal = document.getElementById('achievement-modal');
+                const closeBtn = this.modal.querySelector('.modal-close');
+                
+                closeBtn.addEventListener('click', () => this.closeModal());
+                
+                // Close modal when clicking outside
+                window.addEventListener('click', (e) => {
+                    if (e.target === this.modal) {
+                        this.closeModal();
+                    }
+                });
+            }
+
+            createModal(title, content) {
+                const modal = document.getElementById('achievement-modal');
+                modal.querySelector('.modal-header h3').innerHTML = title;
+                modal.querySelector('.modal-body').innerHTML = content;
+                modal.style.display = 'block';
+                return modal;
+            }
+
+            closeModal() {
+                this.modal.style.display = 'none';
+            }
+
+            startRealTimeUpdates() {
+                // Simulate real-time rank changes
+                setInterval(() => {
+                    this.simulateRankChanges();
+                }, 30000); // Update every 30 seconds
+            }
+
+            simulateRankChanges() {
+                // Randomly update some player scores
+                this.system.leaderboardData.forEach(player => {
+                    if (!player.isUser && Math.random() > 0.7) {
+                        const change = Math.floor(Math.random() * 100) - 45;
+                        player.score = Math.max(0, player.score + change);
+                        player.rankChange = change > 0 ? 1 : change < 0 ? -1 : 0;
+                    }
+                });
+                
+                // Re-sort
+                this.system.leaderboardData.sort((a, b) => b.score - a.score);
+                this.system.leaderboardData.forEach((player, index) => {
+                    player.rank = index + 1;
+                });
+                
+                // Save and re-render if on overall tab
+                this.system.saveToStorage();
+                if (this.system.currentTab === 'overall') {
+                    this.renderLeaderboard();
+                    this.showNotification('🔄 Leaderboard updated!', 'info');
                 }
-            });
+            }
+        }
+
+        // ==================== INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            const leaderboardSystem = new LeaderboardSystem();
+            const leaderboardUI = new LeaderboardUI(leaderboardSystem);
             
-            // Update URL hash
-            history.pushState(null, null, `#${tabId}`);
-        });
-    });
-    
-    // Check URL hash on load
-    const hash = window.location.hash.substring(1);
-    if (hash && ['overall', 'weekly', 'multiplayer', 'friends'].includes(hash)) {
-        const btn = document.querySelector(`.tab-btn[data-tab="${hash}"]`);
-        if (btn) btn.click();
-    }
-    
-    // Real-time updates
-    function updateLeaderboard() {
-        // Simulate real-time updates
-        const rows = document.querySelectorAll('.leaderboard-row');
-        rows.forEach(row => {
-            if (Math.random() > 0.7) {
-                const ratingChange = row.querySelector('.rating-change');
-                if (ratingChange) {
-                    const change = Math.random() > 0.5 ? '+' + Math.floor(Math.random() * 10) : 
-                                 '-' + Math.floor(Math.random() * 10);
-                    ratingChange.textContent = change;
-                    ratingChange.className = `rating-change ${change.startsWith('+') ? 'positive' : 'negative'}`;
+            leaderboardUI.init();
+            
+            // Check URL hash for tab
+            const hash = window.location.hash.substring(1);
+            if (hash && ['overall', 'weekly', 'multiplayer', 'friends'].includes(hash)) {
+                leaderboardUI.switchTab(hash);
+            }
+            
+            // Add CSS for animations
+            const style = document.createElement('style');
+            style.textContent = `
+                .modal {
+                    display: none;
+                    position: fixed;
+                    z-index: 1000;
+                    left: 0;
+                    top: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0,0,0,0.5);
+                    backdrop-filter: blur(5px);
                 }
-            }
+                
+                .modal-content {
+                    background: ${leaderboardUI.currentTheme === 'cute' ? 'white' : 'var(--deadly-card)'};
+                    margin: 10% auto;
+                    padding: 0;
+                    border-radius: var(--radius);
+                    width: 90%;
+                    max-width: 500px;
+                    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                    animation: fadeIn 0.3s ease;
+                    border: 2px solid ${leaderboardUI.currentTheme === 'cute' ? 'var(--cute-primary)' : 'var(--deadly-accent)'};
+                }
+                
+                .modal-header {
+                    padding: 1.5rem 2rem;
+                    border-bottom: 1px solid ${leaderboardUI.currentTheme === 'cute' ? 'var(--cute-border)' : 'var(--deadly-border)'};
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+                
+                .modal-header h3 {
+                    margin: 0;
+                    color: ${leaderboardUI.currentTheme === 'cute' ? 'var(--cute-primary)' : 'var(--deadly-accent)'};
+                }
+                
+                .modal-close {
+                    background: none;
+                    border: none;
+                    font-size: 1.5rem;
+                    cursor: pointer;
+                    color: inherit;
+                    opacity: 0.7;
+                    transition: opacity 0.2s;
+                }
+                
+                .modal-close:hover {
+                    opacity: 1;
+                }
+                
+                .modal-body {
+                    padding: 2rem;
+                }
+                
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
         });
-    }
-    
-    // Update every 30 seconds
-    setInterval(updateLeaderboard, 30000);
-    
-    // Add friend functionality
-    const addFriendBtn = document.querySelector('.friend-search button');
-    const addFriendInput = document.querySelector('.friend-search input');
-    
-    if (addFriendBtn && addFriendInput) {
-        addFriendBtn.addEventListener('click', function() {
-            const username = addFriendInput.value.trim();
-            if (username) {
-                alert(`Friend request sent to ${username}!`);
-                addFriendInput.value = '';
-            }
-        });
-        
-        addFriendInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                addFriendBtn.click();
-            }
-        });
-    }
-    
-    // Challenge friend buttons
-    const challengeBtns = document.querySelectorAll('.action-btn .fa-crosshairs');
-    challengeBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const friendRow = this.closest('.friend-row');
-            const friendName = friendRow.querySelector('h4').textContent;
-            if (confirm(`Challenge ${friendName} to a coding duel?`)) {
-                alert(`Challenge sent to ${friendName}!`);
-            }
-        });
-    });
-    
-    // Animate rank changes
-    function animateRankChanges() {
-        const changes = document.querySelectorAll('.rating-change');
-        changes.forEach(change => {
-            if (change.textContent !== '—' && !change.classList.contains('animated')) {
-                change.classList.add('animated');
-                setTimeout(() => change.classList.remove('animated'), 1000);
-            }
-        });
-    }
-    
-    // Initial animation
-    setTimeout(animateRankChanges, 1000);
-    
-    // Refresh button (could be added to UI)
-    function refreshLeaderboard() {
-        const rows = document.querySelectorAll('.leaderboard-row');
-        rows.forEach(row => {
-            row.style.opacity = '0.5';
-            setTimeout(() => row.style.opacity = '1', 300);
-        });
-        animateRankChanges();
-    }
-    
-    // Auto-refresh every 2 minutes
-    setInterval(refreshLeaderboard, 120000);
-});
-
-// Add animations
-const style = document.createElement('style');
-style.textContent = `
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-}
-
-@keyframes slideIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes highlight {
-    0% { background-color: transparent; }
-    50% { background-color: rgba(255, 255, 0, 0.1); }
-    100% { background-color: transparent; }
-}
-
-.leaderboard-row {
-    animation: slideIn 0.3s ease-out forwards;
-    opacity: 0;
-}
-
-.leaderboard-row:nth-child(1) { animation-delay: 0.1s; }
-.leaderboard-row:nth-child(2) { animation-delay: 0.2s; }
-.leaderboard-row:nth-child(3) { animation-delay: 0.3s; }
-/* Continue pattern... */
-
-.rating-change.positive.animated {
-    animation: pulse 1s ease;
-    color: #4CAF50 !important;
-}
-
-.rating-change.negative.animated {
-    animation: pulse 1s ease;
-    color: #F44336 !important;
-}
-
-.current-user {
-    animation: highlight 2s ease;
-}
-
-.player-status.online:before {
-    content: '';
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    background: #4CAF50;
-    border-radius: 50%;
-    margin-right: 5px;
-    animation: pulse 2s infinite;
-}
-`;
-document.head.appendChild(style);
-</script>
-
-<style>
-.leaderboard-container {
-    display: grid;
-    grid-template-columns: 1fr 350px;
-    gap: 2rem;
-    padding: 2rem;
-    max-width: 1400px;
-    margin: 0 auto;
-    min-height: 100vh;
-}
-
-.leaderboard-header {
-    grid-column: 1 / -1;
-    text-align: center;
-    margin-bottom: 2rem;
-}
-
-.leaderboard-header h1 {
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.leaderboard-header.cute h1 {
-    color: var(--cute-primary);
-}
-
-.leaderboard-header.deadly h1 {
-    color: var(--deadly-accent);
-}
-
-.subtitle {
-    font-size: 1.1rem;
-    opacity: 0.8;
-    margin-bottom: 2rem;
-}
-
-.leaderboard-tabs {
-    display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-bottom: 2rem;
-    flex-wrap: wrap;
-}
-
-.tab-btn {
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 50px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.tab-btn.cute {
-    background: var(--cute-bg);
-    color: var(--cute-text);
-    border: 2px solid var(--cute-secondary);
-}
-
-.tab-btn.deadly {
-    background: var(--deadly-secondary);
-    color: var(--deadly-text);
-    border: 1px solid #444;
-}
-
-.tab-btn.active {
-    transform: translateY(-2px);
-}
-
-.tab-btn.cute.active {
-    background: var(--cute-primary);
-    color: white;
-    border-color: var(--cute-primary);
-    box-shadow: 0 4px 15px rgba(255, 158, 216, 0.3);
-}
-
-.tab-btn.deadly.active {
-    background: var(--deadly-primary);
-    color: white;
-    border-color: var(--deadly-primary);
-    box-shadow: 0 4px 15px rgba(255, 70, 85, 0.3);
-}
-
-.leaderboard-content {
-    grid-column: 1;
-}
-
-.tab-content {
-    display: none;
-}
-
-.tab-content.active {
-    display: block;
-    animation: fadeIn 0.5s ease;
-}
-
-/* Top 3 Players */
-.leaderboard-top3 {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-    margin-bottom: 3rem;
-}
-
-.top-player {
-    padding: 2rem;
-    border-radius: 15px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-}
-
-.top-player.cute {
-    background: white;
-    border: 3px solid transparent;
-}
-
-.top-player.deadly {
-    background: var(--deadly-secondary);
-    border: 1px solid transparent;
-}
-
-.rank-1.cute {
-    border-color: #FFD700;
-    background: linear-gradient(135deg, #fff9e6, white);
-}
-
-.rank-2.cute {
-    border-color: #C0C0C0;
-    background: linear-gradient(135deg, #f5f5f5, white);
-}
-
-.rank-3.cute {
-    border-color: #CD7F32;
-    background: linear-gradient(135deg, #f8f0e6, white);
-}
-
-.rank-1.deadly {
-    border-color: #FFD700;
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), var(--deadly-secondary));
-}
-
-.rank-2.deadly {
-    border-color: #C0C0C0;
-    background: linear-gradient(135deg, rgba(192, 192, 192, 0.1), var(--deadly-secondary));
-}
-
-.rank-3.deadly {
-    border-color: #CD7F32;
-    background: linear-gradient(135deg, rgba(205, 127, 50, 0.1), var(--deadly-secondary));
-}
-
-.rank-badge {
-    position: absolute;
-    top: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-}
-
-.rank-1 .rank-badge.cute {
-    background: #FFD700;
-    color: #333;
-}
-
-.rank-2 .rank-badge.cute {
-    background: #C0C0C0;
-    color: #333;
-}
-
-.rank-3 .rank-badge.cute {
-    background: #CD7F32;
-    color: white;
-}
-
-.rank-1 .rank-badge.deadly {
-    background: linear-gradient(135deg, #FFD700, #FFA500);
-    color: #333;
-}
-
-.rank-2 .rank-badge.deadly {
-    background: linear-gradient(135deg, #C0C0C0, #999);
-    color: #333;
-}
-
-.rank-3 .rank-badge.deadly {
-    background: linear-gradient(135deg, #CD7F32, #8B4513);
-    color: white;
-}
-
-.rank-number {
-    font-size: 1.5rem;
-    font-weight: bold;
-}
-
-.rank-crown {
-    position: absolute;
-    top: -25px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 1.5rem;
-}
-
-.player-info {
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-}
-
-.player-avatar {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    margin: 0 auto 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2rem;
-}
-
-.top-player.cute .player-avatar {
-    background: var(--cute-bg);
-    color: var(--cute-primary);
-}
-
-.top-player.deadly .player-avatar {
-    background: rgba(255, 70, 85, 0.1);
-    color: var(--deadly-primary);
-}
-
-.player-name {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 0.25rem;
-}
-
-.player-title {
-    font-size: 0.9rem;
-    opacity: 0.8;
-}
-
-.player-stats {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin-top: 1rem;
-}
-
-.player-stats .stat {
-    text-align: center;
-}
-
-.stat-value {
-    display: block;
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-bottom: 0.25rem;
-}
-
-.top-player.cute .stat-value {
-    color: var(--cute-primary);
-}
-
-.top-player.deadly .stat-value {
-    color: var(--deadly-accent);
-}
-
-.stat-label {
-    font-size: 0.8rem;
-    opacity: 0.7;
-}
-
-/* Leaderboard List */
-.leaderboard-list {
-    background: var(--bg-color);
-    border-radius: 15px;
-    overflow: hidden;
-}
-
-.leaderboard-list.cute {
-    --bg-color: white;
-    border: 2px solid var(--cute-secondary);
-}
-
-.leaderboard-list.deadly {
-    --bg-color: var(--deadly-secondary);
-    border: 1px solid #444;
-}
-
-.list-header {
-    display: grid;
-    grid-template-columns: 80px 2fr 1fr 1fr 1fr 1fr;
-    padding: 1rem;
-    font-weight: bold;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.leaderboard-list.cute .list-header {
-    --border-color: var(--cute-secondary);
-    background: var(--cute-bg);
-    color: var(--cute-text);
-}
-
-.leaderboard-list.deadly .list-header {
-    --border-color: #444;
-    background: rgba(0, 0, 0, 0.2);
-    color: var(--deadly-text);
-}
-
-.list-body {
-    max-height: 600px;
-    overflow-y: auto;
-}
-
-.leaderboard-row {
-    display: grid;
-    grid-template-columns: 80px 2fr 1fr 1fr 1fr 1fr;
-    padding: 1rem;
-    border-bottom: 1px solid var(--border-color);
-    align-items: center;
-    transition: all 0.3s ease;
-}
-
-.leaderboard-row:hover {
-    transform: translateX(5px);
-}
-
-.leaderboard-row.cute {
-    --border-color: var(--cute-secondary);
-    background: white;
-}
-
-.leaderboard-row.deadly {
-    --border-color: #333;
-    background: var(--deadly-secondary);
-}
-
-.leaderboard-row.cute:hover {
-    background: var(--cute-bg);
-}
-
-.leaderboard-row.deadly:hover {
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.current-user {
-    position: relative;
-}
-
-.current-user.cute:before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 4px;
-    background: var(--cute-primary);
-}
-
-.current-user.deadly:before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 4px;
-    background: var(--deadly-accent);
-}
-
-.row-rank {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.rank-number {
-    font-weight: bold;
-    font-size: 1.1rem;
-}
-
-.rank-icon {
-    color: #FFD700;
-}
-
-.row-player {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.player-avatar.small {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.9rem;
-    font-weight: bold;
-}
-
-.leaderboard-row.cute .player-avatar.small {
-    background: var(--cute-primary);
-    color: white;
-}
-
-.leaderboard-row.deadly .player-avatar.small {
-    background: var(--deadly-primary);
-    color: white;
-}
-
-.avatar-text {
-    font-size: 0.8rem;
-}
-
-.player-info {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.player-name {
-    font-weight: 600;
-}
-
-.current-user .player-name {
-    font-weight: bold;
-}
-
-.row-score, .row-wins {
-    font-weight: 600;
-    font-size: 1.1rem;
-}
-
-.level-badge {
-    display: inline-block;
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: bold;
-}
-
-.leaderboard-row.cute .level-badge {
-    background: var(--cute-bg);
-    color: var(--cute-primary);
-}
-
-.leaderboard-row.deadly .level-badge {
-    background: rgba(31, 192, 255, 0.1);
-    color: var(--deadly-accent);
-}
-
-.row-rating {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.rating-value {
-    font-weight: bold;
-    font-size: 1.1rem;
-}
-
-.leaderboard-row.cute .rating-value {
-    color: var(--cute-primary);
-}
-
-.leaderboard-row.deadly .rating-value {
-    color: var(--deadly-accent);
-}
-
-.rating-change {
-    font-size: 0.9rem;
-    font-weight: bold;
-}
-
-.rating-change.positive {
-    color: #4CAF50;
-}
-
-.rating-change.negative {
-    color: #F44336;
-}
-
-.rating-change.neutral {
-    color: #9E9E9E;
-}
-
-/* Weekly Leaderboard */
-.weekly-stats {
-    padding: 2rem;
-    border-radius: 15px;
-}
-
-.weekly-stats.cute {
-    background: white;
-    border: 2px solid var(--cute-secondary);
-}
-
-.weekly-stats.deadly {
-    background: var(--deadly-secondary);
-    border: 1px solid #444;
-}
-
-.weekly-stats h2 {
-    margin-bottom: 0.5rem;
-}
-
-.week-range {
-    opacity: 0.8;
-    margin-bottom: 2rem;
-    font-style: italic;
-}
-
-.weekly-leaderboard {
-    max-height: 500px;
-    overflow-y: auto;
-}
-
-.weekly-row {
-    display: flex;
-    align-items: center;
-    padding: 1rem;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.weekly-stats.cute .weekly-row {
-    --border-color: var(--cute-secondary);
-}
-
-.weekly-stats.deadly .weekly-row {
-    --border-color: #444;
-}
-
-.weekly-rank {
-    width: 50px;
-    font-weight: bold;
-    font-size: 1.2rem;
-}
-
-.weekly-player {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.player-progress {
-    font-size: 0.8rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 10px;
-}
-
-.player-progress.positive {
-    background: rgba(76, 175, 80, 0.1);
-    color: #4CAF50;
-}
-
-.player-progress.neutral {
-    background: rgba(158, 158, 158, 0.1);
-    color: #9E9E9E;
-}
-
-.weekly-points {
-    width: 100px;
-    text-align: right;
-}
-
-.points-value {
-    display: block;
-    font-weight: bold;
-    font-size: 1.1rem;
-}
-
-.weekly-stats.cute .points-value {
-    color: var(--cute-primary);
-}
-
-.weekly-stats.deadly .points-value {
-    color: var(--deadly-accent);
-}
-
-.weekly-activity {
-    width: 150px;
-}
-
-.activity-bar {
-    display: flex;
-    gap: 2px;
-    height: 20px;
-    align-items: flex-end;
-}
-
-.activity-day {
-    flex: 1;
-    background: var(--activity-color);
-    border-radius: 2px;
-}
-
-.weekly-stats.cute .activity-day {
-    --activity-color: var(--cute-secondary);
-}
-
-.weekly-stats.deadly .activity-day {
-    --activity-color: #444;
-}
-
-.weekly-stats.cute .activity-day.active {
-    --activity-color: var(--cute-primary);
-}
-
-.weekly-stats.deadly .activity-day.active {
-    --activity-color: var(--deadly-accent);
-}
-
-/* Multiplayer Leaderboard */
-.multiplayer-leaderboard {
-    padding: 2rem;
-    border-radius: 15px;
-}
-
-.multiplayer-leaderboard.cute {
-    background: white;
-    border: 2px solid var(--cute-secondary);
-}
-
-.multiplayer-leaderboard.deadly {
-    background: var(--deadly-secondary);
-    border: 1px solid #444;
-}
-
-.multiplayer-leaderboard h2 {
-    margin-bottom: 2rem;
-}
-
-.battle-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-    margin-bottom: 2rem;
-}
-
-.battle-stat {
-    text-align: center;
-    padding: 1.5rem;
-    border-radius: 10px;
-}
-
-.battle-stat.cute {
-    background: var(--cute-bg);
-    border: 2px solid var(--cute-secondary);
-}
-
-.battle-stat.deadly {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid #444;
-}
-
-.battle-stat .stat-value {
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-}
-
-.battle-stat.cute .stat-value {
-    color: var(--cute-primary);
-}
-
-.battle-stat.deadly .stat-value {
-    color: var(--deadly-accent);
-}
-
-.elo-ratings h3 {
-    margin-bottom: 1rem;
-}
-
-.elo-list {
-    max-height: 500px;
-    overflow-y: auto;
-}
-
-.elo-player {
-    display: flex;
-    align-items: center;
-    padding: 1rem;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.multiplayer-leaderboard.cute .elo-player {
-    --border-color: var(--cute-secondary);
-}
-
-.multiplayer-leaderboard.deadly .elo-player {
-    --border-color: #444;
-}
-
-.elo-rank {
-    width: 50px;
-    font-weight: bold;
-    font-size: 1.2rem;
-}
-
-.elo-info {
-    flex: 1;
-}
-
-.player-record {
-    display: flex;
-    gap: 0.5rem;
-    font-size: 0.9rem;
-    opacity: 0.8;
-}
-
-.wins {
-    color: #4CAF50;
-}
-
-.losses {
-    color: #F44336;
-}
-
-.elo-rating {
-    width: 100px;
-    text-align: right;
-}
-
-.elo-rating .rating {
-    display: block;
-    font-weight: bold;
-    font-size: 1.1rem;
-}
-
-.rating.grandmaster {
-    color: #FFD700;
-}
-
-.rating.master {
-    color: #C0C0C0;
-}
-
-.rating.expert {
-    color: #CD7F32;
-}
-
-.rating.advanced {
-    color: #2196F3;
-}
-
-/* Friends Leaderboard */
-.friends-leaderboard {
-    padding: 2rem;
-    border-radius: 15px;
-}
-
-.friends-leaderboard.cute {
-    background: white;
-    border: 2px solid var(--cute-secondary);
-}
-
-.friends-leaderboard.deadly {
-    background: var(--deadly-secondary);
-    border: 1px solid #444;
-}
-
-.friends-stats {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-}
-
-.friend-count {
-    text-align: center;
-}
-
-.count-value {
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 0.25rem;
-}
-
-.friend-count.cute .count-value {
-    color: var(--cute-primary);
-}
-
-.friend-count.deadly .count-value {
-    color: var(--deadly-accent);
-}
-
-.friend-search {
-    display: flex;
-    gap: 0.5rem;
-    flex: 1;
-    max-width: 400px;
-}
-
-.friend-search input {
-    flex: 1;
-    padding: 0.5rem 1rem;
-    border-radius: 5px;
-    border: 1px solid var(--border-color);
-}
-
-.friend-search.cute input {
-    --border-color: var(--cute-secondary);
-    background: var(--cute-bg);
-    color: var(--cute-text);
-}
-
-.friend-search.deadly input {
-    --border-color: #444;
-    background: var(--deadly-secondary);
-    color: var(--deadly-text);
-}
-
-.friends-list {
-    max-height: 500px;
-    overflow-y: auto;
-}
-
-.friend-row {
-    display: flex;
-    align-items: center;
-    padding: 1rem;
-    border-radius: 10px;
-    margin-bottom: 0.5rem;
-    transition: all 0.3s ease;
-}
-
-.friend-row.cute {
-    background: var(--cute-bg);
-    border: 2px solid var(--cute-secondary);
-}
-
-.friend-row.deadly {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid #444;
-}
-
-.friend-row:hover {
-    transform: translateX(5px);
-}
-
-.friend-row.offline {
-    opacity: 0.7;
-}
-
-.friend-info {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.friend-avatar {
-    position: relative;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-}
-
-.friend-row.cute .friend-avatar {
-    background: var(--cute-primary);
-    color: white;
-}
-
-.friend-row.deadly .friend-avatar {
-    background: var(--deadly-primary);
-    color: white;
-}
-
-.friend-status {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    border: 2px solid white;
-}
-
-.friend-status.online {
-    background: #4CAF50;
-}
-
-.friend-status.offline {
-    background: #9E9E9E;
-}
-
-.friend-details h4 {
-    margin-bottom: 0.25rem;
-}
-
-.friend-status-text {
-    font-size: 0.8rem;
-    opacity: 0.8;
-}
-
-.friend-rank {
-    width: 80px;
-    text-align: center;
-}
-
-.friend-rank .rank {
-    display: block;
-    font-weight: bold;
-    font-size: 1.2rem;
-    margin-bottom: 0.25rem;
-}
-
-.friend-actions {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.action-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.action-btn.cute {
-    background: var(--cute-bg);
-    color: var(--cute-primary);
-    border: 2px solid var(--cute-secondary);
-}
-
-.action-btn.deadly {
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--deadly-text);
-    border: 1px solid #444;
-}
-
-.action-btn:hover {
-    transform: scale(1.1);
-}
-
-.action-btn.cute:hover {
-    background: var(--cute-primary);
-    color: white;
-}
-
-.action-btn.deadly:hover {
-    background: var(--deadly-primary);
-    color: white;
-}
-
-/* Your Stats Sidebar */
-.your-stats {
-    position: sticky;
-    top: 2rem;
-    height: fit-content;
-}
-
-.stats-card {
-    padding: 2rem;
-    border-radius: 15px;
-}
-
-.stats-card.cute {
-    background: white;
-    border: 3px solid var(--cute-primary);
-}
-
-.stats-card.deadly {
-    background: var(--deadly-secondary);
-    border: 2px solid var(--deadly-primary);
-}
-
-.stats-card h3 {
-    margin-bottom: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.stats-card.cute h3 {
-    color: var(--cute-primary);
-}
-
-.stats-card.deadly h3 {
-    color: var(--deadly-accent);
-}
-
-.your-ranking {
-    margin-bottom: 2rem;
-}
-
-.rank-display {
-    text-align: center;
-    margin-bottom: 1rem;
-}
-
-.rank-number {
-    font-size: 3rem;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-}
-
-.stats-card.cute .rank-number {
-    color: var(--cute-primary);
-}
-
-.stats-card.deadly .rank-number {
-    color: var(--deadly-accent);
-}
-
-.rank-progress {
-    font-size: 0.9rem;
-}
-
-.progress-bar {
-    height: 6px;
-    background: var(--progress-bg);
-    border-radius: 3px;
-    overflow: hidden;
-    margin-top: 0.5rem;
-}
-
-.stats-card.cute .progress-bar {
-    --progress-bg: var(--cute-secondary);
-}
-
-.stats-card.deadly .progress-bar {
-    --progress-bg: #444;
-}
-
-.progress-fill {
-    height: 100%;
-    border-radius: 3px;
-    transition: width 1s ease;
-}
-
-.stats-card.cute .progress-fill {
-    background: var(--cute-primary);
-}
-
-.stats-card.deadly .progress-fill {
-    background: var(--deadly-accent);
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin-bottom: 2rem;
-}
-
-.stat-item {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 1rem;
-    border-radius: 10px;
-}
-
-.stat-item.cute {
-    background: var(--cute-bg);
-    border: 2px solid var(--cute-secondary);
-}
-
-.stat-item.deadly {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid #444;
-}
-
-.stat-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-}
-
-.stat-item.cute .stat-icon {
-    background: var(--cute-primary);
-    color: white;
-}
-
-.stat-item.deadly .stat-icon {
-    background: var(--deadly-primary);
-    color: white;
-}
-
-.stat-value {
-    font-weight: bold;
-    font-size: 1.2rem;
-    margin-bottom: 0.25rem;
-}
-
-.stat-item.cute .stat-value {
-    color: var(--cute-primary);
-}
-
-.stat-item.deadly .stat-value {
-    color: var(--deadly-accent);
-}
-
-.achievements-preview {
-    margin-bottom: 2rem;
-}
-
-.achievements-preview h4 {
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.achievement {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.75rem;
-    border-radius: 10px;
-    margin-bottom: 0.5rem;
-}
-
-.achievement.cute {
-    background: var(--cute-bg);
-    border: 2px solid var(--cute-secondary);
-}
-
-.achievement.deadly {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid #444;
-}
-
-.achievement-icon {
-    font-size: 1.5rem;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.achievement-name {
-    font-weight: 600;
-    margin-bottom: 0.25rem;
-}
-
-.achievement-date {
-    font-size: 0.8rem;
-    opacity: 0.7;
-}
-
-.next-milestone {
-    padding: 1.5rem;
-    border-radius: 10px;
-}
-
-.next-milestone.cute {
-    background: linear-gradient(135deg, var(--cute-primary), var(--cute-accent));
-    color: white;
-}
-
-.next-milestone.deadly {
-    background: linear-gradient(135deg, var(--deadly-primary), var(--deadly-accent));
-    color: white;
-}
-
-.next-milestone h4 {
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.milestone-title {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-}
-
-.milestone-progress {
-    margin-bottom: 1rem;
-}
-
-.next-milestone .progress-bar {
-    background: rgba(255, 255, 255, 0.3);
-}
-
-.next-milestone .progress-fill {
-    background: white;
-}
-
-@media (max-width: 1024px) {
-    .leaderboard-container {
-        grid-template-columns: 1fr;
-    }
-    
-    .your-stats {
-        position: static;
-        margin-top: 2rem;
-    }
-    
-    .leaderboard-top3 {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 768px) {
-    .leaderboard-container {
-        padding: 1rem;
-    }
-    
-    .list-header,
-    .leaderboard-row {
-        grid-template-columns: 60px 1fr 1fr;
-        font-size: 0.9rem;
-    }
-    
-    .header-level,
-    .header-wins,
-    .header-rating,
-    .row-level,
-    .row-wins,
-    .row-rating {
-        display: none;
-    }
-    
-    .battle-stats {
-        grid-template-columns: 1fr;
-    }
-}
-</style>
-{% endblock %}
+    </script>
+</body>
+</html>
